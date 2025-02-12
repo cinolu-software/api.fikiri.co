@@ -13,13 +13,9 @@ export class DetailsService {
 
   async create(dto: CreateDetailDto): Promise<Detail> {
     try {
-      return await this.detailRepository.save({
-        ...dto,
-        expertises: dto?.expertises?.map((id) => ({ id })),
-        positions: dto?.positions?.map((id) => ({ id }))
-      });
+      return await this.detailRepository.save(dto);
     } catch {
-      throw new BadRequestException('Erreur lors de la création du rôle');
+      throw new BadRequestException();
     }
   }
 }

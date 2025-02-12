@@ -6,10 +6,4 @@ export class CreateDetailDto {
 
   @IsOptional()
   socials: JSON;
-
-  @IsOptional()
-  expertises: string[];
-
-  @IsOptional()
-  positions: string[];
 }
