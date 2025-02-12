@@ -12,6 +12,7 @@ import { EmailModule } from './email/email.module';
 import { UsersModule } from './users/users.module';
 import { BlogModule } from './blog/blog.module';
 import { TransformInterceptor } from './shared/interceptors/transform.interceptor';
+import { CallsModule } from './calls/calls.module';
 
 @Module({
   imports: [
@@ -35,7 +36,8 @@ import { TransformInterceptor } from './shared/interceptors/transform.intercepto
     UsersModule,
     EmailModule,
     DatabaseModule,
-    BlogModule
+    BlogModule,
+    CallsModule
   ],
   providers: [
     { provide: APP_GUARD, useClass: AuthGuard },
