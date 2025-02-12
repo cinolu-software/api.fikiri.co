@@ -76,7 +76,7 @@ export class PostsService {
       if (post.image) await fs.unlink(`./uploads/posts/${post.image}`);
       return await this.postRepository.save({ ...post, image: file.filename });
     } catch {
-      throw new BadRequestException("Erreur lors de la mise à jour de l'image");
+      throw new BadRequestException();
     }
   }
 
