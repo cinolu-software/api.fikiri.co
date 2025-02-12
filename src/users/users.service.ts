@@ -39,14 +39,6 @@ export class UsersService {
     return data;
   }
 
-  async findCoachs(): Promise<User[]> {
-    return this.findWithRole('coach');
-  }
-
-  async findStaff(): Promise<User[]> {
-    return this.findWithRole('staff');
-  }
-
   async findUsers(): Promise<User[]> {
     return this.findWithRole('user');
   }
@@ -62,6 +54,7 @@ export class UsersService {
         ...dto,
         password,
         verified_at: new Date(),
+        organisation: { id: dto?.organisation },
         roles: dto.roles?.map((id) => ({ id }))
       });
       this.eventEmitter.emit('user.created', { user, password });
@@ -87,20 +80,6 @@ export class UsersService {
       id: In(ids)
     });
     return data;
-  }
-
-  async verifyEmail(email: string): Promise<User> {
-    try {
-      const oldUser = await this.findByEmail(email);
-      delete oldUser.password;
-      const user = await this.userRepository.save({
-        ...oldUser,
-        verified_at: new Date()
-      });
-      return user;
-    } catch {
-      throw new BadRequestException("Erreur lors de la vérification de l'email");
-    }
   }
 
   async getVerifiedUser(email: string): Promise<User> {
@@ -136,7 +115,7 @@ export class UsersService {
       await this.userRepository.save({ ...user, detail });
       return await this.getVerifiedUser(user.email);
     } catch {
-      throw new BadRequestException('Une erreur est survenue sur le serveur');
+      throw new BadRequestException();
     }
   }
 
@@ -173,7 +152,7 @@ export class UsersService {
       if (user) return await this.#updateExistingUser(user, dto);
       return await this.#createNewUser(dto, role);
     } catch {
-      throw new BadRequestException("Erreur lors de la récupération de l'utilisateur");
+      throw new BadRequestException();
     }
   }
 
@@ -203,11 +182,12 @@ export class UsersService {
       const user = await this.userRepository.save({
         ...oldUser,
         ...dto,
+        organisation: { id: dto?.organisation },
         roles: dto.roles?.map((id) => ({ id })) || oldUser.roles
       });
       return user;
     } catch {
-      throw new BadRequestException("Erreur lors de la modification de l'utilisateur");
+      throw new BadRequestException();
     }
   }
 

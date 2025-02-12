@@ -33,18 +33,6 @@ export class UsersController {
     return this.userService.addDetail(user, dto);
   }
 
-  @Get('coachs')
-  @Auth(RoleEnum.Guest)
-  findCoachs(): Promise<User[]> {
-    return this.userService.findCoachs();
-  }
-
-  @Get('staff')
-  @Auth(RoleEnum.Guest)
-  findStaff(): Promise<User[]> {
-    return this.userService.findStaff();
-  }
-
   @Get('admins')
   findAdmins(): Promise<User[]> {
     return this.userService.findAdmins();

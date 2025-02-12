@@ -4,21 +4,13 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { User } from './entities/user.entity';
 import { EmailModule } from '../email/email.module';
 import { UsersService } from './users.service';
-import { ExpertisesModule } from './expertises/expertises.module';
-import { PositionsModule } from './positions/positions.module';
 import { RolesModule } from './roles/roles.module';
 import { DetailsModule } from './details/details.module';
 import { UserSubscriber } from './subscribers/user.subscriber';
+import { OrganisationsModule } from './organisations/organisations.module';
 
 @Module({
-  imports: [
-    TypeOrmModule.forFeature([User]),
-    EmailModule,
-    ExpertisesModule,
-    PositionsModule,
-    RolesModule,
-    DetailsModule
-  ],
+  imports: [TypeOrmModule.forFeature([User]), EmailModule, RolesModule, DetailsModule, OrganisationsModule],
   controllers: [UsersController],
   providers: [UsersService, UserSubscriber],
   exports: [UsersService]
