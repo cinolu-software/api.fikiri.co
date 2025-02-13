@@ -8,5 +8,8 @@ export class CreateCallDto {
   description: string;
 
   @IsOptional()
-  form: JSON;
+  form: string;
+
+  @IsOptional()
+  requirements: string;
 }

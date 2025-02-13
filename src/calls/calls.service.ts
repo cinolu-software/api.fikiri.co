@@ -6,17 +6,41 @@ import { Call } from './entities/call.entity';
 import { IsNull, Not, Repository } from 'typeorm';
 import { User } from '../users/entities/user.entity';
 import * as fs from 'fs-extra';
+import { JwtService } from '@nestjs/jwt';
 
 @Injectable()
 export class CallsService {
   constructor(
     @InjectRepository(Call)
-    private callRepository: Repository<Call>
+    private callRepository: Repository<Call>,
+    private jwtService: JwtService
   ) {}
 
   async create(author: User, dto: CreateCallDto): Promise<Call> {
     try {
       return await this.callRepository.save({ ...dto, author });
+    } catch {
+      throw new BadRequestException();
+    }
+  }
+
+  async addReviewer(id: string, email: string): Promise<Call> {
+    try {
+      const call = await this.findOne(id);
+      const token = await this.jwtService.signAsync({ email }, { secret: process.env.JWT_SECRET, expiresIn: '7d' });
+      const reviewers: { [key: string]: string }[] = JSON.parse(call.reviewers);
+      reviewers.push({ [email]: token });
+      call.reviewers = JSON.stringify(reviewers);
+      await this.callRepository.save(call);
+      return await this.callRepository.save(call);
+    } catch {
+      throw new BadRequestException();
+    }
+  }
+
+  async resendReviewLink(email: string): Promise<string> {
+    try {
+      return await this.jwtService.signAsync({ email }, { secret: process.env.JWT_SECRET, expiresIn: '7d' });
     } catch {
       throw new BadRequestException();
     }

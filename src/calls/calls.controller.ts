@@ -20,6 +20,16 @@ export class CallsController {
     return this.callsService.create(author, dto);
   }
 
+  @Post('add-reviewer/:id')
+  addReviwer(@Param('id') id: string, @Body('email') email: string): Promise<Call> {
+    return this.callsService.addReviewer(id, email);
+  }
+
+  @Post('resend-review-link/:email')
+  resendReviewLink(@Param('email') email: string): Promise<string> {
+    return this.callsService.resendReviewLink(email);
+  }
+
   @Post('cover/:id')
   @Auth(RoleEnum.User)
   @UseInterceptors(

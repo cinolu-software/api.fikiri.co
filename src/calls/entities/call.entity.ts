@@ -20,7 +20,13 @@ export class Call extends AbstractEntity {
   document: string;
 
   @Column({ type: 'json', nullable: true })
-  form: JSON;
+  form: string;
+
+  @Column({ type: 'json', nullable: true })
+  reviewers: string;
+
+  @Column({ type: 'json', nullable: true })
+  requirements: string;
 
   @ManyToOne(() => User, (author) => author.calls)
   @JoinColumn()
