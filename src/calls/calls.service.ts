@@ -7,6 +7,7 @@ import { IsNull, Not, Repository } from 'typeorm';
 import { User } from '../users/entities/user.entity';
 import * as fs from 'fs-extra';
 import { JwtService } from '@nestjs/jwt';
+import { addReviewerDto } from './dto/add-reviewer.dto';
 
 @Injectable()
 export class CallsService {
@@ -24,13 +25,28 @@ export class CallsService {
     }
   }
 
-  async addReviewer(id: string, email: string): Promise<Call> {
+  async addReviewer(id: string, dto: addReviewerDto): Promise<Call> {
     try {
       const call = await this.findOne(id);
-      const token = await this.jwtService.signAsync({ email }, { secret: process.env.JWT_SECRET, expiresIn: '7d' });
+      const { email, organization } = dto;
+      const payload = { email, organization };
+      const token = await this.jwtService.signAsync(payload, { secret: process.env.JWT_SECRET, expiresIn: '7d' });
       const reviewers: { [key: string]: string }[] = JSON.parse(call.reviewers);
       reviewers.push({ [email]: token });
       call.reviewers = JSON.stringify(reviewers);
+      await this.callRepository.save(call);
+      return await this.callRepository.save(call);
+    } catch {
+      throw new BadRequestException();
+    }
+  }
+
+  async deleteReviewer(id: string, email: string): Promise<Call> {
+    try {
+      const call = await this.findOne(id);
+      const reviewers: { [key: string]: string }[] = JSON.parse(call.reviewers);
+      const newReviewers = reviewers.filter((r) => r[email] === email);
+      call.reviewers = JSON.stringify(newReviewers);
       await this.callRepository.save(call);
       return await this.callRepository.save(call);
     } catch {

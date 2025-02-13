@@ -10,6 +10,7 @@ import { Auth } from '../shared/decorators/auth.decorators';
 import { RoleEnum } from '../shared/enums/roles.enum';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { diskStorage } from 'multer';
+import { addReviewerDto } from './dto/add-reviewer.dto';
 
 @Controller('calls')
 export class CallsController {
@@ -21,8 +22,13 @@ export class CallsController {
   }
 
   @Post('add-reviewer/:id')
-  addReviwer(@Param('id') id: string, @Body('email') email: string): Promise<Call> {
-    return this.callsService.addReviewer(id, email);
+  addReviwer(@Param('id') id: string, @Body() dto: addReviewerDto): Promise<Call> {
+    return this.callsService.addReviewer(id, dto);
+  }
+
+  @Delete('delete-reviewer/:id')
+  deleteReviewer(@Param('id') id: string, @Body('email') email: string): Promise<Call> {
+    return this.callsService.deleteReviewer(id, email);
   }
 
   @Post('resend-review-link/:email')
