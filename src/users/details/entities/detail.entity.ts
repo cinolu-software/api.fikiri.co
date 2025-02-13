@@ -8,7 +8,7 @@ export class Detail extends AbstractEntity {
   bio: string;
 
   @Column({ type: 'json', nullable: true })
-  socials: JSON;
+  socials: string;
 
   @OneToOne(() => User, (user) => user.detail)
   user: User;

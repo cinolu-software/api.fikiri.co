@@ -5,5 +5,5 @@ export class CreateDetailDto {
   bio: string;
 
   @IsOptional()
-  socials: JSON;
+  socials: string;
 }
