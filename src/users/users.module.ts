@@ -7,7 +7,7 @@ import { UsersService } from './users.service';
 import { RolesModule } from './roles/roles.module';
 import { DetailsModule } from './details/details.module';
 import { UserSubscriber } from './subscribers/user.subscriber';
-import { OrganisationsModule } from './organisations/organisations.module';
+import { OrganisationsModule } from './organizations/organizations.module';
 
 @Module({
   imports: [TypeOrmModule.forFeature([User]), EmailModule, RolesModule, DetailsModule, OrganisationsModule],

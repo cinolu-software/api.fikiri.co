@@ -4,7 +4,7 @@ import { AbstractEntity } from '../../shared/utils/abstract.entity';
 import { Role } from '../roles/entities/role.entity';
 import { Post } from '../../blog/posts/entities/post.entity';
 import { Comment } from '../../blog/comments/entities/comment.entity';
-import { Organisation } from '../organisations/entities/organisation.entity';
+import { Organization } from '../organizations/entities/organization.entity';
 import { Call } from '../../calls/entities/call.entity';
 import { Application } from '../../calls/applications/entities/application.entity';
 
@@ -57,7 +57,7 @@ export class User extends AbstractEntity {
   @JoinColumn()
   detail: Detail;
 
-  @ManyToMany(() => Organisation)
+  @ManyToMany(() => Organization)
   @JoinColumn()
-  organisation: Organisation;
+  organisation: Organization;
 }
