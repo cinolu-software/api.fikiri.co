@@ -3,7 +3,7 @@ import { AbstractEntity } from '../../../shared/utils/abstract.entity';
 import { User } from '../../entities/user.entity';
 
 @Entity()
-export class Organisation extends AbstractEntity {
+export class Organization extends AbstractEntity {
   @Column()
   name: string;
 
