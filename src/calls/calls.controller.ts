@@ -21,8 +21,13 @@ export class CallsController {
     return this.callsService.create(author, dto);
   }
 
+  @Post('find-reviewers/:id')
+  findReviewers(@Param('id') id: string): Promise<addReviewerDto[]> {
+    return this.callsService.findReviewers(id);
+  }
+
   @Post('add-reviewer/:id')
-  addReviwer(@Param('id') id: string, @Body() dto: addReviewerDto): Promise<Call> {
+  addReviwer(@Param('id') id: string, @Body() dto: addReviewerDto): Promise<{ call: Call; token: string }> {
     return this.callsService.addReviewer(id, dto);
   }
 

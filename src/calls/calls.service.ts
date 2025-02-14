@@ -25,29 +25,50 @@ export class CallsService {
     }
   }
 
-  async addReviewer(id: string, dto: addReviewerDto): Promise<Call> {
+  async findReviewers(id: string): Promise<addReviewerDto[]> {
     try {
       const call = await this.findOne(id);
-      const { email, organization } = dto;
-      const payload = { email, organization };
-      const token = await this.jwtService.signAsync(payload, { secret: process.env.JWT_SECRET, expiresIn: '7d' });
-      const reviewers: { [key: string]: string }[] = JSON.parse(call.reviewers);
-      reviewers.push({ [email]: token });
-      call.reviewers = JSON.stringify(reviewers);
-      await this.callRepository.save(call);
-      return await this.callRepository.save(call);
+      return JSON.parse(call.reviewers) as addReviewerDto[];
     } catch {
       throw new BadRequestException();
+    }
+  }
+
+  async addReviewer(id: string, dto: addReviewerDto): Promise<{ call: Call; token: string }> {
+    try {
+      const call = await this.findOne(id);
+      const token = await this.jwtService.signAsync(
+        { ...dto, id },
+        { secret: process.env.JWT_SECRET, expiresIn: '7d' }
+      );
+      const reviewers: addReviewerDto[] = JSON.parse(call.reviewers) ?? [];
+      reviewers.push(dto);
+      call.reviewers = JSON.stringify(reviewers);
+      const upatedCall = await this.callRepository.save(call);
+      return { call: upatedCall, token };
+    } catch (e) {
+      console.log(e);
+      throw new BadRequestException();
+    }
+  }
+
+  async verifyReviewer(token: string): Promise<addReviewerDto> {
+    try {
+      const { id, email } = await this.jwtService.verifyAsync(token);
+      const call = await this.findOne(id);
+      const reviewers: addReviewerDto[] = JSON.parse(call.reviewers);
+      return reviewers.find((r) => r.email === email);
+    } catch {
+      throw new NotFoundException();
     }
   }
 
   async deleteReviewer(id: string, email: string): Promise<Call> {
     try {
       const call = await this.findOne(id);
-      const reviewers: { [key: string]: string }[] = JSON.parse(call.reviewers);
-      const newReviewers = reviewers.filter((r) => r[email] === email);
-      call.reviewers = JSON.stringify(newReviewers);
-      await this.callRepository.save(call);
+      const reviewers: addReviewerDto[] = JSON.parse(call.reviewers);
+      const updatedReviewers = reviewers.filter((r) => r.email === email);
+      call.reviewers = JSON.stringify(updatedReviewers);
       return await this.callRepository.save(call);
     } catch {
       throw new BadRequestException();
@@ -109,7 +130,10 @@ export class CallsService {
 
   async findOne(id: string): Promise<Call> {
     try {
-      return await this.callRepository.findOneByOrFail({ id });
+      return await this.callRepository.findOneOrFail({
+        where: { id },
+        relations: ['author']
+      });
     } catch {
       throw new NotFoundException();
     }
