@@ -4,7 +4,7 @@ import { AbstractEntity } from '../../../../shared/utils/abstract.entity';
 
 @Entity()
 export class Review extends AbstractEntity {
-  @Column({ type: 'double', precision: 2 })
+  @Column({ type: 'decimal', precision: 10, scale: 2, default: 0 })
   note: number;
 
   @Column()

@@ -10,7 +10,7 @@ export class Call extends AbstractEntity {
   @Column({ type: 'text' })
   description: string;
 
-  @Column({ type: 'datetime' })
+  @Column({ type: 'datetime', nullable: true })
   published_at: Date;
 
   @Column({ nullable: true })
