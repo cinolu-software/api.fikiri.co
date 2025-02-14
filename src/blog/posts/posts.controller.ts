@@ -24,7 +24,7 @@ import { v4 as uuidv4 } from 'uuid';
 import { QueryParams } from './utils/query-params.type';
 
 @Controller('blog-posts')
-@Auth(RoleEnum.Staff)
+@Auth(RoleEnum.Cartograph)
 export class PostsController {
   constructor(private readonly postsService: PostsService) {}
 
