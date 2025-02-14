@@ -8,7 +8,14 @@ export class RightsService {
   #hierarchies: Ihierarchy[] = [];
 
   constructor() {
-    this.buildRoles([RoleEnum.Guest, RoleEnum.User, RoleEnum.Coach, RoleEnum.Staff, RoleEnum.Admin]);
+    this.buildRoles([
+      RoleEnum.Guest,
+      RoleEnum.User,
+      RoleEnum.Cartograph,
+      RoleEnum.Explorator,
+      RoleEnum.Experimentor,
+      RoleEnum.Admin
+    ]);
   }
 
   private buildRoles(roles: RoleEnum[]): void {
