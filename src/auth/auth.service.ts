@@ -9,13 +9,15 @@ import { JwtService } from '@nestjs/jwt';
 import { EventEmitter2 } from '@nestjs/event-emitter';
 import { User } from '../users/entities/user.entity';
 import { UsersService } from '../users/users.service';
+import { CallsService } from '../calls/calls.service';
 
 @Injectable()
 export class AuthService {
   constructor(
     private usersService: UsersService,
     private eventEmitter: EventEmitter2,
-    private jwtService: JwtService
+    private jwtService: JwtService,
+    private callsService: CallsService
   ) {}
 
   async validateUser(email: string, pass: string): Promise<User> {
@@ -26,6 +28,14 @@ export class AuthService {
       return { ...user, chat_token } as User;
     } catch {
       throw new NotFoundException('Les identifiants saisis sont invalides');
+    }
+  }
+
+  async verifyReviewer(token: string): Promise<void> {
+    try {
+      await this.callsService.verifyReviewer(token);
+    } catch {
+      throw new BadRequestException();
     }
   }
 
