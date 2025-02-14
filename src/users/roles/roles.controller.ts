@@ -7,7 +7,7 @@ import { Auth } from '../../shared/decorators/auth.decorators';
 import { RoleEnum } from '../../shared/enums/roles.enum';
 
 @Controller('roles')
-@Auth(RoleEnum.Staff)
+@Auth(RoleEnum.Admin)
 export class RolesController {
   constructor(private readonly rolesService: RolesService) {}
 

@@ -13,7 +13,7 @@ export default class UserSeeder implements Seeder {
     await dataSource.query('SET FOREIGN_KEY_CHECKS = 0;');
     await dataSource.query('TRUNCATE TABLE user;');
     await dataSource.query('TRUNCATE TABLE role;');
-    await dataSource.query('TRUNCATE TABLE user_roles;');
+    await dataSource.query('TRUNCATE TABLE user_roles_role;');
     await dataSource.query('SET FOREIGN_KEY_CHECKS = 1;');
 
     /**
@@ -22,7 +22,7 @@ export default class UserSeeder implements Seeder {
     const userRepository = dataSource.getRepository(User);
     const roleRepository = dataSource.getRepository(Role);
 
-    ['admin', 'user', 'staff', 'coach'].map(async (role) => {
+    ['admin', 'user', 'cartograph', 'explorator', 'experimentor'].map(async (role) => {
       await roleRepository.save({ name: role });
     });
 

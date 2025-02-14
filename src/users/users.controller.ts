@@ -12,12 +12,11 @@ import CreateUserDto from './dto/create-user.dto';
 import { CreateDetailDto } from './details/dto/create-detail.dto';
 
 @Controller('users')
-@Auth(RoleEnum.Staff)
+@Auth(RoleEnum.Cartograph)
 export class UsersController {
   constructor(private userService: UsersService) {}
 
   @Post('')
-  @Auth(RoleEnum.Staff)
   create(@Body() dto: CreateUserDto): Promise<User> {
     return this.userService.create(dto);
   }

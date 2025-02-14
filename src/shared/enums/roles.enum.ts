@@ -1,7 +1,8 @@
 export enum RoleEnum {
   Admin = 'admin',
   User = 'user',
-  Staff = 'staff',
-  Coach = 'coach',
+  Cartograph = 'cartograph',
+  Explorator = 'explorator',
+  Experimentor = 'experimentor',
   Guest = 'guest'
 }

@@ -85,7 +85,7 @@ export class UsersService {
   async getVerifiedUser(email: string): Promise<User> {
     const data = await this.userRepository.findOneOrFail({
       where: { email, verified_at: Not(IsNull()) },
-      relations: ['roles', 'detail', 'ventures']
+      relations: ['roles', 'detail']
     });
     const roles = data.roles.map((role) => role.name);
     const user = { ...data, roles } as unknown as User;
