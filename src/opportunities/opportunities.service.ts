@@ -1,8 +1,8 @@
 import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
-import { CreateCallDto } from './dto/create-call.dto';
-import { UpdateCallDto } from './dto/update-call.dto';
+import { CreateOpportunityDto } from './dto/create-opportunity.dto';
+import { UpdateOpportunityDto } from './dto/update-opportunity.dto';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Call } from './entities/call.entity';
+import { Opportunity } from './entities/opportunity.entity';
 import { IsNull, Not, Repository } from 'typeorm';
 import { User } from '../users/entities/user.entity';
 import * as fs from 'fs-extra';
@@ -10,16 +10,16 @@ import { JwtService } from '@nestjs/jwt';
 import { addReviewerDto } from './dto/add-reviewer.dto';
 
 @Injectable()
-export class CallsService {
+export class OpportunitiesService {
   constructor(
-    @InjectRepository(Call)
-    private callRepository: Repository<Call>,
+    @InjectRepository(Opportunity)
+    private opportunityRepository: Repository<Opportunity>,
     private jwtService: JwtService
   ) {}
 
-  async create(author: User, dto: CreateCallDto): Promise<Call> {
+  async create(author: User, dto: CreateOpportunityDto): Promise<Opportunity> {
     try {
-      return await this.callRepository.save({ ...dto, author });
+      return await this.opportunityRepository.save({ ...dto, author });
     } catch {
       throw new BadRequestException();
     }
@@ -34,7 +34,7 @@ export class CallsService {
     }
   }
 
-  async addReviewer(id: string, dto: addReviewerDto): Promise<{ call: Call; token: string }> {
+  async addReviewer(id: string, dto: addReviewerDto): Promise<{ call: Opportunity; token: string }> {
     try {
       const call = await this.findOne(id);
       const token = await this.jwtService.signAsync(
@@ -44,10 +44,9 @@ export class CallsService {
       const reviewers: addReviewerDto[] = JSON.parse(call.reviewers) ?? [];
       reviewers.push(dto);
       call.reviewers = JSON.stringify(reviewers);
-      const upatedCall = await this.callRepository.save(call);
+      const upatedCall = await this.opportunityRepository.save(call);
       return { call: upatedCall, token };
-    } catch (e) {
-      console.log(e);
+    } catch {
       throw new BadRequestException();
     }
   }
@@ -63,13 +62,13 @@ export class CallsService {
     }
   }
 
-  async deleteReviewer(id: string, email: string): Promise<Call> {
+  async deleteReviewer(id: string, email: string): Promise<Opportunity> {
     try {
       const call = await this.findOne(id);
       const reviewers: addReviewerDto[] = JSON.parse(call.reviewers);
       const updatedReviewers = reviewers.filter((r) => r.email === email);
       call.reviewers = JSON.stringify(updatedReviewers);
-      return await this.callRepository.save(call);
+      return await this.opportunityRepository.save(call);
     } catch {
       throw new BadRequestException();
     }
@@ -83,10 +82,10 @@ export class CallsService {
     }
   }
 
-  async publish(publisher: User, id: string): Promise<Call> {
+  async publish(publisher: User, id: string): Promise<Opportunity> {
     try {
       const call = await this.findOne(id);
-      return await this.callRepository.save({
+      return await this.opportunityRepository.save({
         ...call,
         publisher,
         published_at: call.created_at ? null : new Date()
@@ -96,41 +95,41 @@ export class CallsService {
     }
   }
 
-  async findPublished(): Promise<Call[]> {
-    return await this.callRepository.find({
+  async findPublished(): Promise<Opportunity[]> {
+    return await this.opportunityRepository.find({
       where: { published_at: Not(IsNull()) }
     });
   }
 
-  async findAll(): Promise<Call[]> {
-    return await this.callRepository.find({
+  async findAll(): Promise<Opportunity[]> {
+    return await this.opportunityRepository.find({
       order: { created_at: 'DESC' }
     });
   }
 
-  async addDocument(id: string, file: Express.Multer.File): Promise<Call> {
+  async addDocument(id: string, file: Express.Multer.File): Promise<Opportunity> {
     try {
       const call = await this.findOne(id);
       if (call.document) await fs.unlink(`./uploads/calls/documents/${call.document}`);
-      return await this.callRepository.save({ ...call, document: file.filename });
+      return await this.opportunityRepository.save({ ...call, document: file.filename });
     } catch {
       throw new BadRequestException();
     }
   }
 
-  async addCover(id: string, file: Express.Multer.File): Promise<Call> {
+  async addCover(id: string, file: Express.Multer.File): Promise<Opportunity> {
     try {
       const call = await this.findOne(id);
       if (call.cover) await fs.unlink(`./uploads/calls/covers/${call.cover}`);
-      return await this.callRepository.save({ ...call, document: file.filename });
+      return await this.opportunityRepository.save({ ...call, document: file.filename });
     } catch {
       throw new BadRequestException();
     }
   }
 
-  async findOne(id: string): Promise<Call> {
+  async findOne(id: string): Promise<Opportunity> {
     try {
-      return await this.callRepository.findOneOrFail({
+      return await this.opportunityRepository.findOneOrFail({
         where: { id },
         relations: ['author']
       });
@@ -139,10 +138,10 @@ export class CallsService {
     }
   }
 
-  async update(id: string, dto: UpdateCallDto): Promise<Call> {
+  async update(id: string, dto: UpdateOpportunityDto): Promise<Opportunity> {
     try {
       const call = await this.findOne(id);
-      return await this.callRepository.save({
+      return await this.opportunityRepository.save({
         ...call,
         ...dto
       });
@@ -154,7 +153,7 @@ export class CallsService {
   async remove(id: string): Promise<void> {
     try {
       await this.findOne(id);
-      await this.callRepository.softDelete(id);
+      await this.opportunityRepository.softDelete(id);
     } catch {
       throw new BadRequestException();
     }

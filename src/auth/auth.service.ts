@@ -9,7 +9,7 @@ import { JwtService } from '@nestjs/jwt';
 import { EventEmitter2 } from '@nestjs/event-emitter';
 import { User } from '../users/entities/user.entity';
 import { UsersService } from '../users/users.service';
-import { CallsService } from '../calls/calls.service';
+import { OpportunitiesService } from '../opportunities/opportunities.service';
 
 @Injectable()
 export class AuthService {
@@ -17,7 +17,7 @@ export class AuthService {
     private usersService: UsersService,
     private eventEmitter: EventEmitter2,
     private jwtService: JwtService,
-    private callsService: CallsService
+    private callsService: OpportunitiesService
   ) {}
 
   async validateUser(email: string, pass: string): Promise<User> {

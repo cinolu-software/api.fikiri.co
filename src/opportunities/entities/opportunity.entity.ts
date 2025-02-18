@@ -3,12 +3,18 @@ import { AbstractEntity } from '../../shared/utils/abstract.entity';
 import { User } from '../../users/entities/user.entity';
 
 @Entity()
-export class Call extends AbstractEntity {
+export class Opportunity extends AbstractEntity {
   @Column()
   name: string;
 
   @Column({ type: 'text' })
   description: string;
+
+  @Column({ type: 'datetime' })
+  ended_at: Date;
+
+  @Column({ type: 'datetime' })
+  started_at: Date;
 
   @Column({ type: 'datetime', nullable: true })
   published_at: Date;
