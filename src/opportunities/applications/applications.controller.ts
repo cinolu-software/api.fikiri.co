@@ -37,6 +37,7 @@ export class ApplicationsController {
   }
 
   @Get()
+  @Auth(RoleEnum.Cartograph)
   findAll() {
     return this.applicationsService.findAll();
   }
