@@ -12,6 +12,7 @@ import { RoleEnum } from '../../shared/enums/roles.enum';
 import { v4 as uuidv4 } from 'uuid';
 
 @Controller('applications')
+@Auth(RoleEnum.User)
 export class ApplicationsController {
   constructor(private readonly applicationsService: ApplicationsService) {}
 
@@ -21,7 +22,6 @@ export class ApplicationsController {
   }
 
   @Post('document/:id')
-  @Auth(RoleEnum.User)
   @UseInterceptors(
     FileInterceptor('thumb', {
       storage: diskStorage({

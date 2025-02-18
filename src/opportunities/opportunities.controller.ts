@@ -13,6 +13,7 @@ import { diskStorage } from 'multer';
 import { addReviewerDto } from './dto/add-reviewer.dto';
 
 @Controller('opportunities')
+@Auth(RoleEnum.Cartograph)
 export class OpportunitiesController {
   constructor(private readonly opportunitiesService: OpportunitiesService) {}
 
@@ -79,6 +80,7 @@ export class OpportunitiesController {
   }
 
   @Get('published')
+  @Auth(RoleEnum.Guest)
   findPublished(): Promise<Opportunity[]> {
     return this.opportunitiesService.findPublished();
   }
