@@ -3,7 +3,7 @@ import { CreateOpportunityDto } from './dto/create-opportunity.dto';
 import { UpdateOpportunityDto } from './dto/update-opportunity.dto';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Opportunity } from './entities/opportunity.entity';
-import { IsNull, Not, Repository } from 'typeorm';
+import { MoreThan, Repository } from 'typeorm';
 import { User } from '../users/entities/user.entity';
 import * as fs from 'fs-extra';
 import { JwtService } from '@nestjs/jwt';
@@ -82,13 +82,13 @@ export class OpportunitiesService {
     }
   }
 
-  async publish(publisher: User, id: string): Promise<Opportunity> {
+  async publish(publisher: User, id: string, date: Date): Promise<Opportunity> {
     try {
       const call = await this.findOne(id);
       return await this.opportunityRepository.save({
         ...call,
         publisher,
-        published_at: call.created_at ? null : new Date()
+        published_at: new Date(date)
       });
     } catch {
       throw new BadRequestException();
@@ -96,8 +96,10 @@ export class OpportunitiesService {
   }
 
   async findPublished(): Promise<Opportunity[]> {
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
     return await this.opportunityRepository.find({
-      where: { published_at: Not(IsNull()) }
+      where: { published_at: MoreThan(today) }
     });
   }
 

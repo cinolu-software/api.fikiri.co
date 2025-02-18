@@ -46,7 +46,7 @@ export class OpportunitiesController {
   @UseInterceptors(
     FileInterceptor('cover', {
       storage: diskStorage({
-        destination: './uploads/calls/covers',
+        destination: './uploads/opportunities/covers',
         filename: function (_req, file, cb) {
           cb(null, `${uuidv4()}.${file.mimetype.split('/')[1]}`);
         }
@@ -62,7 +62,7 @@ export class OpportunitiesController {
   @UseInterceptors(
     FileInterceptor('thumb', {
       storage: diskStorage({
-        destination: './uploads/calls/documents',
+        destination: './uploads/opportunities/documents',
         filename: function (_req, file, cb) {
           cb(null, `${uuidv4()}.${file.mimetype.split('/')[1]}`);
         }
@@ -74,8 +74,8 @@ export class OpportunitiesController {
   }
 
   @Post('publish/:id')
-  publish(@CurrentUser() publisher: User, @Param('id') id: string): Promise<Opportunity> {
-    return this.opportunitiesService.publish(publisher, id);
+  publish(@CurrentUser() publisher: User, @Param('id') id: string, @Body('date') date: Date): Promise<Opportunity> {
+    return this.opportunitiesService.publish(publisher, id, date);
   }
 
   @Get('published')
