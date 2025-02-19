@@ -95,6 +95,14 @@ export class OpportunitiesService {
     }
   }
 
+  async findLatest(): Promise<Opportunity[]> {
+    return await this.opportunityRepository.find({
+      where: { published_at: MoreThan(new Date(0)) },
+      order: { published_at: 'DESC' },
+      take: 5
+    });
+  }
+
   async findPublished(): Promise<Opportunity[]> {
     const today = new Date();
     today.setHours(0, 0, 0, 0);
@@ -112,7 +120,7 @@ export class OpportunitiesService {
   async addDocument(id: string, file: Express.Multer.File): Promise<Opportunity> {
     try {
       const call = await this.findOne(id);
-      if (call.document) await fs.unlink(`./uploads/calls/documents/${call.document}`);
+      if (call.document) await fs.unlink(`./uploads/opportunities/documents/${call.document}`);
       return await this.opportunityRepository.save({ ...call, document: file.filename });
     } catch {
       throw new BadRequestException();
@@ -122,7 +130,7 @@ export class OpportunitiesService {
   async addCover(id: string, file: Express.Multer.File): Promise<Opportunity> {
     try {
       const call = await this.findOne(id);
-      if (call.cover) await fs.unlink(`./uploads/calls/covers/${call.cover}`);
+      if (call.cover) await fs.unlink(`./uploads/opportunities/covers/${call.cover}`);
       return await this.opportunityRepository.save({ ...call, document: file.filename });
     } catch {
       throw new BadRequestException();

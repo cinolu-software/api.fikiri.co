@@ -22,6 +22,11 @@ export class OpportunitiesController {
     return this.opportunitiesService.create(author, dto);
   }
 
+  @Get('find-latest')
+  findLatest(): Promise<Opportunity[]> {
+    return this.opportunitiesService.findLatest();
+  }
+
   @Post('find-reviewers/:id')
   findReviewers(@Param('id') id: string): Promise<addReviewerDto[]> {
     return this.opportunitiesService.findReviewers(id);
