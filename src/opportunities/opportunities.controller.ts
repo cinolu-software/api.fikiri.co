@@ -87,12 +87,12 @@ export class OpportunitiesController {
 
   @Get('published')
   @Auth(RoleEnum.Guest)
-  findPublished(): Promise<Opportunity[]> {
+  findPublished(): Promise<[Opportunity[], number]> {
     return this.opportunitiesService.findPublished();
   }
 
   @Get()
-  findAll(): Promise<[Opportunity[], number]> {
+  findAll(): Promise<Opportunity[]> {
     return this.opportunitiesService.findAll();
   }
 

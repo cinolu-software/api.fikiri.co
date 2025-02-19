@@ -104,16 +104,16 @@ export class OpportunitiesService {
     });
   }
 
-  async findPublished(): Promise<Opportunity[]> {
+  async findPublished(): Promise<[Opportunity[], number]> {
     const today = new Date();
     today.setHours(0, 0, 0, 0);
-    return await this.opportunityRepository.find({
+    return await this.opportunityRepository.findAndCount({
       where: { published_at: MoreThan(today) }
     });
   }
 
-  async findAll(): Promise<[Opportunity[], number]> {
-    return await this.opportunityRepository.findAndCount({
+  async findAll(): Promise<Opportunity[]> {
+    return await this.opportunityRepository.find({
       order: { created_at: 'DESC' }
     });
   }
