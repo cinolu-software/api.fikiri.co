@@ -1,4 +1,15 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, UploadedFile, UseInterceptors } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Post,
+  Body,
+  Patch,
+  Param,
+  Delete,
+  UploadedFile,
+  UseInterceptors,
+  Query
+} from '@nestjs/common';
 import { OpportunitiesService } from './opportunities.service';
 import { CreateOpportunityDto } from './dto/create-opportunity.dto';
 import { UpdateOpportunityDto } from './dto/update-opportunity.dto';
@@ -11,6 +22,7 @@ import { RoleEnum } from '../shared/enums/roles.enum';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { diskStorage } from 'multer';
 import { addReviewerDto } from './dto/add-reviewer.dto';
+import { QueryParams } from './utils/types/query-params.type';
 
 @Controller('opportunities')
 @Auth(RoleEnum.Cartograph)
@@ -87,8 +99,8 @@ export class OpportunitiesController {
 
   @Get('published')
   @Auth(RoleEnum.Guest)
-  findPublished(): Promise<[Opportunity[], number]> {
-    return this.opportunitiesService.findPublished();
+  findPublished(@Query() queryParams: QueryParams): Promise<[Opportunity[], number]> {
+    return this.opportunitiesService.findPublished(queryParams);
   }
 
   @Get()

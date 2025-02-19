@@ -8,6 +8,7 @@ import { User } from '../users/entities/user.entity';
 import * as fs from 'fs-extra';
 import { JwtService } from '@nestjs/jwt';
 import { addReviewerDto } from './dto/add-reviewer.dto';
+import { QueryParams } from './utils/types/query-params.type';
 
 @Injectable()
 export class OpportunitiesService {
@@ -98,17 +99,22 @@ export class OpportunitiesService {
   async findLatest(): Promise<Opportunity[]> {
     return await this.opportunityRepository.find({
       where: { published_at: MoreThan(new Date(0)) },
-      relations: ['author', 'publisher'],
+      relations: ['author'],
       order: { published_at: 'DESC' },
       take: 5
     });
   }
 
-  async findPublished(): Promise<[Opportunity[], number]> {
+  async findPublished(queryParams: QueryParams): Promise<[Opportunity[], number]> {
+    const { page = 1 } = queryParams;
+    const take = 9;
+    const skip = (page - 1) * take;
     const today = new Date();
     today.setHours(0, 0, 0, 0);
     return await this.opportunityRepository.findAndCount({
-      where: { published_at: MoreThan(today) }
+      where: { published_at: MoreThan(today) },
+      relations: ['author'],
+      skip
     });
   }
 
