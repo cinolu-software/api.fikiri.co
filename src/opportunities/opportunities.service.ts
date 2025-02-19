@@ -114,6 +114,7 @@ export class OpportunitiesService {
     return await this.opportunityRepository.findAndCount({
       where: { published_at: MoreThan(today) },
       relations: ['author'],
+      take,
       skip
     });
   }
