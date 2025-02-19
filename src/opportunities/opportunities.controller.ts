@@ -92,7 +92,7 @@ export class OpportunitiesController {
   }
 
   @Get()
-  findAll(): Promise<Opportunity[]> {
+  findAll(): Promise<[Opportunity[], number]> {
     return this.opportunitiesService.findAll();
   }
 

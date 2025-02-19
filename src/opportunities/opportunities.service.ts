@@ -112,8 +112,8 @@ export class OpportunitiesService {
     });
   }
 
-  async findAll(): Promise<Opportunity[]> {
-    return await this.opportunityRepository.find({
+  async findAll(): Promise<[Opportunity[], number]> {
+    return await this.opportunityRepository.findAndCount({
       order: { created_at: 'DESC' }
     });
   }
