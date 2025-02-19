@@ -23,6 +23,7 @@ export class OpportunitiesController {
   }
 
   @Get('find-latest')
+  @Auth(RoleEnum.Guest)
   findLatest(): Promise<Opportunity[]> {
     return this.opportunitiesService.findLatest();
   }

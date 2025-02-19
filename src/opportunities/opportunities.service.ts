@@ -98,6 +98,7 @@ export class OpportunitiesService {
   async findLatest(): Promise<Opportunity[]> {
     return await this.opportunityRepository.find({
       where: { published_at: MoreThan(new Date(0)) },
+      relations: ['author', 'publisher'],
       order: { published_at: 'DESC' },
       take: 5
     });
