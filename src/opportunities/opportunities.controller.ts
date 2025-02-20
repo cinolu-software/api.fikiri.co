@@ -34,6 +34,12 @@ export class OpportunitiesController {
     return this.opportunitiesService.create(author, dto);
   }
 
+  @Get('find-published')
+  @Auth(RoleEnum.Guest)
+  findPublished(@Query() queryParams: QueryParams): Promise<[Opportunity[], number]> {
+    return this.opportunitiesService.findPublished(queryParams);
+  }
+
   @Get('find-latest')
   @Auth(RoleEnum.Guest)
   findLatest(): Promise<Opportunity[]> {
@@ -95,12 +101,6 @@ export class OpportunitiesController {
   @Post('publish/:id')
   publish(@CurrentUser() publisher: User, @Param('id') id: string, @Body('date') date: Date): Promise<Opportunity> {
     return this.opportunitiesService.publish(publisher, id, date);
-  }
-
-  @Get('published')
-  @Auth(RoleEnum.Guest)
-  findPublished(@Query() queryParams: QueryParams): Promise<[Opportunity[], number]> {
-    return this.opportunitiesService.findPublished(queryParams);
   }
 
   @Get()
