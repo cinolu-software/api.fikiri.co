@@ -109,6 +109,7 @@ export class OpportunitiesController {
   }
 
   @Get(':id')
+  @Auth(RoleEnum.Guest)
   findOne(@Param('id') id: string): Promise<Opportunity> {
     return this.opportunitiesService.findOne(id);
   }
