@@ -6,6 +6,16 @@ import { User } from '../../users/entities/user.entity';
 import { Role } from '../../users/roles/entities/role.entity';
 import { Opportunity } from '../../opportunities/entities/opportunity.entity';
 
+type FieldType = 'text' | 'select' | 'number' | 'textarea';
+
+interface Field {
+  id: number;
+  type: FieldType;
+  label: string;
+  options: string[];
+  required: boolean;
+}
+
 export default class DbSeeder implements Seeder {
   async run(dataSource: DataSource) {
     /**
@@ -30,30 +40,47 @@ export default class DbSeeder implements Seeder {
     });
 
     async function createOpportunities(users: User[], count: number) {
+      function generateFields(count: number): Field[] {
+        return Array.from({ length: count }, () => {
+          const type: FieldType = faker.helpers.arrayElement(['text', 'select', 'number', 'textarea']);
+          const options =
+            type === 'select'
+              ? Array.from({ length: faker.number.int({ min: 4, max: 5 }) }, () => faker.word.noun())
+              : [''];
+          return {
+            id: faker.number.int({ min: 1000000000000, max: 9999999999999 }),
+            type,
+            label: faker.word.words(2),
+            options,
+            required: faker.datatype.boolean()
+          };
+        });
+      }
       return Promise.all(
-        Array(count)
-          .fill(0)
-          .map(async () => {
-            return await opportunityRepository.save({
+        Array.from(
+          { length: count },
+          async () =>
+            await opportunityRepository.save({
               name: faker.company.buzzPhrase(),
               description: faker.commerce.productDescription(),
               ended_at: faker.helpers.arrayElement([faker.date.soon(), faker.date.past()]),
               started_at: faker.helpers.arrayElement([faker.date.recent(), faker.date.soon()]),
               published_at: faker.helpers.arrayElement([faker.date.recent(), faker.date.soon()]),
               author: faker.helpers.arrayElement(users),
-              publisher: faker.helpers.arrayElement(users)
-            });
-          })
+              publisher: faker.helpers.arrayElement(users),
+              form: generateFields(faker.number.int({ min: 5, max: 10 })) as unknown as JSON
+            })
+        )
       );
     }
 
     async function createUsers(roleName: string, count: number) {
       const role = await roleRepository.findOneByOrFail({ name: roleName });
       return Promise.all(
-        Array(count)
-          .fill('')
-          .map(async () => {
-            return await userRepository.save({
+        Array.from(
+          { length: count },
+          async () =>
+            await userRepository.save({
               name: faker.person.firstName(),
               address: faker.location.streetAddress(),
               phone_number: faker.phone.number({ style: 'human' }),
@@ -61,8 +88,8 @@ export default class DbSeeder implements Seeder {
               verified_at: faker.date.recent(),
               password: await bcrypt.hash('admin1234', 10),
               roles: [role]
-            });
-          })
+            })
+        )
       );
     }
 

@@ -6,7 +6,7 @@ import { Review } from '../reviews/entities/review.entity';
 @Entity()
 export class Application extends AbstractEntity {
   @Column({ type: 'json', nullable: true })
-  responses: string;
+  responses: JSON;
 
   @Column({ nullable: true })
   document: string;

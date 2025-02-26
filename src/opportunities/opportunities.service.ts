@@ -29,7 +29,7 @@ export class OpportunitiesService {
   async findReviewers(id: string): Promise<addReviewerDto[]> {
     try {
       const call = await this.findOne(id);
-      return JSON.parse(call.reviewers) as addReviewerDto[];
+      return call.reviewers as unknown as addReviewerDto[];
     } catch {
       throw new BadRequestException();
     }
@@ -42,9 +42,9 @@ export class OpportunitiesService {
         { ...dto, id },
         { secret: process.env.JWT_SECRET, expiresIn: '7d' }
       );
-      const reviewers: addReviewerDto[] = JSON.parse(call.reviewers) ?? [];
+      const reviewers: addReviewerDto[] = (call.reviewers as unknown as addReviewerDto[]) ?? [];
       reviewers.push(dto);
-      call.reviewers = JSON.stringify(reviewers);
+      call.reviewers = reviewers as unknown as JSON;
       const upatedCall = await this.opportunityRepository.save(call);
       return { call: upatedCall, token };
     } catch {
@@ -56,7 +56,7 @@ export class OpportunitiesService {
     try {
       const { id, email } = await this.jwtService.verifyAsync(token);
       const call = await this.findOne(id);
-      const reviewers: addReviewerDto[] = JSON.parse(call.reviewers);
+      const reviewers: addReviewerDto[] = call.reviewers as unknown as addReviewerDto[];
       return reviewers.find((r) => r.email === email);
     } catch {
       throw new NotFoundException();
@@ -66,9 +66,9 @@ export class OpportunitiesService {
   async deleteReviewer(id: string, email: string): Promise<Opportunity> {
     try {
       const call = await this.findOne(id);
-      const reviewers: addReviewerDto[] = JSON.parse(call.reviewers);
+      const reviewers: addReviewerDto[] = call.reviewers as unknown as addReviewerDto[];
       const updatedReviewers = reviewers.filter((r) => r.email === email);
-      call.reviewers = JSON.stringify(updatedReviewers);
+      call.reviewers = updatedReviewers as unknown as JSON;
       return await this.opportunityRepository.save(call);
     } catch {
       throw new BadRequestException();

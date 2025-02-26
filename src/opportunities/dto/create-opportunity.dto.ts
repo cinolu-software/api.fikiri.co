@@ -14,8 +14,8 @@ export class CreateOpportunityDto {
   description: string;
 
   @IsOptional()
-  form: string;
+  form: JSON;
 
   @IsOptional()
-  requirements: string;
+  requirements: JSON;
 }
