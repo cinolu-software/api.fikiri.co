@@ -52,7 +52,10 @@ export class OpportunitiesController {
   }
 
   @Post('add-reviewer/:id')
-  addReviwer(@Param('id') id: string, @Body() dto: addReviewerDto): Promise<{ call: Opportunity; token: string }> {
+  addReviwer(
+    @Param('id') id: string,
+    @Body() dto: addReviewerDto
+  ): Promise<{ opportuniy: Opportunity; token: string }> {
     return this.opportunitiesService.addReviewer(id, dto);
   }
 

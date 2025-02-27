@@ -28,25 +28,25 @@ export class OpportunitiesService {
 
   async findReviewers(id: string): Promise<addReviewerDto[]> {
     try {
-      const opportuniy = await this.findOne(id);
-      return opportuniy.reviewers as unknown as addReviewerDto[];
+      const opportunity = await this.findOne(id);
+      return opportunity.reviewers as unknown as addReviewerDto[];
     } catch {
       throw new BadRequestException();
     }
   }
 
-  async addReviewer(id: string, dto: addReviewerDto): Promise<{ opportuniy: Opportunity; token: string }> {
+  async addReviewer(id: string, dto: addReviewerDto): Promise<{ opportunity: Opportunity; token: string }> {
     try {
-      const opportuniy = await this.findOne(id);
+      const opportunity = await this.findOne(id);
       const token = await this.jwtService.signAsync(
         { ...dto, id },
         { secret: process.env.JWT_SECRET, expiresIn: '7d' }
       );
-      const reviewers: addReviewerDto[] = (opportuniy.reviewers as unknown as addReviewerDto[]) ?? [];
+      const reviewers: addReviewerDto[] = (opportunity.reviewers as unknown as addReviewerDto[]) ?? [];
       reviewers.push(dto);
-      opportuniy.reviewers = reviewers as unknown as JSON;
-      const upatedopportuniy = await this.opportunityRepository.save(opportuniy);
-      return { opportuniy: upatedopportuniy, token };
+      opportunity.reviewers = reviewers as unknown as JSON;
+      const upatedopportunity = await this.opportunityRepository.save(opportunity);
+      return { opportunity: upatedopportunity, token };
     } catch {
       throw new BadRequestException();
     }
@@ -55,8 +55,8 @@ export class OpportunitiesService {
   async verifyReviewer(token: string): Promise<addReviewerDto> {
     try {
       const { id, email } = await this.jwtService.verifyAsync(token);
-      const opportuniy = await this.findOne(id);
-      const reviewers: addReviewerDto[] = opportuniy.reviewers as unknown as addReviewerDto[];
+      const opportunity = await this.findOne(id);
+      const reviewers: addReviewerDto[] = opportunity.reviewers as unknown as addReviewerDto[];
       return reviewers.find((r) => r.email === email);
     } catch {
       throw new NotFoundException();
@@ -65,11 +65,11 @@ export class OpportunitiesService {
 
   async deleteReviewer(id: string, email: string): Promise<Opportunity> {
     try {
-      const opportuniy = await this.findOne(id);
-      const reviewers: addReviewerDto[] = opportuniy.reviewers as unknown as addReviewerDto[];
+      const opportunity = await this.findOne(id);
+      const reviewers: addReviewerDto[] = opportunity.reviewers as unknown as addReviewerDto[];
       const updatedReviewers = reviewers.filter((r) => r.email === email);
-      opportuniy.reviewers = updatedReviewers as unknown as JSON;
-      return await this.opportunityRepository.save(opportuniy);
+      opportunity.reviewers = updatedReviewers as unknown as JSON;
+      return await this.opportunityRepository.save(opportunity);
     } catch {
       throw new BadRequestException();
     }
@@ -85,9 +85,9 @@ export class OpportunitiesService {
 
   async publish(publisher: User, id: string, date: Date): Promise<Opportunity> {
     try {
-      const opportuniy = await this.findOne(id);
+      const opportunity = await this.findOne(id);
       return await this.opportunityRepository.save({
-        ...opportuniy,
+        ...opportunity,
         publisher,
         published_at: date ? new Date(date) : new Date()
       });
@@ -125,9 +125,9 @@ export class OpportunitiesService {
 
   async addDocument(id: string, file: Express.Multer.File): Promise<Opportunity> {
     try {
-      const opportuniy = await this.findOne(id);
-      if (opportuniy.document) await fs.unlink(`./uploads/opportunities/documents/${opportuniy.document}`);
-      return await this.opportunityRepository.save({ ...opportuniy, document: file.filename });
+      const opportunity = await this.findOne(id);
+      if (opportunity.document) await fs.unlink(`./uploads/opportunities/documents/${opportunity.document}`);
+      return await this.opportunityRepository.save({ ...opportunity, document: file.filename });
     } catch {
       throw new BadRequestException();
     }
@@ -135,9 +135,9 @@ export class OpportunitiesService {
 
   async addCover(id: string, file: Express.Multer.File): Promise<Opportunity> {
     try {
-      const opportuniy = await this.findOne(id);
-      if (opportuniy.cover) await fs.unlink(`./uploads/opportunities/covers/${opportuniy.cover}`);
-      return await this.opportunityRepository.save({ ...opportuniy, document: file.filename });
+      const opportunity = await this.findOne(id);
+      if (opportunity.cover) await fs.unlink(`./uploads/opportunities/covers/${opportunity.cover}`);
+      return await this.opportunityRepository.save({ ...opportunity, document: file.filename });
     } catch {
       throw new BadRequestException();
     }
@@ -156,9 +156,9 @@ export class OpportunitiesService {
 
   async update(id: string, dto: UpdateOpportunityDto): Promise<Opportunity> {
     try {
-      const opportuniy = await this.findOne(id);
+      const opportunity = await this.findOne(id);
       return await this.opportunityRepository.save({
-        ...opportuniy,
+        ...opportunity,
         ...dto
       });
     } catch {
