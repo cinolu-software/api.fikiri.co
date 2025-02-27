@@ -89,7 +89,7 @@ export class OpportunitiesService {
       return await this.opportunityRepository.save({
         ...call,
         publisher,
-        published_at: new Date(date)
+        published_at: date ? new Date(date) : new Date()
       });
     } catch {
       throw new BadRequestException();
