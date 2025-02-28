@@ -21,6 +21,12 @@ export class ApplicationsController {
     return this.applicationsService.create(applicant, dto);
   }
 
+  @Get('for/:id')
+  @Auth(RoleEnum.Cartograph)
+  findFor(@Param('id') id: string) {
+    return this.applicationsService.finFor(id);
+  }
+
   @Post('document/:id')
   @UseInterceptors(
     FileInterceptor('thumb', {
@@ -45,7 +51,7 @@ export class ApplicationsController {
   @Get(':id')
   findOne(@Param('id') id: string): Promise<Application> {
     return this.applicationsService.findOne(id);
-  }  
+  }
 
   @Patch(':id')
   update(@Param('id') id: string, @Body() dto: UpdateApplicationDto) {

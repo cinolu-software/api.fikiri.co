@@ -16,15 +16,30 @@ export class ApplicationsService {
 
   async create(applicant: User, dto: CreateApplicationDto): Promise<Application> {
     try {
-      return await this.applicationRepository.save({ ...dto, applicant });
+      return await this.applicationRepository.save({
+        ...dto,
+        opportunity: { id: dto.opportunity },
+        applicant
+      });
     } catch {
       throw new BadRequestException();
     }
   }
 
+  async finFor(id: string): Promise<Application[]> {
+    return await this.applicationRepository.find({
+      where: {
+        opportunity: { id }
+      },
+      order: { created_at: 'DESC' },
+      relations: ['applicant']
+    });
+  }
+
   async findAll(): Promise<Application[]> {
     return await this.applicationRepository.find({
-      order: { created_at: 'DESC' }
+      order: { created_at: 'DESC' },
+      relations: ['applicant']
     });
   }
 
@@ -49,7 +64,11 @@ export class ApplicationsService {
   async update(id: string, dto: UpdateApplicationDto): Promise<Application> {
     try {
       const application = await this.findOne(id);
-      return await this.applicationRepository.save({ ...application, ...dto });
+      return await this.applicationRepository.save({
+        ...application,
+        ...dto,
+        opportunity: { id: dto.opportunity }
+      });
     } catch {
       throw new BadRequestException();
     }
