@@ -45,7 +45,7 @@ export class ApplicationsController {
   @Get(':id')
   findOne(@Param('id') id: string): Promise<Application> {
     return this.applicationsService.findOne(id);
-  }
+  }  
 
   @Patch(':id')
   update(@Param('id') id: string, @Body() dto: UpdateApplicationDto) {
