@@ -1,7 +1,7 @@
 import { MigrationInterface, QueryRunner } from 'typeorm';
 
-export class Init1739873310172 implements MigrationInterface {
-  name = 'Init1739873310172';
+export class Init1740749369376 implements MigrationInterface {
+  name = 'Init1740749369376';
 
   public async up(queryRunner: QueryRunner): Promise<void> {
     await queryRunner.query(
@@ -26,7 +26,7 @@ export class Init1739873310172 implements MigrationInterface {
       `CREATE TABLE \`review\` (\`id\` varchar(36) NOT NULL, \`created_at\` datetime(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6), \`updated_at\` datetime(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6) ON UPDATE CURRENT_TIMESTAMP(6), \`deleted_at\` datetime(6) NULL, \`note\` decimal(10,2) NOT NULL DEFAULT '0.00', \`reviewer\` varchar(255) NOT NULL, \`data\` json NULL, \`applicationId\` varchar(36) NULL, PRIMARY KEY (\`id\`)) ENGINE=InnoDB`
     );
     await queryRunner.query(
-      `CREATE TABLE \`application\` (\`id\` varchar(36) NOT NULL, \`created_at\` datetime(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6), \`updated_at\` datetime(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6) ON UPDATE CURRENT_TIMESTAMP(6), \`deleted_at\` datetime(6) NULL, \`responses\` json NULL, \`document\` varchar(255) NULL, \`applicantId\` varchar(36) NULL, PRIMARY KEY (\`id\`)) ENGINE=InnoDB`
+      `CREATE TABLE \`application\` (\`id\` varchar(36) NOT NULL, \`created_at\` datetime(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6), \`updated_at\` datetime(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6) ON UPDATE CURRENT_TIMESTAMP(6), \`deleted_at\` datetime(6) NULL, \`responses\` json NULL, \`document\` varchar(255) NULL, \`applicantId\` varchar(36) NULL, \`opportunityId\` varchar(36) NULL, PRIMARY KEY (\`id\`)) ENGINE=InnoDB`
     );
     await queryRunner.query(
       `CREATE TABLE \`user\` (\`id\` varchar(36) NOT NULL, \`created_at\` datetime(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6), \`updated_at\` datetime(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6) ON UPDATE CURRENT_TIMESTAMP(6), \`deleted_at\` datetime(6) NULL, \`email\` varchar(255) NOT NULL, \`name\` varchar(255) NOT NULL, \`password\` varchar(255) NULL, \`phone_number\` varchar(255) NULL, \`address\` varchar(255) NULL, \`google_image\` varchar(255) NULL, \`profile\` varchar(255) NULL, \`verified_at\` datetime NULL, \`detailId\` varchar(36) NULL, UNIQUE INDEX \`IDX_e12875dfb3b1d92d7d7c5377e2\` (\`email\`), UNIQUE INDEX \`REL_f05fcc9b589876b45e82e17b31\` (\`detailId\`), PRIMARY KEY (\`id\`)) ENGINE=InnoDB`
@@ -56,6 +56,9 @@ export class Init1739873310172 implements MigrationInterface {
       `ALTER TABLE \`application\` ADD CONSTRAINT \`FK_81c8e4a8a8ce63faba03cbd769e\` FOREIGN KEY (\`applicantId\`) REFERENCES \`user\`(\`id\`) ON DELETE NO ACTION ON UPDATE NO ACTION`
     );
     await queryRunner.query(
+      `ALTER TABLE \`application\` ADD CONSTRAINT \`FK_d20ca4bcf2aed5708c0fbb971aa\` FOREIGN KEY (\`opportunityId\`) REFERENCES \`opportunity\`(\`id\`) ON DELETE NO ACTION ON UPDATE NO ACTION`
+    );
+    await queryRunner.query(
       `ALTER TABLE \`user\` ADD CONSTRAINT \`FK_f05fcc9b589876b45e82e17b313\` FOREIGN KEY (\`detailId\`) REFERENCES \`detail\`(\`id\`) ON DELETE NO ACTION ON UPDATE NO ACTION`
     );
     await queryRunner.query(
@@ -78,6 +81,7 @@ export class Init1739873310172 implements MigrationInterface {
     await queryRunner.query(`ALTER TABLE \`opportunity\` DROP FOREIGN KEY \`FK_12302c07f083358a26e0ff19887\``);
     await queryRunner.query(`ALTER TABLE \`opportunity\` DROP FOREIGN KEY \`FK_86cda28413c6e4b67ce986bda13\``);
     await queryRunner.query(`ALTER TABLE \`user\` DROP FOREIGN KEY \`FK_f05fcc9b589876b45e82e17b313\``);
+    await queryRunner.query(`ALTER TABLE \`application\` DROP FOREIGN KEY \`FK_d20ca4bcf2aed5708c0fbb971aa\``);
     await queryRunner.query(`ALTER TABLE \`application\` DROP FOREIGN KEY \`FK_81c8e4a8a8ce63faba03cbd769e\``);
     await queryRunner.query(`ALTER TABLE \`review\` DROP FOREIGN KEY \`FK_8d5525f4acba6e2149fb5da4a8c\``);
     await queryRunner.query(`ALTER TABLE \`post\` DROP FOREIGN KEY \`FK_c6fb082a3114f35d0cc27c518e0\``);
