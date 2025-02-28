@@ -3,7 +3,7 @@ import { CreateOpportunityDto } from './dto/create-opportunity.dto';
 import { UpdateOpportunityDto } from './dto/update-opportunity.dto';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Opportunity } from './entities/opportunity.entity';
-import { LessThanOrEqual, Repository } from 'typeorm';
+import { LessThanOrEqual, MoreThanOrEqual, Repository } from 'typeorm';
 import { User } from '../users/entities/user.entity';
 import * as fs from 'fs-extra';
 import { JwtService } from '@nestjs/jwt';
@@ -109,9 +109,10 @@ export class OpportunitiesService {
     const { page = 1 } = queryParams;
     const take = 9;
     const skip = (page - 1) * take;
+    const today = new Date();
     return await this.opportunityRepository.findAndCount({
-      where: { published_at: LessThanOrEqual(new Date()) },
-      order: { published_at: 'DESC' },
+      where: { published_at: MoreThanOrEqual(today) },
+      order: { published_at: 'ASC' },
       relations: ['author'],
       take,
       skip
