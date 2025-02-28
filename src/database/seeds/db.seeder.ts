@@ -45,12 +45,12 @@ export default class DbSeeder implements Seeder {
           const type: FieldType = faker.helpers.arrayElement(['text', 'select', 'number', 'textarea']);
           const options =
             type === 'select'
-              ? Array.from({ length: faker.number.int({ min: 4, max: 5 }) }, () => faker.word.noun())
+              ? Array.from({ length: faker.number.int({ min: 2, max: 3 }) }, () => faker.word.sample(10))
               : [''];
           return {
             id: faker.number.int({ min: 1000000000000, max: 9999999999999 }),
             type,
-            label: faker.word.words(2),
+            label: faker.word.words(10),
             options,
             required: faker.datatype.boolean()
           };
@@ -63,12 +63,12 @@ export default class DbSeeder implements Seeder {
             await opportunityRepository.save({
               name: faker.company.buzzPhrase(),
               description: faker.commerce.productDescription(),
-              ended_at: faker.helpers.arrayElement([faker.date.soon(), faker.date.past()]),
-              started_at: faker.helpers.arrayElement([faker.date.recent(), faker.date.soon()]),
-              published_at: faker.helpers.arrayElement([faker.date.recent(), faker.date.soon()]),
+              ended_at: faker.date.soon(),
+              started_at: faker.date.recent(),
+              published_at: faker.date.soon(),
               author: faker.helpers.arrayElement(users),
               publisher: faker.helpers.arrayElement(users),
-              form: generateFields(faker.number.int({ min: 5, max: 10 })) as unknown as JSON
+              form: generateFields(faker.number.int({ min: 3, max: 5 })) as unknown as JSON
             })
         )
       );
