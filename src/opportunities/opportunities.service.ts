@@ -111,6 +111,7 @@ export class OpportunitiesService {
     const skip = (page - 1) * take;
     return await this.opportunityRepository.findAndCount({
       where: { published_at: LessThanOrEqual(new Date()) },
+      order: { published_at: 'DESC' },
       relations: ['author'],
       take,
       skip
