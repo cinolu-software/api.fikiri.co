@@ -107,6 +107,11 @@ export class OpportunitiesController {
     return this.opportunitiesService.addDocument(id, file);
   }
 
+  @Post('unpublish/:id')
+  unpublish(@Param('id') id: string): Promise<Opportunity> {
+    return this.opportunitiesService.unpublish(id);
+  }
+
   @Post('publish/:id')
   publish(@CurrentUser() publisher: User, @Param('id') id: string, @Body('date') date: Date): Promise<Opportunity> {
     return this.opportunitiesService.publish(publisher, id, date);

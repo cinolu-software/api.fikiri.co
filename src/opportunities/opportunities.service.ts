@@ -83,6 +83,19 @@ export class OpportunitiesService {
     }
   }
 
+  async unpublish(id: string): Promise<Opportunity> {
+    try {
+      const opportunity = await this.findOne(id);
+      return await this.opportunityRepository.save({
+        ...opportunity,
+        published_at: null,
+        publisher: null
+      });
+    } catch {
+      throw new BadRequestException();
+    }
+  }
+
   async publish(publisher: User, id: string, date: Date): Promise<Opportunity> {
     try {
       const opportunity = await this.findOne(id);
