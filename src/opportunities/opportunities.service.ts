@@ -3,7 +3,7 @@ import { CreateOpportunityDto } from './dto/create-opportunity.dto';
 import { UpdateOpportunityDto } from './dto/update-opportunity.dto';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Opportunity } from './entities/opportunity.entity';
-import { LessThanOrEqual, MoreThanOrEqual, Repository } from 'typeorm';
+import { LessThanOrEqual, MoreThan, Repository } from 'typeorm';
 import { User } from '../users/entities/user.entity';
 import * as fs from 'fs-extra';
 import { JwtService } from '@nestjs/jwt';
@@ -105,13 +105,27 @@ export class OpportunitiesService {
     });
   }
 
+  async findUnpublished(queryParams: QueryParams): Promise<[Opportunity[], number]> {
+    const { page = 1 } = queryParams;
+    const take = 9;
+    const today = new Date();
+    const skip = (page - 1) * take;
+    return await this.opportunityRepository.findAndCount({
+      where: { published_at: MoreThan(today) },
+      order: { published_at: 'ASC' },
+      relations: ['author'],
+      take,
+      skip
+    });
+  }
+
   async findPublished(queryParams: QueryParams): Promise<[Opportunity[], number]> {
     const { page = 1 } = queryParams;
     const take = 9;
     const skip = (page - 1) * take;
     const today = new Date();
     return await this.opportunityRepository.findAndCount({
-      where: { published_at: MoreThanOrEqual(today) },
+      where: { published_at: LessThanOrEqual(today) },
       order: { published_at: 'ASC' },
       relations: ['author'],
       take,
@@ -139,7 +153,7 @@ export class OpportunitiesService {
     try {
       const opportunity = await this.findOne(id);
       if (opportunity.cover) await fs.unlink(`./uploads/opportunities/covers/${opportunity.cover}`);
-      return await this.opportunityRepository.save({ ...opportunity, document: file.filename });
+      return await this.opportunityRepository.save({ ...opportunity, cover: file.filename });
     } catch {
       throw new BadRequestException();
     }

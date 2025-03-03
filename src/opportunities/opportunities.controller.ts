@@ -34,6 +34,12 @@ export class OpportunitiesController {
     return this.opportunitiesService.create(author, dto);
   }
 
+  @Get('find-unpublished')
+  @Auth(RoleEnum.Guest)
+  findUnpublished(@Query() queryParams: QueryParams): Promise<[Opportunity[], number]> {
+    return this.opportunitiesService.findUnpublished(queryParams);
+  }
+
   @Get('find-published')
   @Auth(RoleEnum.Guest)
   findPublished(@Query() queryParams: QueryParams): Promise<[Opportunity[], number]> {
