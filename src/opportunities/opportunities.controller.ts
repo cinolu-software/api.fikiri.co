@@ -52,16 +52,13 @@ export class OpportunitiesController {
     return this.opportunitiesService.findLatest();
   }
 
-  @Post('find-reviewers/:id')
+  @Get('find-reviewers/:id')
   findReviewers(@Param('id') id: string): Promise<addReviewerDto[]> {
     return this.opportunitiesService.findReviewers(id);
   }
 
   @Post('add-reviewer/:id')
-  addReviwer(
-    @Param('id') id: string,
-    @Body() dto: addReviewerDto
-  ): Promise<{ opportunity: Opportunity; token: string }> {
+  addReviwer(@Param('id') id: string, @Body() dto: addReviewerDto): Promise<Opportunity> {
     return this.opportunitiesService.addReviewer(id, dto);
   }
 
@@ -94,7 +91,7 @@ export class OpportunitiesController {
   @Post('document/:id')
   @Auth(RoleEnum.User)
   @UseInterceptors(
-    FileInterceptor('thumb', {
+    FileInterceptor('doc', {
       storage: diskStorage({
         destination: './uploads/opportunities/documents',
         filename: function (_req, file, cb) {

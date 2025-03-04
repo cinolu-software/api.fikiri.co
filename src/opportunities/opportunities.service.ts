@@ -35,18 +35,17 @@ export class OpportunitiesService {
     }
   }
 
-  async addReviewer(id: string, dto: addReviewerDto): Promise<{ opportunity: Opportunity; token: string }> {
+  async addReviewer(id: string, dto: addReviewerDto): Promise<Opportunity> {
     try {
       const opportunity = await this.findOne(id);
-      const token = await this.jwtService.signAsync(
-        { ...dto, id },
-        { secret: process.env.JWT_SECRET, expiresIn: '7d' }
-      );
+      // const token = await this.jwtService.signAsync(
+      //   { ...dto, id },
+      //   { secret: process.env.JWT_SECRET, expiresIn: '7d' }
+      // );
       const reviewers: addReviewerDto[] = (opportunity.reviewers as unknown as addReviewerDto[]) ?? [];
       reviewers.push(dto);
       opportunity.reviewers = reviewers as unknown as JSON;
-      const upatedopportunity = await this.opportunityRepository.save(opportunity);
-      return { opportunity: upatedopportunity, token };
+      return await this.opportunityRepository.save(opportunity);
     } catch {
       throw new BadRequestException();
     }
