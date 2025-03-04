@@ -66,7 +66,7 @@ export class OpportunitiesService {
     try {
       const opportunity = await this.findOne(id);
       const reviewers: addReviewerDto[] = opportunity.reviewers as unknown as addReviewerDto[];
-      const updatedReviewers = reviewers.filter((r) => r.email === email);
+      const updatedReviewers = reviewers.filter((r) => r.email !== email);
       opportunity.reviewers = updatedReviewers as unknown as JSON;
       return await this.opportunityRepository.save(opportunity);
     } catch {
