@@ -3,6 +3,7 @@ import { AuthEmailService } from './auth-email.service';
 import { MailerModule } from '@nestjs-modules/mailer';
 import { ConfigService } from '@nestjs/config';
 import { HandlebarsAdapter } from '@nestjs-modules/mailer/dist/adapters/handlebars.adapter';
+import { OpportunityEmailService } from './opportunity-email.service';
 
 @Module({
   imports: [
@@ -31,7 +32,6 @@ import { HandlebarsAdapter } from '@nestjs-modules/mailer/dist/adapters/handleba
       })
     })
   ],
-  providers: [AuthEmailService],
-  exports: [AuthEmailService]
+  providers: [AuthEmailService, OpportunityEmailService]
 })
 export class EmailModule {}

@@ -4,20 +4,19 @@ import { OnEvent } from '@nestjs/event-emitter';
 import { User } from '../users/entities/user.entity';
 
 @Injectable()
-export class AuthEmailService {
+export class OpportunityEmailService {
   constructor(private readonly mailerSerive: MailerService) {}
 
-  @OnEvent('user.reset-password')
-  async resetEmail({ user, link }: { user: User; link: string }): Promise<void> {
+  @OnEvent('add-reviewer')
+  async reviewEmail({ user, link }: { user: User; link: string }): Promise<void> {
     try {
       await this.mailerSerive.sendMail({
         to: user.email,
-        subject: 'Réinitialisation du mot de passe',
-        template: 'reset-password',
+        subject: "Invitation à l'évaluation d'une solution dans le cadre de fikiri",
+        template: 'add-reviewer',
         context: { user, link }
       });
-    } catch (e) {
-      console.error(e);
+    } catch {
       throw new BadRequestException("Une erreur est survenenue lors de l'envoie d'email");
     }
   }

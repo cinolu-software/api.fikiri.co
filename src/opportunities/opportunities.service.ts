@@ -9,13 +9,15 @@ import * as fs from 'fs-extra';
 import { JwtService } from '@nestjs/jwt';
 import { addReviewerDto } from './dto/add-reviewer.dto';
 import { QueryParams } from './utils/types/query-params.type';
+import { EventEmitter2 } from '@nestjs/event-emitter';
 
 @Injectable()
 export class OpportunitiesService {
   constructor(
     @InjectRepository(Opportunity)
     private opportunityRepository: Repository<Opportunity>,
-    private jwtService: JwtService
+    private jwtService: JwtService,
+    private eventEmitter: EventEmitter2
   ) {}
 
   async create(author: User, dto: CreateOpportunityDto): Promise<Opportunity> {
@@ -38,10 +40,12 @@ export class OpportunitiesService {
   async addReviewer(id: string, dto: addReviewerDto): Promise<Opportunity> {
     try {
       const opportunity = await this.findOne(id);
-      // const token = await this.jwtService.signAsync(
-      //   { ...dto, id },
-      //   { secret: process.env.JWT_SECRET, expiresIn: '7d' }
-      // );
+      const token = await this.jwtService.signAsync(
+        { ...dto, id },
+        { secret: process.env.JWT_SECRET, expiresIn: '7d' }
+      );
+      const link = `${process.env.ACCOUNT_URI}review/${token}`;
+      this.eventEmitter.emit('add-reviewer', { user: dto, link });
       const reviewers: addReviewerDto[] = (opportunity.reviewers as unknown as addReviewerDto[]) ?? [];
       reviewers.push(dto);
       opportunity.reviewers = reviewers as unknown as JSON;

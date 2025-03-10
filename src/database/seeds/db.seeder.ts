@@ -65,7 +65,7 @@ export default class DbSeeder implements Seeder {
               description: faker.commerce.productDescription(),
               ended_at: faker.date.soon(),
               started_at: faker.date.recent(),
-              published_at: faker.date.soon(),
+              published_at: faker.helpers.arrayElement([faker.date.recent(), faker.date.soon()]),
               author: faker.helpers.arrayElement(users),
               publisher: faker.helpers.arrayElement(users),
               form: generateFields(faker.number.int({ min: 3, max: 5 })) as unknown as JSON
