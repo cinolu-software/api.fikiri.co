@@ -65,7 +65,6 @@ export class OpportunitiesService {
         { secret: process.env.JWT_SECRET, expiresIn: '7d' }
       );
       const link = `${process.env.ACCOUNT_URI}review/${token}`;
-      console.log(token);
       this.eventEmitter.emit('add-reviewer', { user: dto, link });
     } catch {
       throw new BadRequestException();
