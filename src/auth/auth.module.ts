@@ -8,10 +8,9 @@ import { SessionSerializer } from './session.serializer';
 import { EmailModule } from '../email/email.module';
 import { RightsService } from './rights.service';
 import { UsersModule } from '../users/users.module';
-import { OpportunitiesModule } from '../opportunities/opportunities.module';
 
 @Module({
-  imports: [PassportModule, UsersModule, EmailModule, OpportunitiesModule],
+  imports: [PassportModule, UsersModule, EmailModule],
   controllers: [AuthController],
   providers: [AuthService, RightsService, LocalStrategy, SessionSerializer, GoogleStrategy],
   exports: [RightsService, AuthService]
