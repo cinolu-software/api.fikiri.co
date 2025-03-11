@@ -23,6 +23,7 @@ import { FileInterceptor } from '@nestjs/platform-express';
 import { diskStorage } from 'multer';
 import { addReviewerDto } from './dto/add-reviewer.dto';
 import { QueryParams } from './utils/types/query-params.type';
+import { Application } from './applications/entities/application.entity';
 
 @Controller('opportunities')
 @Auth(RoleEnum.Cartograph)
@@ -52,6 +53,12 @@ export class OpportunitiesController {
     return this.opportunitiesService.findLatest();
   }
 
+  @Get('find-applications/:token')
+  @Auth(RoleEnum.Guest)
+  findFor(@Param('token') token: string): Promise<Application[]> {
+    return this.opportunitiesService.findFor(token);
+  }
+
   @Get('find-reviewers/:id')
   findReviewers(@Param('id') id: string): Promise<addReviewerDto[]> {
     return this.opportunitiesService.findReviewers(id);
@@ -67,9 +74,9 @@ export class OpportunitiesController {
     return this.opportunitiesService.deleteReviewer(id, email);
   }
 
-  @Post('resend-review-link/:email')
-  resendReviewLink(@Param('email') email: string): Promise<string> {
-    return this.opportunitiesService.resendReviewLink(email);
+  @Post('resend-review-link/:id')
+  resendReviewLink(@Param('id') id: string, @Body() dto: addReviewerDto): Promise<void> {
+    return this.opportunitiesService.resendReviewLink(id, dto);
   }
 
   @Post('cover/:id')

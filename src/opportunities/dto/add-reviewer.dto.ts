@@ -6,4 +6,7 @@ export class addReviewerDto {
 
   @IsNotEmpty()
   organization: string;
+
+  @IsNotEmpty()
+  solution: number;
 }

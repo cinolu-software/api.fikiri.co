@@ -1,4 +1,4 @@
-import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
+import { BadRequestException, ForbiddenException, Injectable, NotFoundException } from '@nestjs/common';
 import { CreateOpportunityDto } from './dto/create-opportunity.dto';
 import { UpdateOpportunityDto } from './dto/update-opportunity.dto';
 import { InjectRepository } from '@nestjs/typeorm';
@@ -10,6 +10,8 @@ import { JwtService } from '@nestjs/jwt';
 import { addReviewerDto } from './dto/add-reviewer.dto';
 import { QueryParams } from './utils/types/query-params.type';
 import { EventEmitter2 } from '@nestjs/event-emitter';
+import { ApplicationsService } from './applications/applications.service';
+import { Application } from './applications/entities/application.entity';
 
 @Injectable()
 export class OpportunitiesService {
@@ -17,12 +19,31 @@ export class OpportunitiesService {
     @InjectRepository(Opportunity)
     private opportunityRepository: Repository<Opportunity>,
     private jwtService: JwtService,
-    private eventEmitter: EventEmitter2
+    private eventEmitter: EventEmitter2,
+    private applicationsService: ApplicationsService
   ) {}
 
   async create(author: User, dto: CreateOpportunityDto): Promise<Opportunity> {
     try {
       return await this.opportunityRepository.save({ ...dto, author });
+    } catch {
+      throw new BadRequestException();
+    }
+  }
+
+  async findFor(token: string): Promise<Application[]> {
+    try {
+      const { id, email } = await this.jwtService.verifyAsync(token);
+      const opportunity = await this.findOne(id);
+      const reviewers: addReviewerDto[] = (opportunity.reviewers as unknown as addReviewerDto[]) ?? [];
+      const reviewerIndex = reviewers.findIndex((reviewer) => reviewer.email === email);
+      const reviewer = reviewers.find((reviewer) => reviewer.email === email);
+      if (reviewerIndex === -1) throw new ForbiddenException();
+      const applications = await this.applicationsService.findByOpportunity(id);
+      if (applications.length === 0) return [];
+      let reviewerApplications = applications.filter((_, index) => index % reviewers.length === reviewerIndex);
+      if (reviewer.solution) reviewerApplications = reviewerApplications.slice(0, reviewer.solution);
+      return reviewerApplications;
     } catch {
       throw new BadRequestException();
     }
@@ -37,15 +58,24 @@ export class OpportunitiesService {
     }
   }
 
-  async addReviewer(id: string, dto: addReviewerDto): Promise<Opportunity> {
+  async sendReviewLink(id: string, dto: addReviewerDto): Promise<void> {
     try {
-      const opportunity = await this.findOne(id);
       const token = await this.jwtService.signAsync(
         { ...dto, id },
         { secret: process.env.JWT_SECRET, expiresIn: '7d' }
       );
       const link = `${process.env.ACCOUNT_URI}review/${token}`;
+      console.log(token);
       this.eventEmitter.emit('add-reviewer', { user: dto, link });
+    } catch {
+      throw new BadRequestException();
+    }
+  }
+
+  async addReviewer(id: string, dto: addReviewerDto): Promise<Opportunity> {
+    try {
+      const opportunity = await this.findOne(id);
+      await this.sendReviewLink(id, dto);
       const reviewers: addReviewerDto[] = (opportunity.reviewers as unknown as addReviewerDto[]) ?? [];
       reviewers.push(dto);
       opportunity.reviewers = reviewers as unknown as JSON;
@@ -78,9 +108,9 @@ export class OpportunitiesService {
     }
   }
 
-  async resendReviewLink(email: string): Promise<string> {
+  async resendReviewLink(id: string, dto: addReviewerDto): Promise<void> {
     try {
-      return await this.jwtService.signAsync({ email }, { secret: process.env.JWT_SECRET, expiresIn: '7d' });
+      await this.sendReviewLink(id, dto);
     } catch {
       throw new BadRequestException();
     }

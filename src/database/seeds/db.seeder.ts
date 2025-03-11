@@ -5,6 +5,8 @@ import { faker } from '@faker-js/faker';
 import { User } from '../../users/entities/user.entity';
 import { Role } from '../../users/roles/entities/role.entity';
 import { Opportunity } from '../../opportunities/entities/opportunity.entity';
+import { Application } from '../../opportunities/applications/entities/application.entity';
+import { Organization } from '../../users/organizations/entities/organization.entity';
 
 type FieldType = 'text' | 'select' | 'number' | 'textarea';
 
@@ -26,6 +28,8 @@ export default class DbSeeder implements Seeder {
     await dataSource.query('TRUNCATE TABLE user;');
     await dataSource.query('TRUNCATE TABLE role;');
     await dataSource.query('TRUNCATE TABLE opportunity;');
+    await dataSource.query('TRUNCATE TABLE organization;');
+    await dataSource.query('TRUNCATE TABLE application;');
     await dataSource.query('SET FOREIGN_KEY_CHECKS = 1;');
 
     /**
@@ -33,25 +37,47 @@ export default class DbSeeder implements Seeder {
      */
     const roleRepository = dataSource.getRepository(Role);
     const opportunityRepository = dataSource.getRepository(Opportunity);
+    const applicationRepository = dataSource.getRepository(Application);
+    const organizationRepository = dataSource.getRepository(Organization);
     const userRepository = dataSource.getRepository(User);
 
     ['admin', 'user', 'cartograph', 'explorator', 'experimentor'].map(async (role) => {
       await roleRepository.save({ name: role });
     });
 
+    async function generateOrganizations(count: number): Promise<Organization[]> {
+      return Promise.all(
+        Array.from(
+          { length: count },
+          async () =>
+            await organizationRepository.save({
+              name: faker.company.buzzNoun()
+            })
+        )
+      );
+    }
+
+    function createReviewers(organizations: Organization[], count: number) {
+      return Array.from({ length: count }, () => {
+        return {
+          email: faker.internet.email(),
+          organization: faker.helpers.arrayElement(organizations.map((o) => o.name)),
+          solution: faker.number.int({ min: 3, max: 5 })
+        };
+      });
+    }
+
     async function createOpportunities(users: User[], count: number) {
+      const organizations = await generateOrganizations(10);
       function generateFields(count: number): Field[] {
         return Array.from({ length: count }, () => {
           const type: FieldType = faker.helpers.arrayElement(['text', 'select', 'number', 'textarea']);
-          const options =
-            type === 'select'
-              ? Array.from({ length: faker.number.int({ min: 2, max: 3 }) }, () => faker.word.sample(10))
-              : [''];
+          const options = type === 'select' ? Array.from({ length: 4 }, () => faker.word.sample(10)) : [''];
           return {
             id: faker.number.int({ min: 1000000000000, max: 9999999999999 }),
             type,
-            label: faker.word.words(10),
             options,
+            label: faker.word.words(10),
             required: faker.datatype.boolean()
           };
         });
@@ -68,7 +94,29 @@ export default class DbSeeder implements Seeder {
               published_at: faker.helpers.arrayElement([faker.date.recent(), faker.date.soon()]),
               author: faker.helpers.arrayElement(users),
               publisher: faker.helpers.arrayElement(users),
+              reviewers: createReviewers(organizations, faker.number.int({ min: 3, max: 5 })) as unknown as JSON,
               form: generateFields(faker.number.int({ min: 3, max: 5 })) as unknown as JSON
+            })
+        )
+      );
+    }
+
+    async function createApplications(users: User[], opportunities: Opportunity[], count: number) {
+      function generateResponses(count: number) {
+        return Array.from({ length: count }, () => {
+          const label = faker.word.words(10);
+          const value = faker.helpers.arrayElement([faker.word.words(10)]);
+          return { [label]: value };
+        });
+      }
+      return Promise.all(
+        Array.from(
+          { length: count },
+          async () =>
+            await applicationRepository.save({
+              applicant: faker.helpers.arrayElement(users),
+              responses: generateResponses(faker.number.int({ min: 3, max: 5 })) as unknown as JSON,
+              opportunity: faker.helpers.arrayElement(opportunities)
             })
         )
       );
@@ -106,7 +154,8 @@ export default class DbSeeder implements Seeder {
     const cartographs = await createUsers('cartograph', 2);
     const explorators = await createUsers('explorator', 2);
     const experimentors = await createUsers('experimentor', 2);
-    await createUsers('user', 200);
-    await createOpportunities([...cartographs, ...explorators, ...experimentors], 200);
+    const users = await createUsers('user', 200);
+    const opportunities = await createOpportunities([...cartographs, ...explorators, ...experimentors], 200);
+    await createApplications(users, opportunities, 200);
   }
 }

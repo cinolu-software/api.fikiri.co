@@ -8,6 +8,7 @@ import { ReviewsModule } from './reviews/reviews.module';
 @Module({
   imports: [TypeOrmModule.forFeature([Application]), ReviewsModule],
   controllers: [ApplicationsController],
-  providers: [ApplicationsService]
+  providers: [ApplicationsService],
+  exports: [ApplicationsService]
 })
 export class ApplicationsModule {}

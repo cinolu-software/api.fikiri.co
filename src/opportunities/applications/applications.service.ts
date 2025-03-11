@@ -26,7 +26,7 @@ export class ApplicationsService {
     }
   }
 
-  async finFor(id: string): Promise<Application[]> {
+  async findByOpportunity(id: string): Promise<Application[]> {
     return await this.applicationRepository.find({
       where: {
         opportunity: { id }

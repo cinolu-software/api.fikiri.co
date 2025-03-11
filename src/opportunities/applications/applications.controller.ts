@@ -21,15 +21,15 @@ export class ApplicationsController {
     return this.applicationsService.create(applicant, dto);
   }
 
-  @Get('for/:id')
+  @Get('opportunity/:id')
   @Auth(RoleEnum.Cartograph)
-  findFor(@Param('id') id: string) {
-    return this.applicationsService.finFor(id);
+  findByOpportunity(@Param('id') id: string) {
+    return this.applicationsService.findByOpportunity(id);
   }
 
   @Post('document/:id')
   @UseInterceptors(
-    FileInterceptor('thumb', {
+    FileInterceptor('doc', {
       storage: diskStorage({
         destination: './uploads/calls/applications/documents',
         filename: function (_req, file, cb) {
