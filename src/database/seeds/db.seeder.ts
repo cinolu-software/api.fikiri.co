@@ -82,6 +82,18 @@ export default class DbSeeder implements Seeder {
           };
         });
       }
+      function generateReviewForm(count: number) {
+        return Array.from({ length: count }, () => {
+          const type: FieldType = faker.helpers.arrayElement(['number', 'textarea']);
+          return {
+            id: faker.number.int({ min: 1000000000000, max: 9999999999999 }),
+            type,
+            label: faker.word.words(10),
+            description: faker.lorem.sentence(),
+            required: faker.datatype.boolean()
+          };
+        });
+      }
       return Promise.all(
         Array.from(
           { length: count },
@@ -95,7 +107,8 @@ export default class DbSeeder implements Seeder {
               author: faker.helpers.arrayElement(users),
               publisher: faker.helpers.arrayElement(users),
               reviewers: createReviewers(organizations, faker.number.int({ min: 3, max: 5 })) as unknown as JSON,
-              form: generateFields(faker.number.int({ min: 3, max: 5 })) as unknown as JSON
+              form: generateFields(faker.number.int({ min: 3, max: 5 })) as unknown as JSON,
+              review_form: generateReviewForm(faker.number.int({ min: 3, max: 5 })) as unknown as JSON
             })
         )
       );

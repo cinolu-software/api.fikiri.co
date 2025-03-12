@@ -17,5 +17,8 @@ export class CreateOpportunityDto {
   form: JSON;
 
   @IsOptional()
+  review_form: JSON;
+
+  @IsOptional()
   requirements: JSON;
 }

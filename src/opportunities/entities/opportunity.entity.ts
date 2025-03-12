@@ -29,6 +29,9 @@ export class Opportunity extends AbstractEntity {
   form: JSON;
 
   @Column({ type: 'json', nullable: true })
+  review_form: JSON;
+
+  @Column({ type: 'json', nullable: true })
   reviewers: JSON;
 
   @Column({ type: 'json', nullable: true })
