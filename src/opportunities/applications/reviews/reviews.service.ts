@@ -4,20 +4,22 @@ import { UpdateReviewDto } from './dto/update-review.dto';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Review } from './entities/review.entity';
 import { Repository } from 'typeorm';
-import { User } from '../../../users/entities/user.entity';
+import { OpportunitiesService } from '../../opportunities.service';
 
 @Injectable()
 export class ReviewsService {
   constructor(
     @InjectRepository(Review)
-    private reviewRepository: Repository<Review>
+    private reviewRepository: Repository<Review>,
+    private opportunitiesService: OpportunitiesService
   ) {}
 
-  async create(reviwer: User, dto: CreateReviewDto): Promise<Review> {
+  async create(token: string, dto: CreateReviewDto): Promise<Review> {
     try {
+      const reviewer = await this.opportunitiesService.verifyReviewer(token);
       return await this.reviewRepository.save({
         ...dto,
-        reviwer,
+        reviewer: reviewer.email,
         application: { id: dto.application }
       });
     } catch {

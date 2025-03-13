@@ -5,7 +5,7 @@ export class CreateReviewDto {
   note: number;
 
   @IsNotEmpty()
-  data: string;
+  data: JSON;
 
   @IsNotEmpty()
   application: string;

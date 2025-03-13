@@ -11,7 +11,7 @@ export class Review extends AbstractEntity {
   reviewer: string;
 
   @Column({ type: 'json', nullable: true })
-  data: string;
+  data: JSON;
 
   @ManyToOne(() => Application)
   @JoinColumn()

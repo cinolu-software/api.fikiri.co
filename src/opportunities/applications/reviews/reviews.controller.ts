@@ -2,17 +2,15 @@ import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/commo
 import { ReviewsService } from './reviews.service';
 import { CreateReviewDto } from './dto/create-review.dto';
 import { UpdateReviewDto } from './dto/update-review.dto';
-import { CurrentUser } from '../../../shared/decorators/user.decorator';
-import { User } from '../../../users/entities/user.entity';
 import { Review } from './entities/review.entity';
 
 @Controller('reviews')
 export class ReviewsController {
   constructor(private readonly reviewsService: ReviewsService) {}
 
-  @Post()
-  create(@CurrentUser() reviewer: User, @Body() dto: CreateReviewDto): Promise<Review> {
-    return this.reviewsService.create(reviewer, dto);
+  @Post(':token')
+  create(@Param('token') token: string, @Body() dto: CreateReviewDto): Promise<Review> {
+    return this.reviewsService.create(token, dto);
   }
 
   @Get('applications/:id')
