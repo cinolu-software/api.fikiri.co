@@ -36,8 +36,8 @@ export class OpportunitiesService {
       const { id, email } = await this.jwtService.verifyAsync(token);
       const opportunity = await this.findOne(id);
       const reviewers: addReviewerDto[] = (opportunity.reviewers as unknown as addReviewerDto[]) ?? [];
-      const reviewerIndex = reviewers.findIndex((reviewer) => reviewer.email === email);
-      const reviewer = reviewers.find((reviewer) => reviewer.email === email);
+      const reviewerIndex = reviewers.findIndex((r) => r.email === email);
+      const reviewer = reviewers.find((r) => r.email === email);
       if (reviewerIndex === -1) throw new ForbiddenException();
       const applications = await this.applicationsService.findByOpportunity(id);
       if (applications.length === 0) return [];
@@ -46,6 +46,17 @@ export class OpportunitiesService {
       return reviewerApplications;
     } catch {
       throw new BadRequestException();
+    }
+  }
+
+  async verifyReviewer(token: string): Promise<addReviewerDto> {
+    try {
+      const { id, email } = await this.jwtService.verifyAsync(token);
+      const opportunity = await this.findOne(id);
+      const reviewers: addReviewerDto[] = opportunity.reviewers as unknown as addReviewerDto[];
+      return reviewers.find((r) => r.email === email);
+    } catch {
+      throw new NotFoundException();
     }
   }
 
@@ -81,17 +92,6 @@ export class OpportunitiesService {
       return await this.opportunityRepository.save(opportunity);
     } catch {
       throw new BadRequestException();
-    }
-  }
-
-  async verifyReviewer(token: string): Promise<addReviewerDto> {
-    try {
-      const { id, email } = await this.jwtService.verifyAsync(token);
-      const opportunity = await this.findOne(id);
-      const reviewers: addReviewerDto[] = opportunity.reviewers as unknown as addReviewerDto[];
-      return reviewers.find((r) => r.email === email);
-    } catch {
-      throw new NotFoundException();
     }
   }
 
