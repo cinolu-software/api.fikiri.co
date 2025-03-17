@@ -13,6 +13,7 @@ import { UsersModule } from './users/users.module';
 import { BlogModule } from './blog/blog.module';
 import { TransformInterceptor } from './shared/interceptors/transform.interceptor';
 import { OpportunitiesModule } from './opportunities/opportunities.module';
+import { PartnersModule } from './partners/partners.module';
 
 @Module({
   imports: [
@@ -37,6 +38,7 @@ import { OpportunitiesModule } from './opportunities/opportunities.module';
     EmailModule,
     DatabaseModule,
     BlogModule,
+    PartnersModule,
     OpportunitiesModule
   ],
   providers: [

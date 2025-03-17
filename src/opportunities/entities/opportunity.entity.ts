@@ -1,6 +1,7 @@
-import { Column, Entity, JoinColumn, ManyToOne } from 'typeorm';
+import { Column, Entity, JoinColumn, ManyToOne, OneToMany } from 'typeorm';
 import { AbstractEntity } from '../../shared/utils/abstract.entity';
 import { User } from '../../users/entities/user.entity';
+import { Partner } from '../../partners/entities/partner.entity';
 
 @Entity()
 export class Opportunity extends AbstractEntity {
@@ -44,4 +45,7 @@ export class Opportunity extends AbstractEntity {
   @ManyToOne(() => User, (publisher) => publisher.published_calls)
   @JoinColumn()
   publisher: User;
+
+  @OneToMany(() => Partner, (partner) => partner.opportunity)
+  partners: Partner[];
 }

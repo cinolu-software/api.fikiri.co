@@ -1,7 +1,7 @@
 import { MigrationInterface, QueryRunner } from 'typeorm';
 
-export class Init1741780518565 implements MigrationInterface {
-  name = 'Init1741780518565';
+export class Init1742199192253 implements MigrationInterface {
+  name = 'Init1742199192253';
 
   public async up(queryRunner: QueryRunner): Promise<void> {
     await queryRunner.query(
@@ -21,6 +21,9 @@ export class Init1741780518565 implements MigrationInterface {
     );
     await queryRunner.query(
       `CREATE TABLE \`organization\` (\`id\` varchar(36) NOT NULL, \`created_at\` datetime(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6), \`updated_at\` datetime(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6) ON UPDATE CURRENT_TIMESTAMP(6), \`deleted_at\` datetime(6) NULL, \`name\` varchar(255) NOT NULL, PRIMARY KEY (\`id\`)) ENGINE=InnoDB`
+    );
+    await queryRunner.query(
+      `CREATE TABLE \`partner\` (\`id\` varchar(36) NOT NULL, \`created_at\` datetime(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6), \`updated_at\` datetime(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6) ON UPDATE CURRENT_TIMESTAMP(6), \`deleted_at\` datetime(6) NULL, \`name\` varchar(255) NOT NULL, \`link\` varchar(255) NULL, \`logo\` varchar(255) NULL, \`type\` enum ('standard', 'program_specific') NOT NULL, \`opportunityId\` varchar(36) NULL, PRIMARY KEY (\`id\`)) ENGINE=InnoDB`
     );
     await queryRunner.query(
       `CREATE TABLE \`opportunity\` (\`id\` varchar(36) NOT NULL, \`created_at\` datetime(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6), \`updated_at\` datetime(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6) ON UPDATE CURRENT_TIMESTAMP(6), \`deleted_at\` datetime(6) NULL, \`name\` varchar(255) NOT NULL, \`description\` text NOT NULL, \`ended_at\` datetime NOT NULL, \`started_at\` datetime NOT NULL, \`published_at\` datetime NULL, \`cover\` varchar(255) NULL, \`document\` varchar(255) NULL, \`form\` json NULL, \`review_form\` json NULL, \`reviewers\` json NULL, \`requirements\` json NULL, \`authorId\` varchar(36) NULL, \`publisherId\` varchar(36) NULL, PRIMARY KEY (\`id\`)) ENGINE=InnoDB`
@@ -48,6 +51,9 @@ export class Init1741780518565 implements MigrationInterface {
     );
     await queryRunner.query(
       `ALTER TABLE \`post\` ADD CONSTRAINT \`FK_c6fb082a3114f35d0cc27c518e0\` FOREIGN KEY (\`authorId\`) REFERENCES \`user\`(\`id\`) ON DELETE NO ACTION ON UPDATE NO ACTION`
+    );
+    await queryRunner.query(
+      `ALTER TABLE \`partner\` ADD CONSTRAINT \`FK_a9f64f38caa5171e6833c92ad0e\` FOREIGN KEY (\`opportunityId\`) REFERENCES \`opportunity\`(\`id\`) ON DELETE NO ACTION ON UPDATE NO ACTION`
     );
     await queryRunner.query(
       `ALTER TABLE \`opportunity\` ADD CONSTRAINT \`FK_86cda28413c6e4b67ce986bda13\` FOREIGN KEY (\`authorId\`) REFERENCES \`user\`(\`id\`) ON DELETE NO ACTION ON UPDATE NO ACTION`
@@ -84,6 +90,7 @@ export class Init1741780518565 implements MigrationInterface {
     await queryRunner.query(`ALTER TABLE \`review\` DROP FOREIGN KEY \`FK_8d5525f4acba6e2149fb5da4a8c\``);
     await queryRunner.query(`ALTER TABLE \`opportunity\` DROP FOREIGN KEY \`FK_12302c07f083358a26e0ff19887\``);
     await queryRunner.query(`ALTER TABLE \`opportunity\` DROP FOREIGN KEY \`FK_86cda28413c6e4b67ce986bda13\``);
+    await queryRunner.query(`ALTER TABLE \`partner\` DROP FOREIGN KEY \`FK_a9f64f38caa5171e6833c92ad0e\``);
     await queryRunner.query(`ALTER TABLE \`post\` DROP FOREIGN KEY \`FK_c6fb082a3114f35d0cc27c518e0\``);
     await queryRunner.query(`ALTER TABLE \`post\` DROP FOREIGN KEY \`FK_1077d47e0112cad3c16bbcea6cd\``);
     await queryRunner.query(`ALTER TABLE \`comment\` DROP FOREIGN KEY \`FK_94a85bb16d24033a2afdd5df060\``);
@@ -97,6 +104,7 @@ export class Init1741780518565 implements MigrationInterface {
     await queryRunner.query(`DROP TABLE \`application\``);
     await queryRunner.query(`DROP TABLE \`review\``);
     await queryRunner.query(`DROP TABLE \`opportunity\``);
+    await queryRunner.query(`DROP TABLE \`partner\``);
     await queryRunner.query(`DROP TABLE \`organization\``);
     await queryRunner.query(`DROP TABLE \`post\``);
     await queryRunner.query(`DROP TABLE \`comment\``);
