@@ -38,6 +38,9 @@ export class Opportunity extends AbstractEntity {
   @Column({ type: 'json', nullable: true })
   requirements: JSON;
 
+  @Column({ type: 'json', nullable: true })
+  contact_form: JSON;
+
   @ManyToOne(() => User, (author) => author.calls)
   @JoinColumn()
   author: User;

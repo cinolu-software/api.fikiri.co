@@ -20,5 +20,8 @@ export class CreateOpportunityDto {
   review_form: JSON;
 
   @IsOptional()
+  contact_form: JSON;
+
+  @IsOptional()
   requirements: JSON;
 }
