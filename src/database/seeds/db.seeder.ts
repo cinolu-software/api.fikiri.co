@@ -108,7 +108,8 @@ export default class DbSeeder implements Seeder {
               publisher: faker.helpers.arrayElement(users),
               reviewers: createReviewers(organizations, faker.number.int({ min: 3, max: 5 })) as unknown as JSON,
               form: generateFields(faker.number.int({ min: 3, max: 5 })) as unknown as JSON,
-              review_form: generateReviewForm(faker.number.int({ min: 3, max: 5 })) as unknown as JSON
+              review_form: generateReviewForm(faker.number.int({ min: 3, max: 5 })) as unknown as JSON,
+              contact_form: generateFields(faker.number.int({ min: 3, max: 5 })) as unknown as JSON
             })
         )
       );
