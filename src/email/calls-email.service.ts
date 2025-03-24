@@ -4,7 +4,7 @@ import { OnEvent } from '@nestjs/event-emitter';
 import { User } from '../users/entities/user.entity';
 
 @Injectable()
-export class OpportunityEmailService {
+export class callsEmailService {
   constructor(private readonly mailerSerive: MailerService) {}
 
   @OnEvent('add-reviewer')

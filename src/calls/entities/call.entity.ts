@@ -2,9 +2,10 @@ import { Column, Entity, JoinColumn, ManyToOne, OneToMany } from 'typeorm';
 import { AbstractEntity } from '../../shared/utils/abstract.entity';
 import { User } from '../../users/entities/user.entity';
 import { Partner } from '../../partners/entities/partner.entity';
+import { addReviewerDto } from '../dto/add-reviewer.dto';
 
-@Entity()
-export class Opportunity extends AbstractEntity {
+@Entity('callForApplications')
+export class Call extends AbstractEntity {
   @Column()
   name: string;
 
@@ -33,7 +34,7 @@ export class Opportunity extends AbstractEntity {
   review_form: JSON;
 
   @Column({ type: 'json', nullable: true })
-  reviewers: JSON;
+  reviewers: JSON | addReviewerDto[];
 
   @Column({ type: 'json', nullable: true })
   requirements: JSON;
@@ -49,6 +50,6 @@ export class Opportunity extends AbstractEntity {
   @JoinColumn()
   publisher: User;
 
-  @OneToMany(() => Partner, (partner) => partner.opportunity)
+  @OneToMany(() => Partner, (partner) => partner.call)
   partners: Partner[];
 }

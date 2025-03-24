@@ -18,7 +18,7 @@ export class ApplicationsService {
     try {
       return await this.applicationRepository.save({
         ...dto,
-        opportunity: { id: dto.opportunity },
+        call: { id: dto.call },
         applicant
       });
     } catch {
@@ -26,10 +26,10 @@ export class ApplicationsService {
     }
   }
 
-  async findByOpportunity(id: string): Promise<Application[]> {
+  async findByCall(id: string): Promise<Application[]> {
     return await this.applicationRepository.find({
       where: {
-        opportunity: { id }
+        call: { id }
       },
       order: { created_at: 'DESC' },
       relations: ['applicant']
@@ -67,7 +67,7 @@ export class ApplicationsService {
       return await this.applicationRepository.save({
         ...application,
         ...dto,
-        opportunity: { id: dto.opportunity }
+        call: { id: dto.call }
       });
     } catch {
       throw new BadRequestException();

@@ -12,7 +12,7 @@ import { EmailModule } from './email/email.module';
 import { UsersModule } from './users/users.module';
 import { BlogModule } from './blog/blog.module';
 import { TransformInterceptor } from './shared/interceptors/transform.interceptor';
-import { OpportunitiesModule } from './opportunities/opportunities.module';
+import { CallsModule } from './calls/calls.module';
 import { PartnersModule } from './partners/partners.module';
 
 @Module({
@@ -39,7 +39,7 @@ import { PartnersModule } from './partners/partners.module';
     DatabaseModule,
     BlogModule,
     PartnersModule,
-    OpportunitiesModule
+    CallsModule
   ],
   providers: [
     { provide: APP_GUARD, useClass: AuthGuard },

@@ -2,7 +2,7 @@ import { IsNotEmpty } from 'class-validator';
 
 export class CreateApplicationDto {
   @IsNotEmpty()
-  opportunity: string;
+  call: string;
 
   @IsNotEmpty()
   responses: JSON;

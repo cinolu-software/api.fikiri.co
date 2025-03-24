@@ -4,8 +4,8 @@ import * as bcrypt from 'bcrypt';
 import { faker } from '@faker-js/faker';
 import { User } from '../../users/entities/user.entity';
 import { Role } from '../../users/roles/entities/role.entity';
-import { Opportunity } from '../../opportunities/entities/opportunity.entity';
-import { Application } from '../../opportunities/applications/entities/application.entity';
+import { Call } from '../../calls/entities/call.entity';
+import { Application } from '../../calls/applications/entities/application.entity';
 import { Organization } from '../../users/organizations/entities/organization.entity';
 
 type FieldType = 'text' | 'select' | 'number' | 'textarea';
@@ -27,7 +27,7 @@ export default class DbSeeder implements Seeder {
     await dataSource.query('TRUNCATE TABLE user_roles_role;');
     await dataSource.query('TRUNCATE TABLE user;');
     await dataSource.query('TRUNCATE TABLE role;');
-    await dataSource.query('TRUNCATE TABLE opportunity;');
+    await dataSource.query('TRUNCATE TABLE call;');
     await dataSource.query('TRUNCATE TABLE organization;');
     await dataSource.query('TRUNCATE TABLE application;');
     await dataSource.query('SET FOREIGN_KEY_CHECKS = 1;');
@@ -36,7 +36,7 @@ export default class DbSeeder implements Seeder {
      * Get repositories
      */
     const roleRepository = dataSource.getRepository(Role);
-    const opportunityRepository = dataSource.getRepository(Opportunity);
+    const callRepository = dataSource.getRepository(Call);
     const applicationRepository = dataSource.getRepository(Application);
     const organizationRepository = dataSource.getRepository(Organization);
     const userRepository = dataSource.getRepository(User);
@@ -67,7 +67,7 @@ export default class DbSeeder implements Seeder {
       });
     }
 
-    async function createOpportunities(users: User[], count: number) {
+    async function createcalls(users: User[], count: number) {
       const organizations = await generateOrganizations(10);
       function generateFields(count: number): Field[] {
         return Array.from({ length: count }, () => {
@@ -98,7 +98,7 @@ export default class DbSeeder implements Seeder {
         Array.from(
           { length: count },
           async () =>
-            await opportunityRepository.save({
+            await callRepository.save({
               name: faker.company.buzzPhrase(),
               description: faker.commerce.productDescription(),
               ended_at: faker.date.soon(),
@@ -115,7 +115,7 @@ export default class DbSeeder implements Seeder {
       );
     }
 
-    async function createApplications(users: User[], opportunities: Opportunity[], count: number) {
+    async function createApplications(users: User[], calls: Call[], count: number) {
       function generateResponses(count: number) {
         return Array.from({ length: count }, () => {
           const label = faker.word.words(10);
@@ -130,7 +130,7 @@ export default class DbSeeder implements Seeder {
             await applicationRepository.save({
               applicant: faker.helpers.arrayElement(users),
               responses: generateResponses(faker.number.int({ min: 3, max: 5 })) as unknown as JSON,
-              opportunity: faker.helpers.arrayElement(opportunities)
+              call: faker.helpers.arrayElement(calls)
             })
         )
       );
@@ -169,7 +169,7 @@ export default class DbSeeder implements Seeder {
     const explorators = await createUsers('explorator', 2);
     const experimentors = await createUsers('experimentor', 2);
     const users = await createUsers('user', 200);
-    const opportunities = await createOpportunities([...cartographs, ...explorators, ...experimentors], 200);
-    await createApplications(users, opportunities, 200);
+    const calls = await createcalls([...cartographs, ...explorators, ...experimentors], 200);
+    await createApplications(users, calls, 200);
   }
 }

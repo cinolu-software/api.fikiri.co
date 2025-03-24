@@ -2,7 +2,7 @@ import { Column, Entity, JoinColumn, ManyToOne, OneToMany } from 'typeorm';
 import { AbstractEntity } from '../../../shared/utils/abstract.entity';
 import { User } from '../../../users/entities/user.entity';
 import { Review } from '../reviews/entities/review.entity';
-import { Opportunity } from '../../entities/opportunity.entity';
+import { Call } from '../../entities/call.entity';
 
 @Entity()
 export class Application extends AbstractEntity {
@@ -19,7 +19,7 @@ export class Application extends AbstractEntity {
   @JoinColumn()
   applicant: User;
 
-  @ManyToOne(() => Opportunity)
+  @ManyToOne(() => Call)
   @JoinColumn()
-  opportunity: Opportunity;
+  call: Call;
 }

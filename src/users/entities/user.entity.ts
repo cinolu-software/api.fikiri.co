@@ -5,8 +5,8 @@ import { Role } from '../roles/entities/role.entity';
 import { Post } from '../../blog/posts/entities/post.entity';
 import { Comment } from '../../blog/comments/entities/comment.entity';
 import { Organization } from '../organizations/entities/organization.entity';
-import { Opportunity } from '../../opportunities/entities/opportunity.entity';
-import { Application } from '../../opportunities/applications/entities/application.entity';
+import { Call } from '../../calls/entities/call.entity';
+import { Application } from '../../calls/applications/entities/application.entity';
 
 @Entity()
 export class User extends AbstractEntity {
@@ -37,11 +37,11 @@ export class User extends AbstractEntity {
   @OneToMany(() => Application, (application) => application.applicant)
   applications: Application[];
 
-  @OneToMany(() => Opportunity, (call) => call.author)
-  calls: Opportunity[];
+  @OneToMany(() => Call, (call) => call.author)
+  calls: Call[];
 
-  @OneToMany(() => Opportunity, (call) => call.publisher)
-  published_calls: Opportunity[];
+  @OneToMany(() => Call, (call) => call.publisher)
+  published_calls: Call[];
 
   @OneToMany(() => Post, (post) => post.author)
   posts: Post[];

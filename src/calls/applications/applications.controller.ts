@@ -21,10 +21,10 @@ export class ApplicationsController {
     return this.applicationsService.create(applicant, dto);
   }
 
-  @Get('opportunity/:id')
+  @Get('call/:id')
   @Auth(RoleEnum.Cartograph)
-  findByOpportunity(@Param('id') id: string) {
-    return this.applicationsService.findByOpportunity(id);
+  findByCall(@Param('id') id: string) {
+    return this.applicationsService.findByCall(id);
   }
 
   @Post('document/:id')

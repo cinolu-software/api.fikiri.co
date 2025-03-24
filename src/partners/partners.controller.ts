@@ -20,8 +20,8 @@ export class PartnersController {
   }
 
   @Post(':id')
-  createForOpportunity(@Body() dto: CreatePartnerDto, @Param('id') id: string): Promise<Partner> {
-    return this.partnersService.createForOpportunity(dto, id);
+  createForcall(@Body() dto: CreatePartnerDto, @Param('id') id: string): Promise<Partner> {
+    return this.partnersService.createForcall(dto, id);
   }
 
   @Get()

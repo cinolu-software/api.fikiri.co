@@ -21,9 +21,9 @@ export class PartnersService {
     }
   }
 
-  async createForOpportunity(dto: CreatePartnerDto, opportunityId: string): Promise<Partner> {
+  async createForcall(dto: CreatePartnerDto, callId: string): Promise<Partner> {
     try {
-      return await this.partnerRepository.save({ ...dto, opportunity: { id: opportunityId } });
+      return await this.partnerRepository.save({ ...dto, call: { id: callId } });
     } catch {
       throw new BadRequestException();
     }
