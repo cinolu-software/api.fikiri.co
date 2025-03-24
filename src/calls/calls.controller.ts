@@ -23,7 +23,6 @@ import { FileInterceptor } from '@nestjs/platform-express';
 import { diskStorage } from 'multer';
 import { addReviewerDto } from './dto/add-reviewer.dto';
 import { QueryParams } from './utils/types/query-params.type';
-import { Application } from './applications/entities/application.entity';
 
 @Controller('calls')
 @Auth(RoleEnum.Cartograph)
@@ -51,12 +50,6 @@ export class CallsController {
   @Auth(RoleEnum.Guest)
   findLatest(): Promise<Call[]> {
     return this.callsService.findLatest();
-  }
-
-  @Get('find-applications/:token')
-  @Auth(RoleEnum.Guest)
-  findFor(@Param('token') token: string): Promise<Application[]> {
-    return this.callsService.findFor(token);
   }
 
   @Get('find-reviewers/:id')

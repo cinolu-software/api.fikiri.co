@@ -27,7 +27,7 @@ export default class DbSeeder implements Seeder {
     await dataSource.query('TRUNCATE TABLE user_roles_role;');
     await dataSource.query('TRUNCATE TABLE user;');
     await dataSource.query('TRUNCATE TABLE role;');
-    await dataSource.query('TRUNCATE TABLE call;');
+    await dataSource.query('TRUNCATE TABLE callForApplications;');
     await dataSource.query('TRUNCATE TABLE organization;');
     await dataSource.query('TRUNCATE TABLE application;');
     await dataSource.query('SET FOREIGN_KEY_CHECKS = 1;');

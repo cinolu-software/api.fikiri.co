@@ -26,16 +26,6 @@ export class ApplicationsService {
     }
   }
 
-  async findByCall(id: string): Promise<Application[]> {
-    return await this.applicationRepository.find({
-      where: {
-        call: { id }
-      },
-      order: { created_at: 'DESC' },
-      relations: ['applicant']
-    });
-  }
-
   async findAll(): Promise<Application[]> {
     return await this.applicationRepository.find({
       order: { created_at: 'DESC' },

@@ -1,4 +1,4 @@
-import { BadRequestException, ForbiddenException, Injectable, NotFoundException } from '@nestjs/common';
+import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
 import { CreateCallDto } from './dto/create-call.dto';
 import { UpdateCallDto } from './dto/update-call.dto';
 import { InjectRepository } from '@nestjs/typeorm';
@@ -11,7 +11,6 @@ import { addReviewerDto } from './dto/add-reviewer.dto';
 import { QueryParams } from './utils/types/query-params.type';
 import { EventEmitter2 } from '@nestjs/event-emitter';
 import { ApplicationsService } from './applications/applications.service';
-import { Application } from './applications/entities/application.entity';
 
 @Injectable()
 export class CallsService {
@@ -26,24 +25,6 @@ export class CallsService {
   async create(author: User, dto: CreateCallDto): Promise<Call> {
     try {
       return await this.callRepository.save({ ...dto, author });
-    } catch {
-      throw new BadRequestException();
-    }
-  }
-
-  async findFor(token: string): Promise<Application[]> {
-    try {
-      const { id, email } = await this.jwtService.verifyAsync(token);
-      const call = await this.findOne(id);
-      const reviewers: addReviewerDto[] = (call.reviewers as unknown as addReviewerDto[]) ?? [];
-      const reviewerIndex = reviewers.findIndex((r) => r.email === email);
-      const reviewer = reviewers.find((r) => r.email === email);
-      if (reviewerIndex === -1) throw new ForbiddenException();
-      const applications = await this.applicationsService.findByCall(id);
-      if (applications.length === 0) return [];
-      let reviewerApplications = applications.filter((_, index) => index % reviewers.length === reviewerIndex);
-      if (reviewer.solution) reviewerApplications = reviewerApplications.slice(0, reviewer.solution);
-      return reviewerApplications;
     } catch {
       throw new BadRequestException();
     }
@@ -86,7 +67,7 @@ export class CallsService {
     try {
       const call = await this.findOne(id);
       await this.sendReviewLink(id, dto);
-      const reviewers = (call.reviewers as unknown as addReviewerDto[]) || [];
+      const reviewers = (call.reviewers || []) as addReviewerDto[];
       reviewers.push(dto);
       call.reviewers = reviewers as unknown as JSON;
       return await this.callRepository.save(call);
