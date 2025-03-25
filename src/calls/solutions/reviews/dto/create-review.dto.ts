@@ -8,5 +8,5 @@ export class CreateReviewDto {
   data: JSON;
 
   @IsNotEmpty()
-  application: string;
+  solution: string;
 }

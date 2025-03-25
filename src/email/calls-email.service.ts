@@ -12,12 +12,12 @@ export class callsEmailService {
     try {
       await this.mailerSerive.sendMail({
         to: user.email,
-        subject: "Invitation à l'évaluation d'une solution dans le cadre de fikiri",
+        subject: "Invitation à l'évaluation Fikiri",
         template: 'add-reviewer',
         context: { user, link }
       });
     } catch {
-      throw new BadRequestException("Une erreur est survenenue lors de l'envoie d'email");
+      throw new BadRequestException();
     }
   }
 }

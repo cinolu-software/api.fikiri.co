@@ -1,6 +1,6 @@
 import { IsNotEmpty } from 'class-validator';
 
-export class CreateApplicationDto {
+export class CreateSolutionDto {
   @IsNotEmpty()
   call: string;
 

@@ -1,5 +1,5 @@
 import { Column, Entity, JoinColumn, ManyToOne } from 'typeorm';
-import { Application } from '../../entities/application.entity';
+import { Solution } from '../../entities/solution.entity';
 import { AbstractEntity } from '../../../../shared/utils/abstract.entity';
 
 @Entity()
@@ -13,7 +13,7 @@ export class Review extends AbstractEntity {
   @Column({ type: 'json', nullable: true })
   data: JSON;
 
-  @ManyToOne(() => Application)
+  @ManyToOne(() => Solution)
   @JoinColumn()
-  application: Application;
+  solution: Solution;
 }

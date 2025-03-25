@@ -21,8 +21,8 @@ import { Auth } from '../shared/decorators/auth.decorators';
 import { RoleEnum } from '../shared/enums/roles.enum';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { diskStorage } from 'multer';
-import { addReviewerDto } from './dto/add-reviewer.dto';
 import { QueryParams } from './utils/types/query-params.type';
+import { IReviewer } from './utils/types/reviewer.type';
 
 @Controller('calls')
 @Auth(RoleEnum.Cartograph)
@@ -53,18 +53,18 @@ export class CallsController {
   }
 
   @Get('find-reviewers/:id')
-  findReviewers(@Param('id') id: string): Promise<addReviewerDto[]> {
+  findReviewers(@Param('id') id: string): Promise<IReviewer[]> {
     return this.callsService.findReviewers(id);
   }
 
   @Post('add-reviewer/:id')
-  addReviwer(@Param('id') id: string, @Body() dto: addReviewerDto): Promise<Call> {
+  addReviwer(@Param('id') id: string, @Body() dto: IReviewer): Promise<Call> {
     return this.callsService.addReviewer(id, dto);
   }
 
-  @Post('update-reviewer/:id')
-  updateReviewer(@Param('id') id: string, @Body() dto: addReviewerDto): Promise<Call> {
-    return this.callsService.updateReviewer(id, dto);
+  @Post('update-reviewer/:id/:email')
+  updateReviewer(@Param() params: unknown, @Body() dto: IReviewer): Promise<Call> {
+    return this.callsService.updateReviewer(params['id'], params['email'], dto);
   }
 
   @Delete('delete-reviewer/:id')
@@ -72,9 +72,9 @@ export class CallsController {
     return this.callsService.deleteReviewer(id, email);
   }
 
-  @Post('resend-review-link/:id')
-  resendReviewLink(@Param('id') id: string, @Body() dto: addReviewerDto): Promise<void> {
-    return this.callsService.resendReviewLink(id, dto);
+  @Post('resend-review-link/:id/:email')
+  resendReviewLink(@Param() params: unknown): Promise<void> {
+    return this.callsService.resendReviewLink(params['id'], params['email']);
   }
 
   @Post('cover/:id')

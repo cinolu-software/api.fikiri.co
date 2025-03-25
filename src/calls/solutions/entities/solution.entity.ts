@@ -5,19 +5,19 @@ import { Review } from '../reviews/entities/review.entity';
 import { Call } from '../../entities/call.entity';
 
 @Entity()
-export class Application extends AbstractEntity {
-  @Column({ type: 'json', nullable: true })
+export class Solution extends AbstractEntity {
+  @Column({ type: 'json' })
   responses: JSON;
 
   @Column({ nullable: true })
-  document: string;
+  reviewer: string;
 
-  @OneToMany(() => Review, (review) => review.application)
+  @OneToMany(() => Review, (review) => review.solution)
   reviews: Review[];
 
-  @ManyToOne(() => User, (applicant) => applicant.applications)
+  @ManyToOne(() => User, (user) => user.solutions)
   @JoinColumn()
-  applicant: User;
+  user: User;
 
   @ManyToOne(() => Call)
   @JoinColumn()

@@ -4,34 +4,27 @@ import { UpdateReviewDto } from './dto/update-review.dto';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Review } from './entities/review.entity';
 import { Repository } from 'typeorm';
-import { CallsService } from '../../calls.service';
+import { JwtService } from '@nestjs/jwt';
 
 @Injectable()
 export class ReviewsService {
   constructor(
     @InjectRepository(Review)
     private reviewRepository: Repository<Review>,
-    private callsService: CallsService
+    private jwtService: JwtService
   ) {}
 
   async create(token: string, dto: CreateReviewDto): Promise<Review> {
     try {
-      const reviewer = await this.callsService.verifyReviewer(token);
+      const { email } = await this.jwtService.verifyAsync(token, { secret: process.env.JWT_SECRET });
       return await this.reviewRepository.save({
         ...dto,
-        reviewer: reviewer.email,
-        application: { id: dto.application }
+        reviewer: email,
+        solution: { id: dto.solution }
       });
     } catch {
       throw new BadRequestException();
     }
-  }
-
-  async findForApplication(id: string): Promise<Review[]> {
-    return await this.reviewRepository.find({
-      where: { application: { id } },
-      order: { created_at: 'DESC' }
-    });
   }
 
   async findOne(id: string): Promise<Review> {
@@ -47,7 +40,7 @@ export class ReviewsService {
       const review = await this.findOne(id);
       return await this.reviewRepository.save({
         ...review,
-        application: { id: dto.application }
+        solution: { id: dto.solution }
       });
     } catch {
       throw new BadRequestException();

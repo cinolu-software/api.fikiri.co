@@ -6,7 +6,7 @@ import { Post } from '../../blog/posts/entities/post.entity';
 import { Comment } from '../../blog/comments/entities/comment.entity';
 import { Organization } from '../organizations/entities/organization.entity';
 import { Call } from '../../calls/entities/call.entity';
-import { Application } from '../../calls/applications/entities/application.entity';
+import { Solution } from '../../calls/solutions/entities/solution.entity';
 
 @Entity()
 export class User extends AbstractEntity {
@@ -34,8 +34,8 @@ export class User extends AbstractEntity {
   @Column({ type: 'datetime', nullable: true, default: null })
   verified_at: Date;
 
-  @OneToMany(() => Application, (application) => application.applicant)
-  applications: Application[];
+  @OneToMany(() => Solution, (solution) => solution.user)
+  solutions: Solution[];
 
   @OneToMany(() => Call, (call) => call.author)
   calls: Call[];

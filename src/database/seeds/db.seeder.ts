@@ -5,7 +5,7 @@ import { faker } from '@faker-js/faker';
 import { User } from '../../users/entities/user.entity';
 import { Role } from '../../users/roles/entities/role.entity';
 import { Call } from '../../calls/entities/call.entity';
-import { Application } from '../../calls/applications/entities/application.entity';
+import { Solution } from '../../calls/solutions/entities/solution.entity';
 import { Organization } from '../../users/organizations/entities/organization.entity';
 
 type FieldType = 'text' | 'select' | 'number' | 'textarea';
@@ -29,7 +29,7 @@ export default class DbSeeder implements Seeder {
     await dataSource.query('TRUNCATE TABLE role;');
     await dataSource.query('TRUNCATE TABLE callForApplications;');
     await dataSource.query('TRUNCATE TABLE organization;');
-    await dataSource.query('TRUNCATE TABLE application;');
+    await dataSource.query('TRUNCATE TABLE solution;');
     await dataSource.query('SET FOREIGN_KEY_CHECKS = 1;');
 
     /**
@@ -37,7 +37,7 @@ export default class DbSeeder implements Seeder {
      */
     const roleRepository = dataSource.getRepository(Role);
     const callRepository = dataSource.getRepository(Call);
-    const applicationRepository = dataSource.getRepository(Application);
+    const solutionRepository = dataSource.getRepository(Solution);
     const organizationRepository = dataSource.getRepository(Organization);
     const userRepository = dataSource.getRepository(User);
 
@@ -106,7 +106,7 @@ export default class DbSeeder implements Seeder {
               published_at: faker.helpers.arrayElement([faker.date.recent(), faker.date.soon()]),
               author: faker.helpers.arrayElement(users),
               publisher: faker.helpers.arrayElement(users),
-              reviewers: createReviewers(organizations, faker.number.int({ min: 3, max: 5 })) as unknown as JSON,
+              reviewers: createReviewers(organizations, faker.number.int({ min: 3, max: 5 })),
               form: generateFields(faker.number.int({ min: 3, max: 5 })) as unknown as JSON,
               review_form: generateReviewForm(faker.number.int({ min: 3, max: 5 })) as unknown as JSON,
               contact_form: generateFields(faker.number.int({ min: 3, max: 5 })) as unknown as JSON
@@ -115,7 +115,7 @@ export default class DbSeeder implements Seeder {
       );
     }
 
-    async function createApplications(users: User[], calls: Call[], count: number) {
+    async function createsolutions(users: User[], calls: Call[], count: number) {
       function generateResponses(count: number) {
         return Array.from({ length: count }, () => {
           const label = faker.word.words(10);
@@ -127,8 +127,8 @@ export default class DbSeeder implements Seeder {
         Array.from(
           { length: count },
           async () =>
-            await applicationRepository.save({
-              applicant: faker.helpers.arrayElement(users),
+            await solutionRepository.save({
+              user: faker.helpers.arrayElement(users),
               responses: generateResponses(faker.number.int({ min: 3, max: 5 })) as unknown as JSON,
               call: faker.helpers.arrayElement(calls)
             })
@@ -170,6 +170,6 @@ export default class DbSeeder implements Seeder {
     const experimentors = await createUsers('experimentor', 2);
     const users = await createUsers('user', 200);
     const calls = await createcalls([...cartographs, ...explorators, ...experimentors], 200);
-    await createApplications(users, calls, 200);
+    await createsolutions(users, calls, 200);
   }
 }

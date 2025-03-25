@@ -2,7 +2,7 @@ import { Column, Entity, JoinColumn, ManyToOne, OneToMany } from 'typeorm';
 import { AbstractEntity } from '../../shared/utils/abstract.entity';
 import { User } from '../../users/entities/user.entity';
 import { Partner } from '../../partners/entities/partner.entity';
-import { addReviewerDto } from '../dto/add-reviewer.dto';
+import { IReviewer } from '../utils/types/reviewer.type';
 
 @Entity('callForApplications')
 export class Call extends AbstractEntity {
@@ -34,7 +34,7 @@ export class Call extends AbstractEntity {
   review_form: JSON;
 
   @Column({ type: 'json', nullable: true })
-  reviewers: JSON | addReviewerDto[];
+  reviewers: IReviewer[];
 
   @Column({ type: 'json', nullable: true })
   requirements: JSON;

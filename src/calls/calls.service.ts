@@ -7,10 +7,10 @@ import { LessThanOrEqual, MoreThan, Repository } from 'typeorm';
 import { User } from '../users/entities/user.entity';
 import * as fs from 'fs-extra';
 import { JwtService } from '@nestjs/jwt';
-import { addReviewerDto } from './dto/add-reviewer.dto';
 import { QueryParams } from './utils/types/query-params.type';
 import { EventEmitter2 } from '@nestjs/event-emitter';
-import { ApplicationsService } from './applications/applications.service';
+import { SolutionsService } from './solutions/solutions.service';
+import { IReviewer } from './utils/types/reviewer.type';
 
 @Injectable()
 export class CallsService {
@@ -19,7 +19,7 @@ export class CallsService {
     private callRepository: Repository<Call>,
     private jwtService: JwtService,
     private eventEmitter: EventEmitter2,
-    private applicationsService: ApplicationsService
+    private solutionsService: SolutionsService
   ) {}
 
   async create(author: User, dto: CreateCallDto): Promise<Call> {
@@ -30,60 +30,45 @@ export class CallsService {
     }
   }
 
-  async verifyReviewer(token: string): Promise<addReviewerDto> {
-    try {
-      const { id, email } = await this.jwtService.verifyAsync(token);
-      const call = await this.findOne(id);
-      const reviewers: addReviewerDto[] = call.reviewers as unknown as addReviewerDto[];
-      return reviewers.find((r) => r.email === email);
-    } catch {
-      throw new NotFoundException();
-    }
-  }
-
-  async findReviewers(id: string): Promise<addReviewerDto[]> {
+  async findReviewers(id: string): Promise<IReviewer[]> {
     try {
       const call = await this.findOne(id);
-      return call.reviewers as unknown as addReviewerDto[];
+      return call.reviewers;
     } catch {
       throw new BadRequestException();
     }
   }
 
-  async sendReviewLink(id: string, dto: addReviewerDto): Promise<void> {
+  async sendReviewLink(id: string, dto: IReviewer): Promise<void> {
     try {
       const token = await this.jwtService.signAsync(
         { ...dto, id },
         { secret: process.env.JWT_SECRET, expiresIn: '7d' }
       );
-      const link = `${process.env.ACCOUNT_URI}review/${token}`;
+      const link = `${process.env.ACCOUNT_URI}?token=/${token}`;
       this.eventEmitter.emit('add-reviewer', { user: dto, link });
     } catch {
       throw new BadRequestException();
     }
   }
 
-  async addReviewer(id: string, dto: addReviewerDto): Promise<Call> {
+  async addReviewer(id: string, dto: IReviewer): Promise<Call> {
     try {
       const call = await this.findOne(id);
+      call.reviewers = [...call.reviewers, dto];
+      await this.solutionsService.affect(dto.solutions, dto.email);
       await this.sendReviewLink(id, dto);
-      const reviewers = (call.reviewers || []) as addReviewerDto[];
-      reviewers.push(dto);
-      call.reviewers = reviewers as unknown as JSON;
       return await this.callRepository.save(call);
     } catch {
       throw new BadRequestException();
     }
   }
 
-  async updateReviewer(id: string, dto: addReviewerDto): Promise<Call> {
+  async updateReviewer(id: string, email: string, dto: IReviewer): Promise<Call> {
     try {
       const call = await this.findOne(id);
-      const reviewers = (call.reviewers || []) as addReviewerDto[];
-      const index = reviewers.findIndex((reviewer) => reviewer.email === dto.email);
-      if (index === -1) throw new NotFoundException();
-      reviewers[index] = dto;
-      call.reviewers = reviewers as unknown as JSON;
+      call.reviewers = call.reviewers?.map((r) => (r.email === email ? dto : r));
+      await this.solutionsService.reaffectReviewer(email, dto.email);
       return await this.callRepository.save(call);
     } catch {
       throw new BadRequestException();
@@ -93,16 +78,15 @@ export class CallsService {
   async deleteReviewer(id: string, email: string): Promise<Call> {
     try {
       const call = await this.findOne(id);
-      const reviewers = (call.reviewers || []) as addReviewerDto[];
-      const updatedReviewers = reviewers.filter((r) => r.email !== email);
-      call.reviewers = updatedReviewers as unknown as JSON;
+      call.reviewers = call.reviewers?.filter((r) => r.email !== email);
+      await this.solutionsService.reaffectReviewer(email, null);
       return await this.callRepository.save(call);
     } catch {
       throw new BadRequestException();
     }
   }
 
-  async resendReviewLink(id: string, dto: addReviewerDto): Promise<void> {
+  async resendReviewLink(id: string, dto: IReviewer): Promise<void> {
     try {
       await this.sendReviewLink(id, dto);
     } catch {
@@ -183,7 +167,10 @@ export class CallsService {
     try {
       const call = await this.findOne(id);
       if (call.document) await fs.unlink(`./uploads/calls/documents/${call.document}`);
-      return await this.callRepository.save({ ...call, document: file.filename });
+      return await this.callRepository.save({
+        ...call,
+        document: file.filename
+      });
     } catch {
       throw new BadRequestException();
     }
