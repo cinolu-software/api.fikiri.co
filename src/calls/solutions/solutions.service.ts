@@ -6,6 +6,7 @@ import { Solution } from './entities/solution.entity';
 import { IsNull, Repository } from 'typeorm';
 import { User } from '../../users/entities/user.entity';
 import { JwtService } from '@nestjs/jwt';
+import { IReviewer } from '../utils/types/reviewer.type';
 
 @Injectable()
 export class SolutionsService {
@@ -27,28 +28,18 @@ export class SolutionsService {
     }
   }
 
-  async findUnaffected(count: number, id: string): Promise<[Solution[], number]> {
-    return await this.solutionRepository.findAndCount({
-      where: {
-        reviewer: IsNull(),
-        call: { id }
-      },
-      take: count
+  async findAll(): Promise<Solution[]> {
+    return await this.solutionRepository.find({
+      order: { updated_at: 'DESC' },
+      relations: ['user']
     });
   }
 
-  async affect(count: number, token: unknown) {
-    try {
-      const [unaffected, n] = await this.findUnaffected(+count, token['id']);
-      if (n === 0) throw new BadRequestException();
-      const affected = unaffected.map((solution) => {
-        solution.reviewer = token['email'];
-        return solution;
-      });
-      return await this.solutionRepository.save(affected);
-    } catch {
-      throw new BadRequestException();
-    }
+  async findUnaffected(id: string, count: number): Promise<[Solution[], number]> {
+    return await this.solutionRepository.findAndCount({
+      where: { reviewer: IsNull(), call: { id } },
+      take: count
+    });
   }
 
   async findByReviewer(token: string): Promise<Solution[]> {
@@ -60,11 +51,12 @@ export class SolutionsService {
     }
   }
 
-  async reaffectReviewer(oldReviewer: string, reviewer: string | null): Promise<Solution[]> {
+  async affect(id: string, reviewer: IReviewer) {
     try {
-      const solutions = await this.solutionRepository.findBy({ reviewer: oldReviewer });
-      const affected = solutions.map((solution) => {
-        solution.reviewer = reviewer;
+      const [unaffected, n] = await this.findUnaffected(id, +reviewer.solutions);
+      if (n === 0) throw new BadRequestException();
+      const affected = unaffected.map((solution) => {
+        solution.reviewer = reviewer.email;
         return solution;
       });
       return await this.solutionRepository.save(affected);
@@ -72,6 +64,20 @@ export class SolutionsService {
       throw new BadRequestException();
     }
   }
+
+  // async reaffect(oldReviewer: string, reviewer: IReviewer): Promise<Solution[]> {
+  //   try {
+  //     const solutions = await this.solutionRepository.findBy({ reviewer: oldReviewer });
+  //     const affected = solutions.map((solution) => {
+  //       solution.reviewer = null;
+  //       return solution;
+  //     });
+  //     await this.affect()
+  //     return await this.solutionRepository.save(affected);
+  //   } catch {
+  //     throw new BadRequestException();
+  //   }
+  // }
 
   async findByCall(id: string): Promise<Solution[]> {
     try {
@@ -81,13 +87,6 @@ export class SolutionsService {
     } catch {
       throw new NotFoundException();
     }
-  }
-
-  async findAll(): Promise<Solution[]> {
-    return await this.solutionRepository.find({
-      order: { updated_at: 'DESC' },
-      relations: ['user']
-    });
   }
 
   async findOne(id: string): Promise<Solution> {
