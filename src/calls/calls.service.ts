@@ -193,8 +193,10 @@ export class CallsService {
     try {
       const call = await this.findOne(id);
       const reviewers = call.reviewers as unknown as IReviewer[];
-      call.reviewers = reviewers?.map((r) => (r.email === email ? dto : r)) as unknown as JSON;
-      // await this.solutionsService.affect(id, dto);
+      if (!reviewers) throw new BadRequestException();
+      const reviewer = reviewers.find((r) => r.email === email);
+      call.reviewers = reviewers.map((r) => (r.email === reviewer.email ? dto : r)) as unknown as JSON;
+      await this.solutionsService.reaffect(id, reviewer, dto);
       return await this.callRepository.save(call);
     } catch {
       throw new BadRequestException();
@@ -206,7 +208,7 @@ export class CallsService {
       const call = await this.findOne(id);
       const reviewers = call.reviewers as unknown as IReviewer[];
       call.reviewers = reviewers?.filter((r) => r.email !== email) as unknown as JSON;
-      // await this.solutionsService.reaffect(email, null);
+      await this.solutionsService.desaffect(id, email);
       return await this.callRepository.save(call);
     } catch {
       throw new BadRequestException();

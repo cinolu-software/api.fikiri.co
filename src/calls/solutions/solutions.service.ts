@@ -42,18 +42,29 @@ export class SolutionsService {
     });
   }
 
+  async findAffectedForReviewer(callId: string, reviewer: string): Promise<Solution[]> {
+    return await this.solutionRepository.find({
+      where: {
+        reviewer,
+        call: { id: callId }
+      }
+    });
+  }
+
   async findByReviewer(token: string): Promise<Solution[]> {
     try {
-      const { email } = await this.jwtService.verifyAsync(token, { secret: process.env.JWT_SECRET });
-      return await this.solutionRepository.findBy({ reviewer: email });
+      const { id, email } = await this.jwtService.verifyAsync(token, {
+        secret: process.env.JWT_SECRET
+      });
+      return await this.findAffectedForReviewer(id, email);
     } catch {
       throw new NotFoundException();
     }
   }
 
-  async affect(id: string, reviewer: IReviewer) {
+  async affect(callId: string, reviewer: IReviewer) {
     try {
-      const [unaffected, n] = await this.findUnaffected(id, +reviewer.solutions);
+      const [unaffected, n] = await this.findUnaffected(callId, reviewer.solutions);
       if (n === 0) throw new BadRequestException();
       const affected = unaffected.map((solution) => {
         solution.reviewer = reviewer.email;
@@ -65,19 +76,28 @@ export class SolutionsService {
     }
   }
 
-  // async reaffect(oldReviewer: string, reviewer: IReviewer): Promise<Solution[]> {
-  //   try {
-  //     const solutions = await this.solutionRepository.findBy({ reviewer: oldReviewer });
-  //     const affected = solutions.map((solution) => {
-  //       solution.reviewer = null;
-  //       return solution;
-  //     });
-  //     await this.affect()
-  //     return await this.solutionRepository.save(affected);
-  //   } catch {
-  //     throw new BadRequestException();
-  //   }
-  // }
+  async desaffect(callId: string, reviewer: string): Promise<Solution[]> {
+    try {
+      const solutions = await this.findAffectedForReviewer(callId, reviewer);
+      if (!solutions) throw new BadRequestException();
+      const desaffected = solutions.map((solution) => {
+        solution.reviewer = null;
+        return solution;
+      });
+      return await this.solutionRepository.save(desaffected);
+    } catch {
+      throw new BadRequestException();
+    }
+  }
+
+  async reaffect(callId: string, oldReviewer: IReviewer, reviewer: IReviewer): Promise<Solution[]> {
+    try {
+      await this.desaffect(callId, oldReviewer.email);
+      return await this.affect(callId, reviewer);
+    } catch {
+      throw new BadRequestException();
+    }
+  }
 
   async findByCall(id: string): Promise<Solution[]> {
     try {
