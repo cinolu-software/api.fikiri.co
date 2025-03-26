@@ -30,13 +30,13 @@ export class CallsService {
     }
   }
 
-  async publish(publisher: User, id: string, date: Date): Promise<Call> {
+  async publish(publisher: User, id: string): Promise<Call> {
     try {
       const call = await this.findOne(id);
       return await this.callRepository.save({
         ...call,
         publisher,
-        published_at: date ? new Date(date) : new Date()
+        published_at: new Date()
       });
     } catch {
       throw new BadRequestException();
