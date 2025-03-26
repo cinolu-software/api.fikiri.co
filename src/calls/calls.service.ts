@@ -152,12 +152,22 @@ export class CallsService {
     }
   }
 
-  async sendReviewLink(id: string, dto: IReviewer): Promise<void> {
+  async generateReviewLink(id: string, dto: IReviewer): Promise<string> {
     try {
-      const token = await this.jwtService.signAsync(
+      return await this.jwtService.signAsync(
         { ...dto, id },
-        { secret: process.env.JWT_SECRET, expiresIn: '7d' }
+        {
+          secret: process.env.JWT_SECRET,
+          expiresIn: '7d'
+        }
       );
+    } catch {
+      throw new BadRequestException();
+    }
+  }
+
+  async sendReviewLink(dto: IReviewer, token: string): Promise<void> {
+    try {
       const link = `${process.env.ACCOUNT_URI}review?token=${token}`;
       this.eventEmitter.emit('add-reviewer', { user: dto, link });
     } catch {
@@ -170,8 +180,9 @@ export class CallsService {
       const call = await this.findOne(id);
       const reviewers = call.reviewers as unknown as IReviewer[];
       call.reviewers = [...reviewers, dto] as unknown as JSON;
-      await this.solutionsService.affect(dto.solutions, dto.email);
-      await this.sendReviewLink(id, dto);
+      await this.solutionsService.affect(dto.solutions, dto);
+      const token = await this.generateReviewLink(id, dto);
+      await this.sendReviewLink(dto, token);
       return await this.callRepository.save(call);
     } catch {
       throw new BadRequestException();
@@ -204,7 +215,8 @@ export class CallsService {
 
   async resendReviewLink(id: string, dto: IReviewer): Promise<void> {
     try {
-      await this.sendReviewLink(id, dto);
+      const token = await this.generateReviewLink(id, dto);
+      await this.sendReviewLink(dto, token);
     } catch {
       throw new BadRequestException();
     }
