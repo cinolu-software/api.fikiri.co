@@ -30,19 +30,6 @@ export class CallsService {
     }
   }
 
-  async unpublish(id: string): Promise<Call> {
-    try {
-      const call = await this.findOne(id);
-      return await this.callRepository.save({
-        ...call,
-        published_at: null,
-        publisher: null
-      });
-    } catch {
-      throw new BadRequestException();
-    }
-  }
-
   async publish(publisher: User, id: string, date: Date): Promise<Call> {
     try {
       const call = await this.findOne(id);
@@ -50,6 +37,19 @@ export class CallsService {
         ...call,
         publisher,
         published_at: date ? new Date(date) : new Date()
+      });
+    } catch {
+      throw new BadRequestException();
+    }
+  }
+
+  async unpublish(id: string): Promise<Call> {
+    try {
+      const call = await this.findOne(id);
+      return await this.callRepository.save({
+        ...call,
+        published_at: null,
+        publisher: null
       });
     } catch {
       throw new BadRequestException();
