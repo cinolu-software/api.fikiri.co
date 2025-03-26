@@ -27,19 +27,22 @@ export class SolutionsService {
     }
   }
 
-  async findUnaffected(count: number): Promise<[Solution[], number]> {
+  async findUnaffected(count: number, id: string): Promise<[Solution[], number]> {
     return await this.solutionRepository.findAndCount({
-      where: { reviewer: IsNull() },
+      where: {
+        reviewer: IsNull(),
+        call: { id }
+      },
       take: count
     });
   }
 
-  async affect(count: number, reviewer: string) {
+  async affect(count: number, token: unknown) {
     try {
-      const [unaffected, n] = await this.findUnaffected(+count || 1);
+      const [unaffected, n] = await this.findUnaffected(+count, token['id']);
       if (n === 0) throw new BadRequestException();
       const affected = unaffected.map((solution) => {
-        solution.reviewer = reviewer;
+        solution.reviewer = token['email'];
         return solution;
       });
       return await this.solutionRepository.save(affected);
