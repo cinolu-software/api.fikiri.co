@@ -158,7 +158,7 @@ export class CallsService {
         { ...dto, id },
         { secret: process.env.JWT_SECRET, expiresIn: '7d' }
       );
-      const link = `${process.env.ACCOUNT_URI}?token=/${token}`;
+      const link = `${process.env.ACCOUNT_URI}review?token=${token}`;
       this.eventEmitter.emit('add-reviewer', { user: dto, link });
     } catch {
       throw new BadRequestException();
