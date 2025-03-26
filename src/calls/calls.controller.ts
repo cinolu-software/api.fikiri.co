@@ -115,8 +115,8 @@ export class CallsController {
   }
 
   @Post('publish/:id')
-  publish(@CurrentUser() publisher: User, @Param('id') id: string, @Body('date') date: Date): Promise<Call> {
-    return this.callsService.publish(publisher, id, date);
+  publish(@CurrentUser() publisher: User, @Param('id') id: string): Promise<Call> {
+    return this.callsService.publish(publisher, id);
   }
 
   @Get()
