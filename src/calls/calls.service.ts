@@ -33,7 +33,7 @@ export class CallsService {
   async findReviewers(id: string): Promise<IReviewer[]> {
     try {
       const call = await this.findOne(id);
-      return call.reviewers;
+      return call.reviewers as unknown as IReviewer[];
     } catch {
       throw new BadRequestException();
     }
@@ -55,7 +55,8 @@ export class CallsService {
   async addReviewer(id: string, dto: IReviewer): Promise<Call> {
     try {
       const call = await this.findOne(id);
-      call.reviewers = [...call.reviewers, dto];
+      const reviewers = call.reviewers as unknown as IReviewer[];
+      call.reviewers = [...reviewers, dto] as unknown as JSON;
       await this.solutionsService.affect(dto.solutions, dto.email);
       await this.sendReviewLink(id, dto);
       return await this.callRepository.save(call);
@@ -67,7 +68,8 @@ export class CallsService {
   async updateReviewer(id: string, email: string, dto: IReviewer): Promise<Call> {
     try {
       const call = await this.findOne(id);
-      call.reviewers = call.reviewers?.map((r) => (r.email === email ? dto : r));
+      const reviewers = call.reviewers as unknown as IReviewer[];
+      call.reviewers = reviewers?.map((r) => (r.email === email ? dto : r)) as unknown as JSON;
       await this.solutionsService.reaffectReviewer(email, dto.email);
       return await this.callRepository.save(call);
     } catch {
@@ -78,7 +80,8 @@ export class CallsService {
   async deleteReviewer(id: string, email: string): Promise<Call> {
     try {
       const call = await this.findOne(id);
-      call.reviewers = call.reviewers?.filter((r) => r.email !== email);
+      const reviewers = call.reviewers as unknown as IReviewer[];
+      call.reviewers = reviewers?.filter((r) => r.email !== email) as unknown as JSON;
       await this.solutionsService.reaffectReviewer(email, null);
       return await this.callRepository.save(call);
     } catch {
