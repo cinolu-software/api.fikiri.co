@@ -36,7 +36,7 @@ export class SolutionsService {
 
   async affect(count: number, reviewer: string) {
     try {
-      const [unaffected, n] = await this.findUnaffected(count);
+      const [unaffected, n] = await this.findUnaffected(+count || 1);
       if (n === 0) throw new BadRequestException();
       const affected = unaffected.map((solution) => {
         solution.reviewer = reviewer;
