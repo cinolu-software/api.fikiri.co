@@ -47,7 +47,8 @@ export class SolutionsService {
       where: {
         reviewer,
         call: { id: callId }
-      }
+      },
+      relations: ['user']
     });
   }
 
