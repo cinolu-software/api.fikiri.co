@@ -62,7 +62,7 @@ export class CallsController {
     return this.callsService.addReviewer(id, dto);
   }
 
-  @Post('update-reviewer/:id/:email')
+  @Patch('update-reviewer/:id/:email')
   updateReviewer(@Param() params: unknown, @Body() dto: IReviewer): Promise<Call> {
     return this.callsService.updateReviewer(params['id'], params['email'], dto);
   }
