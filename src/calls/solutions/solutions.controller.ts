@@ -20,7 +20,7 @@ export class SolutionsController {
 
   @Get('reviewer/:token')
   @Auth(RoleEnum.Guest)
-  findByUser(@Param('token') token: string) {
+  findByReviewer(@Param('token') token: string) {
     return this.solutionsService.findByReviewer(token);
   }
 
