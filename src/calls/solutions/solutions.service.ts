@@ -42,13 +42,13 @@ export class SolutionsService {
     });
   }
 
-  async findAffectedForReviewer(callId: string, reviewer: string): Promise<Solution[]> {
+  async findAffectedToReviewer(callId: string, reviewer: string): Promise<Solution[]> {
     return await this.solutionRepository.find({
       where: {
         reviewer,
         call: { id: callId }
       },
-      relations: ['user']
+      relations: ['user', 'call']
     });
   }
 
@@ -57,7 +57,7 @@ export class SolutionsService {
       const { id, email } = await this.jwtService.verifyAsync(token, {
         secret: process.env.JWT_SECRET
       });
-      return await this.findAffectedForReviewer(id, email);
+      return await this.findAffectedToReviewer(id, email);
     } catch {
       throw new NotFoundException();
     }
@@ -79,7 +79,7 @@ export class SolutionsService {
 
   async desaffect(callId: string, reviewer: string): Promise<Solution[]> {
     try {
-      const solutions = await this.findAffectedForReviewer(callId, reviewer);
+      const solutions = await this.findAffectedToReviewer(callId, reviewer);
       if (!solutions) throw new BadRequestException();
       const desaffected = solutions.map((solution) => {
         solution.reviewer = null;
