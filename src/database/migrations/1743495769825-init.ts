@@ -1,7 +1,7 @@
 import { MigrationInterface, QueryRunner } from 'typeorm';
 
-export class Init1742910614525 implements MigrationInterface {
-  name = 'Init1742910614525';
+export class Init1743495769825 implements MigrationInterface {
+  name = 'Init1743495769825';
 
   public async up(queryRunner: QueryRunner): Promise<void> {
     await queryRunner.query(
@@ -29,7 +29,7 @@ export class Init1742910614525 implements MigrationInterface {
       `CREATE TABLE \`callForApplications\` (\`id\` varchar(36) NOT NULL, \`created_at\` datetime(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6), \`updated_at\` datetime(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6) ON UPDATE CURRENT_TIMESTAMP(6), \`deleted_at\` datetime(6) NULL, \`name\` varchar(255) NOT NULL, \`description\` text NOT NULL, \`ended_at\` datetime NOT NULL, \`started_at\` datetime NOT NULL, \`published_at\` datetime NULL, \`cover\` varchar(255) NULL, \`document\` varchar(255) NULL, \`form\` json NULL, \`review_form\` json NULL, \`reviewers\` json NULL, \`requirements\` json NULL, \`contact_form\` json NULL, \`authorId\` varchar(36) NULL, \`publisherId\` varchar(36) NULL, PRIMARY KEY (\`id\`)) ENGINE=InnoDB`
     );
     await queryRunner.query(
-      `CREATE TABLE \`review\` (\`id\` varchar(36) NOT NULL, \`created_at\` datetime(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6), \`updated_at\` datetime(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6) ON UPDATE CURRENT_TIMESTAMP(6), \`deleted_at\` datetime(6) NULL, \`note\` decimal(10,2) NOT NULL DEFAULT '0.00', \`reviewer\` varchar(255) NOT NULL, \`data\` json NULL, \`solutionId\` varchar(36) NULL, PRIMARY KEY (\`id\`)) ENGINE=InnoDB`
+      `CREATE TABLE \`review\` (\`id\` varchar(36) NOT NULL, \`created_at\` datetime(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6), \`updated_at\` datetime(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6) ON UPDATE CURRENT_TIMESTAMP(6), \`deleted_at\` datetime(6) NULL, \`reviewer\` varchar(255) NOT NULL, \`data\` json NULL, \`solutionId\` varchar(36) NULL, PRIMARY KEY (\`id\`)) ENGINE=InnoDB`
     );
     await queryRunner.query(
       `CREATE TABLE \`solution\` (\`id\` varchar(36) NOT NULL, \`created_at\` datetime(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6), \`updated_at\` datetime(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6) ON UPDATE CURRENT_TIMESTAMP(6), \`deleted_at\` datetime(6) NULL, \`responses\` json NOT NULL, \`reviewer\` varchar(255) NULL, \`userId\` varchar(36) NULL, \`callId\` varchar(36) NULL, PRIMARY KEY (\`id\`)) ENGINE=InnoDB`
