@@ -10,7 +10,6 @@ export class StatsController {
   constructor(private readonly statsService: StatsService) {}
 
   @Get('admin-stats')
-  @Auth(RoleEnum.Guest)
   getAdminStats(): Promise<IAdminStats> {
     return this.statsService.getAdminStats();
   }
