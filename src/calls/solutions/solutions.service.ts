@@ -48,7 +48,7 @@ export class SolutionsService {
         reviewer,
         call: { id: callId }
       },
-      relations: ['user', 'call', 'reviews']
+      relations: ['user', 'reviews']
     });
   }
 
