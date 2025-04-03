@@ -1,5 +1,4 @@
-import { Column, Entity, JoinColumn, JoinTable, ManyToMany, OneToMany, OneToOne } from 'typeorm';
-import { Detail } from '../details/entities/detail.entity';
+import { Column, Entity, JoinColumn, JoinTable, ManyToMany, ManyToOne, OneToMany } from 'typeorm';
 import { AbstractEntity } from '../../shared/utils/abstract.entity';
 import { Role } from '../roles/entities/role.entity';
 import { Post } from '../../blog/posts/entities/post.entity';
@@ -21,6 +20,12 @@ export class User extends AbstractEntity {
 
   @Column({ nullable: true })
   phone_number: string;
+
+  @Column({ type: 'text', nullable: true })
+  bio: string;
+
+  @Column({ type: 'json', nullable: true })
+  socials: JSON;
 
   @Column({ nullable: true })
   address: string;
@@ -53,11 +58,7 @@ export class User extends AbstractEntity {
   @JoinTable()
   roles: Role[];
 
-  @OneToOne(() => Detail, (detail) => detail.user)
+  @ManyToOne(() => Organization)
   @JoinColumn()
-  detail: Detail;
-
-  @ManyToMany(() => Organization)
-  @JoinColumn()
-  organisation: Organization;
+  organization: Organization;
 }

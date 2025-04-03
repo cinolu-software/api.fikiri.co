@@ -16,6 +16,12 @@ export default class CreateUserDto {
   @IsOptional()
   organisation: string;
 
+  @IsOptional()
+  bio: string;
+
+  @IsOptional()
+  socials: JSON;
+
   @IsNotEmpty()
   roles: string[];
 }

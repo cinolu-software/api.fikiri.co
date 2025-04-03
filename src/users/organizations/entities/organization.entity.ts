@@ -7,6 +7,6 @@ export class Organization extends AbstractEntity {
   @Column()
   name: string;
 
-  @OneToMany(() => User, (user) => user.organisation)
+  @OneToMany(() => User, (user) => user.organization)
   user: User;
 }

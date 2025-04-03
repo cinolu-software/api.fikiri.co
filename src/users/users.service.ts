@@ -5,13 +5,11 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { EventEmitter2 } from '@nestjs/event-emitter';
 import { SignupDto, CreateWithGoogleDto } from '../auth/dto';
 import UpdateProfileDto from '../auth/dto/update-profile.dto';
-import { DetailsService } from './details/details.service';
 import CreateUserDto from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { Role } from './roles/entities/role.entity';
 import { User } from './entities/user.entity';
 import { RolesService } from './roles/roles.service';
-import { CreateDetailDto } from './details/dto/create-detail.dto';
 
 @Injectable()
 export class UsersService {
@@ -19,14 +17,12 @@ export class UsersService {
     @InjectRepository(User)
     private userRepository: Repository<User>,
     private rolesService: RolesService,
-    private detailsService: DetailsService,
     private eventEmitter: EventEmitter2
   ) {}
 
   private async findWithRole(name: string): Promise<User[]> {
     const data = await this.userRepository.find({
-      select: ['id', 'name', 'email', 'profile', 'google_image', 'address', 'phone_number'],
-      relations: ['roles', 'detail'],
+      relations: ['roles'],
       where: { roles: { name } }
     });
     return data;
@@ -37,14 +33,6 @@ export class UsersService {
       relations: ['roles']
     });
     return data;
-  }
-
-  async findUsers(): Promise<User[]> {
-    return this.findWithRole('user');
-  }
-
-  async findAdmins(): Promise<User[]> {
-    return this.findWithRole('admin');
   }
 
   async create(dto: CreateUserDto): Promise<User> {
@@ -85,7 +73,7 @@ export class UsersService {
   async getVerifiedUser(email: string): Promise<User> {
     const data = await this.userRepository.findOneOrFail({
       where: { email, verified_at: Not(IsNull()) },
-      relations: ['roles', 'detail']
+      relations: ['roles']
     });
     const roles = data.roles.map((role) => role.name);
     const user = { ...data, roles } as unknown as User;
@@ -106,24 +94,11 @@ export class UsersService {
     }
   }
 
-  async addDetail(currentUser: User, dto: CreateDetailDto): Promise<User> {
-    try {
-      const user = await this.findOne(currentUser.id);
-      delete user.password;
-      const userDetail = { ...user.detail, ...dto };
-      const detail = await this.detailsService.create(userDetail);
-      await this.userRepository.save({ ...user, detail });
-      return await this.getVerifiedUser(user.email);
-    } catch {
-      throw new BadRequestException();
-    }
-  }
-
   async findOne(id: string): Promise<User> {
     try {
       const user = await this.userRepository.findOneOrFail({
         where: { id },
-        relations: ['roles', 'detail']
+        relations: ['roles', 'organization']
       });
       return user;
     } catch {
@@ -149,14 +124,14 @@ export class UsersService {
       const user = await this.userRepository.findOne({
         where: { email: dto.email }
       });
-      if (user) return await this.#updateExistingUser(user, dto);
-      return await this.#createNewUser(dto, role);
+      if (user) return await this.updateExistingUser(user, dto);
+      return await this.createNewUser(dto, role);
     } catch {
       throw new BadRequestException();
     }
   }
 
-  async #updateExistingUser(currentUser: User, dto: CreateWithGoogleDto): Promise<User> {
+  async updateExistingUser(currentUser: User, dto: CreateWithGoogleDto): Promise<User> {
     if (!currentUser.profile) {
       currentUser.google_image = dto.google_image;
       currentUser.verified_at = new Date();
@@ -166,7 +141,7 @@ export class UsersService {
     return user;
   }
 
-  async #createNewUser(dto: CreateWithGoogleDto, userRole: Role): Promise<User> {
+  async createNewUser(dto: CreateWithGoogleDto, userRole: Role): Promise<User> {
     const newUser = await this.userRepository.save({
       ...dto,
       verified_at: new Date(),
@@ -182,7 +157,7 @@ export class UsersService {
       const user = await this.userRepository.save({
         ...oldUser,
         ...dto,
-        organisation: { id: dto?.organisation },
+        organisation: { id: dto?.organisation || oldUser.organization.id },
         roles: dto.roles?.map((id) => ({ id })) || oldUser.roles
       });
       return user;
