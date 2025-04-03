@@ -23,6 +23,7 @@ import { FileInterceptor } from '@nestjs/platform-express';
 import { diskStorage } from 'multer';
 import { QueryParams } from './utils/types/query-params.type';
 import { IReviewer } from './utils/types/reviewer.type';
+import { IForm } from './utils/types/form.type';
 
 @Controller('calls')
 @Auth(RoleEnum.Cartograph)
@@ -50,6 +51,12 @@ export class CallsController {
   @Auth(RoleEnum.Guest)
   findLatest(): Promise<Call[]> {
     return this.callsService.findLatest();
+  }
+
+  @Get('find-review-form/:token')
+  @Auth(RoleEnum.Guest)
+  findReviewForm(@Param('token') token: string): Promise<IForm> {
+    return this.callsService.findReviewForm(token);
   }
 
   @Get('find-reviewers/:id')

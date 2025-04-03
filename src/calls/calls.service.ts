@@ -11,6 +11,7 @@ import { QueryParams } from './utils/types/query-params.type';
 import { EventEmitter2 } from '@nestjs/event-emitter';
 import { SolutionsService } from './solutions/solutions.service';
 import { IReviewer } from './utils/types/reviewer.type';
+import { IForm } from './utils/types/form.type';
 
 @Injectable()
 export class CallsService {
@@ -76,6 +77,23 @@ export class CallsService {
       take,
       skip
     });
+  }
+
+  async findReviewForm(token: string): Promise<IForm> {
+    try {
+      const { id, phase } = await this.jwtService.verifyAsync(token, {
+        secret: process.env.JWT_SECRET
+      });
+      const call = await this.callRepository.findOneOrFail({
+        where: { id }
+      });
+      const forms = (call.form || []) as unknown as IForm[];
+      const form = forms.find((f) => f.phase === phase);
+      if (!form) throw new NotFoundException();
+      return form;
+    } catch {
+      throw new NotFoundException();
+    }
   }
 
   async findPublished(queryParams: QueryParams): Promise<[Call[], number]> {
