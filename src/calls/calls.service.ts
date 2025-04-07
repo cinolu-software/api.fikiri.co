@@ -87,7 +87,7 @@ export class CallsService {
       const call = await this.callRepository.findOneOrFail({
         where: { id }
       });
-      const forms = (call.form || []) as unknown as IForm[];
+      const forms = (call.review_form || []) as unknown as IForm[];
       const form = forms.find((f) => f.phase === phase);
       if (!form) throw new NotFoundException();
       return form;
