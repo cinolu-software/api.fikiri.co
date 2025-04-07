@@ -1,64 +1,63 @@
-<html lang='en'>
-  <head>
-    <meta charset='UTF-8' />
-    <meta name='viewport' content='width=device-width, initial-scale=1.0' />
-    <style>
-      body {
-        font-family: Arial, sans-serif;
-        background-color: #f4f4f4;
-        margin: 0;
-        padding: 0;
-      }
-      .container {
-        max-width: 600px;
-        margin: 20px auto;
-        padding: 20px;
-        background-color: #fff;
-        border-radius: 5px;
-        box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-      }
-      h1 {
-        color: #333;
-      }
-      p {
-        color: #666;
-      }
-      .btn {
-        display: inline-block;
-        background-color: #167d11;
-        color: #fff;
-        margin-bottom: 5px;
-        text-decoration: none;
-        padding: 10px 20px;
-        border-radius: 3px;
-      }
-      .btn:hover {
-        background-color: #0056b3;
-      }
-    </style>
-  </head>
-  <body>
-    <div class='container'>
-      <h2>Cher/Chère curateur,</h2>
-      <p>
-        Dans le cadre de notre initiative fikiri, nous avons identifié une solution nécessitant une évaluation
-        approfondie afin d'assurer sa pertinence et son alignement avec les Objectifs de Développement Durable (ODD).
-      </p>
-      <p>
-        En tant qu'expert(e) dans votre domaine, nous vous invitons à examiner cette solution et à partager votre
-        analyse. Votre contribution sera essentielle pour garantir une évaluation rigoureuse et objective.
-      </p>
-      <p>
-        Vous pouvez accéder à la plateforme et soumettre votre évaluation en suivant ci-dessous. Nous vous serions
-        reconnaissants de bien vouloir compléter votre évaluation.
-      </p>
-      <a href='{{link}}' class='btn'>
-        Accéder à la plateforme
-      </a>
-      <p>
-        N'hésitez pas à nous contacter si vous avez des questions ou si vous avez besoin de précisions supplémentaires.
-        Nous vous remercions par avance pour votre engagement et votre précieuse contribution.</p>
-      <p>Merci,<br /> L'équipe Fikiri.</p>
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <title>Bienvenue sur Fikiri</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #f4f4f7;
+      margin: 0;
+      padding: 0;
+      color: #333;
+    }
+    .container {
+      max-width: 600px;
+      margin: 40px auto;
+      background-color: #ffffff;
+      padding: 30px;
+      border-radius: 10px;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+    }
+    h1 {
+      color: #0A7C86;
+    }
+    p {
+      line-height: 1.6;
+    }
+    .btn {
+      display: inline-block;
+      padding: 12px 20px;
+      background-color: #0A7C86;
+      color: white;
+      text-decoration: none;
+      border-radius: 6px;
+      margin-top: 20px;
+    }
+    .footer {
+      font-size: 0.9em;
+      color: #888;
+      text-align: left;
+      margin-top: 30px;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <p>Cher/Chère curateur,</p>
+    <p>
+      Nous sommes ravis de vous accueillir dans la communauté Fikiri ! Vous avez été sélectionné(e) pour participer à l'évaluation de solutions innovantes.
+      En tant qu'expert(e) dans votre domaine, nous vous invitons à examiner quelques solutions et à partager votre  analyse. Votre contribution sera essentielle pour garantir une évaluation rigoureuse et objective.
+    </p>
+    <a class="btn" href="{{ link }}" target="_blank">Accéder à la plateforme</a>
+    <p>Si vous avez des questions, notre équipe reste disponible à <a href="mailto:wilfriedm@cinolu.org">wilfriedm@cinolu.org</a>.</p>
+
+    <p>Bienvenue dans la communauté Fikiri,<br>
+    <strong>L'équipe Fikiri</strong></p>
+
+    <div class="footer">
+      &copy; 2025 Fikiri - Tous droits réservés.
     </div>
-  </body>
+  </div>
+</body>
 </html>
