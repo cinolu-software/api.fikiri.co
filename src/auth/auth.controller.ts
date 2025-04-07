@@ -47,13 +47,11 @@ export class AuthController {
   }
 
   @Patch('profile')
-  @Auth(RoleEnum.User)
   updateProfile(@CurrentUser() currentUser: User, @Body() dto: UpdateProfileDto): Promise<User> {
     return this.authService.updateProfile(currentUser, dto);
   }
 
   @Patch('update-password')
-  @Auth(RoleEnum.User)
   updatePassword(@CurrentUser() user: User, @Body() dto: UpdatePasswordDto): Promise<User> {
     return this.authService.updatePassword(user, dto);
   }

@@ -11,6 +11,7 @@ export class RightsService {
     this.buildRoles([
       RoleEnum.Guest,
       RoleEnum.User,
+      RoleEnum.Volunteer,
       RoleEnum.Cartograph,
       RoleEnum.Explorator,
       RoleEnum.Experimentor,

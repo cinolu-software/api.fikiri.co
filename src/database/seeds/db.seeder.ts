@@ -7,22 +7,13 @@ import { Role } from '../../users/roles/entities/role.entity';
 
 export default class DbSeeder implements Seeder {
   async run(dataSource: DataSource) {
-    /**
-     * Truncate tables
-     */
-    await dataSource.query('SET FOREIGN_KEY_CHECKS = 0;');
-    await dataSource.query('TRUNCATE TABLE user_roles_role;');
-    await dataSource.query('TRUNCATE TABLE user;');
-    await dataSource.query('TRUNCATE TABLE role;');
-    await dataSource.query('SET FOREIGN_KEY_CHECKS = 1;');
+    await dataSource.dropDatabase();
+    await dataSource.synchronize();
 
-    /**
-     * Get repositories
-     */
     const roleRepository = dataSource.getRepository(Role);
     const userRepository = dataSource.getRepository(User);
 
-    ['admin', 'user', 'cartograph', 'explorator', 'experimentor'].map(async (role) => {
+    ['admin', 'user', 'cartograph', 'explorator', 'experimentor', 'volunteer'].map(async (role) => {
       await roleRepository.save({ name: role });
     });
 
