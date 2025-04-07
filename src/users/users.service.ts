@@ -129,6 +129,7 @@ export class UsersService {
   async update(id: string, dto: UpdateUserDto): Promise<User> {
     try {
       const oldUser = await this.findOne(id);
+      delete oldUser.password;
       const user = await this.userRepository.save({
         ...oldUser,
         ...dto,
