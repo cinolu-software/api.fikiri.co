@@ -1,9 +1,9 @@
 import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
 import * as fs from 'fs-extra';
-import { In, IsNull, Not, Repository } from 'typeorm';
+import { In, Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
 import { EventEmitter2 } from '@nestjs/event-emitter';
-import { SignupDto, CreateWithGoogleDto } from '../auth/dto';
+import { CreateWithGoogleDto } from '../auth/dto';
 import UpdateProfileDto from '../auth/dto/update-profile.dto';
 import CreateUserDto from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
@@ -20,7 +20,7 @@ export class UsersService {
     private eventEmitter: EventEmitter2
   ) {}
 
-  private async findWithRole(name: string): Promise<User[]> {
+  async findWithRole(name: string): Promise<User[]> {
     const data = await this.userRepository.find({
       relations: ['roles'],
       where: { roles: { name } }
@@ -41,7 +41,6 @@ export class UsersService {
       const user = await this.userRepository.save({
         ...dto,
         password,
-        verified_at: new Date(),
         organisation: { id: dto?.organisation },
         roles: dto.roles?.map((id) => ({ id }))
       });
@@ -70,37 +69,14 @@ export class UsersService {
     return data;
   }
 
-  async getVerifiedUser(email: string): Promise<User> {
-    const data = await this.userRepository.findOneOrFail({
-      where: { email, verified_at: Not(IsNull()) },
-      relations: ['roles']
-    });
-    const roles = data.roles.map((role) => role.name);
-    const user = { ...data, roles } as unknown as User;
-    return user;
-  }
-
-  async signUp(dto: SignupDto): Promise<User> {
-    try {
-      const role = await this.rolesService.findByName('user');
-      delete dto.password_confirm;
-      const user = await this.userRepository.save({
-        ...dto,
-        roles: [role]
-      });
-      return user;
-    } catch {
-      throw new BadRequestException('Cette adresse email est déjà utilisée');
-    }
-  }
-
   async findOne(id: string): Promise<User> {
     try {
       const user = await this.userRepository.findOneOrFail({
         where: { id },
         relations: ['roles', 'organization']
       });
-      return user;
+      const roles = user.roles.map((role) => role.name);
+      return { ...user, roles } as unknown as User;
     } catch {
       throw new BadRequestException();
     }
@@ -112,7 +88,8 @@ export class UsersService {
         where: { email },
         relations: ['roles']
       });
-      return user;
+      const roles = user.roles.map((role) => role.name);
+      return { ...user, roles } as unknown as User;
     } catch {
       throw new NotFoundException();
     }
@@ -134,20 +111,18 @@ export class UsersService {
   async updateExistingUser(currentUser: User, dto: CreateWithGoogleDto): Promise<User> {
     if (!currentUser.profile) {
       currentUser.google_image = dto.google_image;
-      currentUser.verified_at = new Date();
       await this.userRepository.save(currentUser);
     }
-    const user = await this.getVerifiedUser(currentUser.email);
+    const user = await this.findByEmail(currentUser.email);
     return user;
   }
 
   async createNewUser(dto: CreateWithGoogleDto, userRole: Role): Promise<User> {
     const newUser = await this.userRepository.save({
       ...dto,
-      verified_at: new Date(),
       roles: [userRole]
     });
-    const user = await this.getVerifiedUser(newUser.email);
+    const user = await this.findByEmail(newUser.email);
     return user;
   }
 
@@ -157,11 +132,12 @@ export class UsersService {
       const user = await this.userRepository.save({
         ...oldUser,
         ...dto,
-        organisation: { id: dto?.organisation || oldUser.organization.id },
+        organisation: { id: dto?.organisation || oldUser.organization?.id },
         roles: dto.roles?.map((id) => ({ id })) || oldUser.roles
       });
       return user;
-    } catch {
+    } catch (e) {
+      console.log(e);
       throw new BadRequestException();
     }
   }
@@ -171,10 +147,10 @@ export class UsersService {
       const oldUser = await this.findOne(currentUser.id);
       delete oldUser.password;
       await this.userRepository.save({ ...oldUser, ...dto });
-      const user = await this.getVerifiedUser(oldUser.email);
+      const user = await this.findByEmail(oldUser.email);
       return user;
     } catch {
-      throw new BadRequestException('Erreur lors de la modification du profil');
+      throw new BadRequestException();
     }
   }
 
@@ -184,10 +160,10 @@ export class UsersService {
       if (oldUser.profile) await fs.unlink(`./uploads/profiles/${oldUser.profile}`);
       delete oldUser.password;
       await this.userRepository.save({ ...oldUser, profile: file.filename });
-      const user = await this.getVerifiedUser(oldUser.email);
+      const user = await this.findByEmail(oldUser.email);
       return user;
     } catch {
-      throw new BadRequestException("Erreur lors de la mise à jour de l'image");
+      throw new BadRequestException();
     }
   }
 
@@ -197,7 +173,7 @@ export class UsersService {
       await this.userRepository.update(user.id, { password });
       return user;
     } catch {
-      throw new BadRequestException('Erreur lors de la réinitialisation du mot de passe');
+      throw new BadRequestException();
     }
   }
 
@@ -206,7 +182,7 @@ export class UsersService {
       await this.findOne(id);
       await this.userRepository.softDelete(id);
     } catch {
-      throw new BadRequestException("Erreur lors de la suppression de l'utilisateur");
+      throw new BadRequestException();
     }
   }
 }

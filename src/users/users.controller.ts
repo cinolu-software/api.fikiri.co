@@ -27,7 +27,7 @@ export class UsersController {
 
   @Get('with-role/:role')
   findAdmins(@Param() role: string): Promise<User[]> {
-    return this.userService.findByRole(role);
+    return this.userService.findWithRole(role);
   }
 
   @Get(':id')

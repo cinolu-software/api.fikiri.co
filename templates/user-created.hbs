@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <title>Bienvenue sur Fikiri</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #f4f4f7;
+      margin: 0;
+      padding: 0;
+      color: #333;
+    }
+    .container {
+      max-width: 600px;
+      margin: 40px auto;
+      background-color: #ffffff;
+      padding: 30px;
+      border-radius: 10px;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+    }
+    h1 {
+      color: #0A7C86;
+    }
+    p {
+      line-height: 1.6;
+    }
+    .credentials {
+      background-color: #f0f8f8;
+      padding: 15px;
+      border-radius: 8px;
+      margin: 20px 0;
+    }
+    .btn {
+      display: inline-block;
+      padding: 12px 20px;
+      background-color: #0A7C86;
+      color: white;
+      text-decoration: none;
+      border-radius: 6px;
+      margin-top: 20px;
+    }
+    .footer {
+      font-size: 0.9em;
+      color: #888;
+      text-align: left;
+      margin-top: 30px;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>Bienvenue sur Fikiri !</h1>
+    <p>Bonjour <strong> {{ user.name }} </strong>,</p>
+    <p>Un administrateur vient de vous ajouter à la plateforme <strong>Fikiri</strong>. Vous pouvez dès maintenant accéder à votre espace personnel.</p>
+
+    <div class="credentials">
+      <p><strong>Vos identifiants :</strong></p>
+      <p>Email : <code> {{ user.email }} </code><br>
+         Mot de passe temporaire : <code> {{ password }} </code></p>
+    </div>
+
+    <p>🔐 <strong>Important :</strong> Pour des raisons de sécurité, merci de vous connecter et de modifier votre mot de passe dès votre première visite.</p>
+
+    <a class="btn" href="https://fikiri.co/sign-in/" target="_blank">Se connecter à la plateforme</a>
+
+    <p>Si vous avez des questions, notre équipe reste disponible à <a href="mailto:wilfriedm@cinolu.org">[email de contact]</a>.</p>
+
+    <p>Bienvenue dans la communauté Fikiri,<br>
+    <strong>L'équipe Fikiri</strong></p>
+
+    <div class="footer">
+      &copy; 2025 Fikiri - Tous droits réservés.
+    </div>
+  </div>
+</body>
+</html>

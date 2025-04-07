@@ -4,20 +4,20 @@ import { OnEvent } from '@nestjs/event-emitter';
 import { User } from '../users/entities/user.entity';
 
 @Injectable()
-export class AuthEmailService {
+export class UsersEmailService {
   constructor(private readonly mailerSerive: MailerService) {}
 
-  @OnEvent('user.reset-password')
-  async resetEmail({ user, link }: { user: User; link: string }): Promise<void> {
+  @OnEvent('user.created')
+  async createUser({ user, password }: { user: User; password: string }): Promise<void> {
     try {
       await this.mailerSerive.sendMail({
         to: user.email,
-        subject: 'Réinitialisation du mot de passe',
-        template: 'reset-password',
-        context: { user, link }
+        subject: 'Bienvenue sur la plateforme Fikiri !',
+        template: 'user-created',
+        context: { user, password }
       });
     } catch {
-      throw new BadRequestException("Une erreur est survenenue lors de l'envoie d'email");
+      throw new BadRequestException();
     }
   }
 }

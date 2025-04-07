@@ -20,10 +20,9 @@ export class AuthService {
 
   async validateUser(email: string, pass: string): Promise<User> {
     try {
-      const user = await this.usersService.getVerifiedUser(email);
+      const user = await this.usersService.findByEmail(email);
       await this.verifyPassword(pass, user.password);
-      const chat_token = await this.generateToken(user, '1d');
-      return { ...user, chat_token } as User;
+      return user;
     } catch {
       throw new NotFoundException('Les identifiants saisis sont invalides');
     }
@@ -73,7 +72,7 @@ export class AuthService {
   async updatePassword(currentUser: User, dto: UpdatePasswordDto): Promise<User> {
     try {
       await this.usersService.updatePassword(currentUser.id, dto.password);
-      const user = await this.usersService.getVerifiedUser(currentUser.email);
+      const user = await this.usersService.findByEmail(currentUser.email);
       return user;
     } catch {
       throw new BadRequestException();
