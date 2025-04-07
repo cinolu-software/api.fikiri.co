@@ -129,7 +129,7 @@ export class UsersService {
   async update(id: string, dto: UpdateUserDto): Promise<User> {
     try {
       const oldUser = await this.findOne(id);
-      delete oldUser.password;
+      delete oldUser?.password;
       const user = await this.userRepository.save({
         ...oldUser,
         ...dto,
@@ -137,8 +137,7 @@ export class UsersService {
         roles: dto.roles?.map((id) => ({ id })) || oldUser.roles
       });
       return user;
-    } catch (e) {
-      console.log(e);
+    } catch {
       throw new BadRequestException();
     }
   }
