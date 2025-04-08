@@ -35,15 +35,15 @@ export class UsersController {
     return this.userService.findOne(id);
   }
 
-  @Patch(':id')
-  update(@Param('id') id: string, @Body() updateUserDto: UpdateUserDto): Promise<User> {
-    return this.userService.update(id, updateUserDto);
-  }
-
   @Patch('update-many')
   @Auth(RoleEnum.Admin)
   updateMany(@Body() dto: { ids: string[]; data: UpdateUserDto[] }): Promise<User[]> {
     return this.userService.updateMany(dto);
+  }
+
+  @Patch(':id')
+  update(@Param('id') id: string, @Body() updateUserDto: UpdateUserDto): Promise<User> {
+    return this.userService.update(id, updateUserDto);
   }
 
   @Post('image-profile')
