@@ -62,11 +62,24 @@ export class UsersService {
     }
   }
 
-  async findByIds(ids: string[]): Promise<User[]> {
-    const data = await this.userRepository.findBy({
-      id: In(ids)
-    });
-    return data;
+  async updateMany(dto: { ids: string[]; data: UpdateUserDto[] }): Promise<User[]> {
+    try {
+      const users = await this.findByIds(dto.ids);
+      const updatedUsers = await Promise.all(
+        users.map(async (user, index) => {
+          const updatedUser = await this.userRepository.save({
+            ...user,
+            ...dto.data[index],
+            organisation: { id: dto.data[index]?.organisation || user.organization?.id },
+            roles: dto.data[index].roles?.map((id) => ({ id })) || user.roles
+          });
+          return updatedUser;
+        })
+      );
+      return updatedUsers;
+    } catch {
+      throw new BadRequestException();
+    }
   }
 
   async findOne(id: string): Promise<User> {
@@ -77,6 +90,18 @@ export class UsersService {
       });
       const roles = user.roles.map((role) => role.name);
       return { ...user, roles } as unknown as User;
+    } catch {
+      throw new BadRequestException();
+    }
+  }
+
+  async findByIds(ids: string[]): Promise<User[]> {
+    try {
+      const data = await this.userRepository.find({
+        where: { id: In(ids) },
+        relations: ['roles']
+      });
+      return data;
     } catch {
       throw new BadRequestException();
     }

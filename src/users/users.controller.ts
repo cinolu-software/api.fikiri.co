@@ -40,6 +40,12 @@ export class UsersController {
     return this.userService.update(id, updateUserDto);
   }
 
+  @Patch('update-many')
+  @Auth(RoleEnum.Admin)
+  updateMany(@Body() dto: { ids: string[]; data: UpdateUserDto[] }): Promise<User[]> {
+    return this.userService.updateMany(dto);
+  }
+
   @Post('image-profile')
   @Auth(RoleEnum.User)
   @UseInterceptors(
