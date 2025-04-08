@@ -1,6 +1,5 @@
 import { Body, Controller, Get, Patch, Post, Req, Res, UseGuards } from '@nestjs/common';
 import { AuthService } from './auth.service';
-import UpdateProfileDto from './dto/update-profile.dto';
 import { UpdatePasswordDto } from './dto/update-password.dto';
 import { forgotPasswordDto } from './dto/forgot-password.dto';
 import { ResetPasswordDto } from './dto/reset-password.dto';
@@ -11,6 +10,7 @@ import { Auth } from '../shared/decorators/auth.decorators';
 import { CurrentUser } from '../shared/decorators/user.decorator';
 import { RoleEnum } from '../shared/enums/roles.enum';
 import { User } from '../users/entities/user.entity';
+import { UpdateUserDto } from 'src/users/dto/update-user.dto';
 
 @Controller('auth')
 @Auth(RoleEnum.User)
@@ -47,7 +47,7 @@ export class AuthController {
   }
 
   @Patch('profile')
-  updateProfile(@CurrentUser() currentUser: User, @Body() dto: UpdateProfileDto): Promise<User> {
+  updateProfile(@CurrentUser() currentUser: User, @Body() dto: UpdateUserDto): Promise<User> {
     return this.authService.updateProfile(currentUser, dto);
   }
 

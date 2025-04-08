@@ -2,13 +2,13 @@ import { UpdatePasswordDto } from './dto/update-password.dto';
 import { ResetPasswordDto } from './dto/reset-password.dto';
 import { forgotPasswordDto } from './dto/forgot-password.dto';
 import { BadRequestException, Injectable, NotFoundException, Req, Res } from '@nestjs/common';
-import UpdateProfileDto from './dto/update-profile.dto';
 import * as bcrypt from 'bcrypt';
 import { Request, Response } from 'express';
 import { JwtService } from '@nestjs/jwt';
 import { EventEmitter2 } from '@nestjs/event-emitter';
 import { User } from '../users/entities/user.entity';
 import { UsersService } from '../users/users.service';
+import { UpdateUserDto } from 'src/users/dto/update-user.dto';
 
 @Injectable()
 export class AuthService {
@@ -65,7 +65,7 @@ export class AuthService {
     return user;
   }
 
-  async updateProfile(user: User, dto: UpdateProfileDto): Promise<User> {
+  async updateProfile(user: User, dto: UpdateUserDto): Promise<User> {
     return await this.usersService.updateProfile(user, dto);
   }
 

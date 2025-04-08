@@ -4,7 +4,6 @@ import { In, Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
 import { EventEmitter2 } from '@nestjs/event-emitter';
 import { CreateWithGoogleDto } from '../auth/dto';
-import UpdateProfileDto from '../auth/dto/update-profile.dto';
 import CreateUserDto from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { Role } from './roles/entities/role.entity';
@@ -167,11 +166,18 @@ export class UsersService {
     }
   }
 
-  async updateProfile(currentUser: User, dto: UpdateProfileDto): Promise<User> {
+  async updateProfile(currentUser: User, dto: UpdateUserDto): Promise<User> {
     try {
-      const oldUser = await this.findOne(currentUser.id);
+      const oldUser = await this.userRepository.findOneOrFail({
+        where: { id: currentUser.id },
+        relations: ['roles']
+      });
       delete oldUser.password;
-      await this.userRepository.save({ ...oldUser, ...dto });
+      await this.userRepository.save({
+        ...oldUser,
+        ...dto,
+        roles: dto?.roles?.map((id) => ({ id })) || oldUser.roles
+      });
       const user = await this.findByEmail(oldUser.email);
       return user;
     } catch {
