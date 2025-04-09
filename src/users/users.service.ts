@@ -152,7 +152,10 @@ export class UsersService {
 
   async update(id: string, dto: UpdateUserDto): Promise<User> {
     try {
-      const oldUser = await this.findOne(id);
+      const oldUser = await this.userRepository.findOneOrFail({
+        where: { id },
+        relations: ['roles']
+      });
       delete oldUser?.password;
       const user = await this.userRepository.save({
         ...oldUser,
@@ -178,8 +181,7 @@ export class UsersService {
         ...dto,
         roles: dto?.roles?.map((id) => ({ id })) || oldUser.roles
       });
-      const user = await this.findByEmail(oldUser.email);
-      return user;
+      return await this.findByEmail(oldUser.email);
     } catch {
       throw new BadRequestException();
     }
@@ -187,12 +189,14 @@ export class UsersService {
 
   async uploadImage(currenUser: User, file: Express.Multer.File): Promise<User> {
     try {
-      const oldUser = await this.findOne(currenUser.id);
+      const oldUser = await this.userRepository.findOneOrFail({
+        where: { id: currenUser.id },
+        relations: ['roles']
+      });
       if (oldUser.profile) await fs.unlink(`./uploads/profiles/${oldUser.profile}`);
       delete oldUser.password;
       await this.userRepository.save({ ...oldUser, profile: file.filename });
-      const user = await this.findByEmail(oldUser.email);
-      return user;
+      return await this.findByEmail(oldUser.email);
     } catch {
       throw new BadRequestException();
     }
@@ -200,9 +204,11 @@ export class UsersService {
 
   async updatePassword(id: string, password: string): Promise<User> {
     try {
-      const user = await this.findOne(id);
+      const user = await this.userRepository.findOneOrFail({
+        where: { id }
+      });
       await this.userRepository.update(user.id, { password });
-      return user;
+      return await this.findByEmail(user.email);
     } catch {
       throw new BadRequestException();
     }
@@ -210,7 +216,9 @@ export class UsersService {
 
   async remove(id: string): Promise<void> {
     try {
-      await this.findOne(id);
+      await this.userRepository.findOneOrFail({
+        where: { id }
+      });
       await this.userRepository.softDelete(id);
     } catch {
       throw new BadRequestException();
