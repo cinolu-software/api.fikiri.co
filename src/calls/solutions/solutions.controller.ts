@@ -24,6 +24,12 @@ export class SolutionsController {
     return this.solutionsService.findByReviewer(token);
   }
 
+  @Get('user/:id')
+  @Auth(RoleEnum.Cartograph)
+  findByUser(@Param('id') id: string) {
+    return this.solutionsService.findByUser(id);
+  }
+
   @Get('call/:id')
   @Auth(RoleEnum.Cartograph)
   findByCall(@Param('id') id: string) {

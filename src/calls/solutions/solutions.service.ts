@@ -28,6 +28,17 @@ export class SolutionsService {
     }
   }
 
+  async findByUser(id: string): Promise<Solution[]> {
+    try {
+      return await this.solutionRepository.find({
+        where: { user: { id } },
+        relations: ['user', 'call']
+      });
+    } catch {
+      throw new NotFoundException();
+    }
+  }
+
   async findAll(): Promise<Solution[]> {
     return await this.solutionRepository.find({
       order: { updated_at: 'DESC' },
