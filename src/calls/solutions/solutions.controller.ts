@@ -25,7 +25,7 @@ export class SolutionsController {
   }
 
   @Get('user/:id')
-  @Auth(RoleEnum.Cartograph)
+  @Auth(RoleEnum.User)
   findByUser(@Param('id') id: string) {
     return this.solutionsService.findByUser(id);
   }
