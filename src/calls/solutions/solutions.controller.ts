@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, UploadedFile, UseInterceptors } from '@nestjs/common';
 import { SolutionsService } from './solutions.service';
 import { CreateSolutionDto } from './dto/create-solution.dto';
 import { UpdateSolutionDto } from './dto/update-solution.dto';
@@ -7,6 +7,9 @@ import { User } from '../../users/entities/user.entity';
 import { Solution } from './entities/solution.entity';
 import { Auth } from '../../shared/decorators/auth.decorators';
 import { RoleEnum } from '../../shared/enums/roles.enum';
+import { FileInterceptor } from '@nestjs/platform-express';
+import { diskStorage } from 'multer';
+import { v4 as uuidv4 } from 'uuid';
 
 @Controller('solutions')
 @Auth(RoleEnum.User)
@@ -16,6 +19,22 @@ export class SolutionsController {
   @Post()
   create(@CurrentUser() user: User, @Body() dto: CreateSolutionDto): Promise<Solution> {
     return this.solutionsService.create(user, dto);
+  }
+
+  @Post('image-profile/:id')
+  @Auth(RoleEnum.User)
+  @UseInterceptors(
+    FileInterceptor('thumb', {
+      storage: diskStorage({
+        destination: './uploads/solutions',
+        filename: function (_req, file, cb) {
+          cb(null, `${uuidv4()}.${file.mimetype.split('/')[1]}`);
+        }
+      })
+    })
+  )
+  uploadImage(@Param('id') id: string, @UploadedFile() file: Express.Multer.File): Promise<Solution> {
+    return this.solutionsService.uploadImage(id, file);
   }
 
   @Get('reviewer/:token')

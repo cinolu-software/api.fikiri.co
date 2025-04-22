@@ -12,6 +12,9 @@ export class Solution extends AbstractEntity {
   @Column({ nullable: true })
   reviewer: string;
 
+  @Column({ nullable: true })
+  image: string;
+
   @OneToMany(() => Review, (review) => review.solution)
   reviews: Review[];
 

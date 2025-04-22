@@ -7,6 +7,7 @@ import { IsNull, Repository } from 'typeorm';
 import { User } from '../../users/entities/user.entity';
 import { JwtService } from '@nestjs/jwt';
 import { IReviewer } from '../utils/types/reviewer.type';
+import * as fs from 'fs-extra';
 
 @Injectable()
 export class SolutionsService {
@@ -36,6 +37,19 @@ export class SolutionsService {
       });
     } catch {
       throw new NotFoundException();
+    }
+  }
+
+  async uploadImage(id: string, file: Express.Multer.File): Promise<Solution> {
+    try {
+      const solution = await this.solutionRepository.findOneOrFail({
+        where: { id }
+      });
+      if (solution.image) await fs.unlink(`./uploads/solutions/${solution.image}`);
+      await this.solutionRepository.save({ ...solution, image: file.filename });
+      return await this.findOne(id);
+    } catch {
+      throw new BadRequestException();
     }
   }
 
