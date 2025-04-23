@@ -8,6 +8,7 @@ import CreateUserDto from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { Role } from './roles/entities/role.entity';
 import { User } from './entities/user.entity';
+// import { User as v1User } from './entities/v1-user.entity';
 import { RolesService } from './roles/roles.service';
 
 @Injectable()
@@ -15,6 +16,9 @@ export class UsersService {
   constructor(
     @InjectRepository(User)
     private userRepository: Repository<User>,
+
+    // @InjectRepository(User, 'v1')
+    // private v1userRepository: Repository<v1User>,
     private rolesService: RolesService,
     private eventEmitter: EventEmitter2
   ) {}
