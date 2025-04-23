@@ -7,6 +7,9 @@ import { Role } from '../../users/roles/entities/role.entity';
 
 export default class DbSeeder implements Seeder {
   async run(dataSource: DataSource) {
+    dataSource.setOptions({
+      database: 'fikiri'
+    });
     await dataSource.dropDatabase();
     await dataSource.synchronize();
 
@@ -18,7 +21,7 @@ export default class DbSeeder implements Seeder {
     });
 
     await userRepository.save({
-      name: faker.person.firstName(),
+      name: faker.person.fullName(),
       address: faker.location.streetAddress(),
       phone_number: faker.phone.number({ style: 'human' }),
       email: 'admin@admin.com',

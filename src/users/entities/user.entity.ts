@@ -36,9 +36,6 @@ export class User extends AbstractEntity {
   @Column({ nullable: true })
   profile: string;
 
-  @Column({ type: 'datetime', nullable: true, default: null })
-  verified_at: Date;
-
   @OneToMany(() => Solution, (solution) => solution.user)
   solutions: Solution[];
 
