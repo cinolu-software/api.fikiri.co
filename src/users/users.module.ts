@@ -7,16 +7,9 @@ import { UsersService } from './users.service';
 import { RolesModule } from './roles/roles.module';
 import { UserSubscriber } from './subscribers/user.subscriber';
 import { OrganisationsModule } from './organizations/organizations.module';
-import { User as v1User } from './entities/v1-user.entity';
 
 @Module({
-  imports: [
-    TypeOrmModule.forFeature([User]),
-    TypeOrmModule.forFeature([v1User], 'v1'),
-    EmailModule,
-    RolesModule,
-    OrganisationsModule
-  ],
+  imports: [TypeOrmModule.forFeature([User]), EmailModule, RolesModule, OrganisationsModule],
   controllers: [UsersController],
   providers: [UsersService, UserSubscriber],
   exports: [UsersService]

@@ -1,7 +1,6 @@
 import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { ConfigService } from '@nestjs/config';
-import { User } from 'src/users/entities/v1-user.entity';
 
 @Module({
   imports: [
@@ -30,7 +29,7 @@ import { User } from 'src/users/entities/v1-user.entity';
         password: configServie.get('DB_PASSWORD'),
         database: configServie.get('DB_V1_NAME'),
         synchronize: false,
-        entities: [User]
+        entities: []
       }),
       inject: [ConfigService]
     })

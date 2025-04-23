@@ -8,7 +8,6 @@ import CreateUserDto from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { Role } from './roles/entities/role.entity';
 import { User } from './entities/user.entity';
-import { User as v1User } from './entities/v1-user.entity';
 import { RolesService } from './roles/roles.service';
 
 @Injectable()
@@ -16,34 +15,9 @@ export class UsersService {
   constructor(
     @InjectRepository(User)
     private userRepository: Repository<User>,
-    @InjectRepository(User, 'v1')
-    private v1userRepository: Repository<v1User>,
     private rolesService: RolesService,
     private eventEmitter: EventEmitter2
   ) {}
-
-  async migrateUsers(): Promise<void> {
-    const v1Users = await this.v1userRepository.find();
-    const imgs = fs.readdirSync('./uploads/profiles');
-    v1Users.forEach((u) => {
-      if (u.profile && !imgs.includes(u.profile)) {
-        fs.unlinkSync(`./uploads/profiles/${u.profile}`);
-      }
-    });
-    const role = await this.rolesService.findByName('user');
-    v1Users.forEach(async (u) => {
-      await this.userRepository.save({
-        email: u.email,
-        name: u.name,
-        password: u.name,
-        phone_number: u.phone_number,
-        address: u.address,
-        google_image: u.google_image,
-        profile: u.profile,
-        roles: [role]
-      });
-    });
-  }
 
   async findWithRole(name: string): Promise<User[]> {
     const data = await this.userRepository.find({

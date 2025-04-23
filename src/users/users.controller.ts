@@ -15,12 +15,6 @@ import CreateUserDto from './dto/create-user.dto';
 export class UsersController {
   constructor(private userService: UsersService) {}
 
-  @Get('migrate')
-  @Auth(RoleEnum.Guest)
-  migrateUsers(): Promise<void> {
-    return this.userService.migrateUsers();
-  }
-
   @Post('')
   create(@Body() dto: CreateUserDto): Promise<User> {
     return this.userService.create(dto);
