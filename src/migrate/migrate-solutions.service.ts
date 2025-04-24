@@ -50,8 +50,9 @@ export class MigrateSolutionsService {
       const newSolution = {
         user,
         call: {
-          id: 'f94b1e75-e9bf-47fd-a521-30394e3c2980'
+          id: 'f5287615-403a-4f27-b25c-fd4d88b835c8'
         },
+        awardId: 'f5287615-403a-4f27-b25c-fd4d88b835c8',
         responses: {
           name: s.name,
           video_link: s.video_link,

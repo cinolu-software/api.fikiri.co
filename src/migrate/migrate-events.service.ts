@@ -21,7 +21,8 @@ export class MigrateEventsService {
         description: event.description,
         ended_at: event.ended_at,
         started_at: event.started_at,
-        published_at: event.started_at
+        published_at: event.started_at,
+        created_at: event.created_at
       };
       await this.callRepository.save(newEvent);
     });
