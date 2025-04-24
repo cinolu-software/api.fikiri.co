@@ -5,6 +5,7 @@ import { ConfigService } from '@nestjs/config';
 @Module({
   imports: [
     TypeOrmModule.forRootAsync({
+      inject: [ConfigService],
       useFactory: (configServie: ConfigService) => ({
         type: 'mariadb',
         port: +configServie.get('DB_PORT'),
@@ -15,8 +16,7 @@ import { ConfigService } from '@nestjs/config';
         database: configServie.get('DB_NAME'),
         synchronize: false,
         autoLoadEntities: true
-      }),
-      inject: [ConfigService]
+      })
     }),
     TypeOrmModule.forRootAsync({
       name: 'v1',
@@ -29,7 +29,7 @@ import { ConfigService } from '@nestjs/config';
         password: configServie.get('DB_PASSWORD'),
         database: configServie.get('DB_V1_NAME'),
         synchronize: false,
-        entities: []
+        autoLoadEntities: true
       }),
       inject: [ConfigService]
     })
