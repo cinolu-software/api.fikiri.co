@@ -40,7 +40,8 @@ export class MigrateSolutionsService {
     const solutions = await this.findAll();
     const calls = await this.callRepository.find();
     const winningSolutions = await this.findWinningSolutions();
-
+    const callId = calls[0]?.id;
+    console.log('Call ID:', callId);
     for (const s of solutions) {
       const user = await this.userRepositoryV2.findOne({
         where: { email: s.user.email }
@@ -64,8 +65,7 @@ export class MigrateSolutionsService {
 
       for (const w of winningSolutions) {
         if (s.id === w.id) {
-          console.log('Found winning solution:', s.name);
-          newSolution['awardId'] = calls[0]?.id;
+          newSolution['award'] = calls[0];
         }
       }
       await this.v2SolutionRepository.save(newSolution);
