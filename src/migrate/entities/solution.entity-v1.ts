@@ -15,6 +15,7 @@ import { Challenge } from './challenge.entity-v1';
 import { Thematic } from './thematic.entity-v1';
 import { Image } from './image.entity-v1';
 import { User } from './user.entity-v1';
+import { Status } from './status.entity-v1';
 
 @Entity()
 export class Solution {
@@ -56,4 +57,8 @@ export class Solution {
 
   @ManyToOne(() => User, (user) => user.solutions)
   user: User;
+
+  @ManyToOne(() => Status, (status) => status.solutions)
+  @JoinColumn()
+  status: Status;
 }

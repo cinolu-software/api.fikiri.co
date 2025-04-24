@@ -8,9 +8,9 @@ import { Call } from 'src/calls/entities/call.entity';
 export class MigrateEventsService {
   constructor(
     @InjectRepository(Event, 'v1')
-    private readonly eventRepository: Repository<v1Event>,
+    private eventRepository: Repository<v1Event>,
     @InjectRepository(Call)
-    private readonly callRepository: Repository<Call>
+    private callRepository: Repository<Call>
   ) {}
 
   async migrateEvents(): Promise<void> {

@@ -14,11 +14,12 @@ import { MigrateSolutionsService } from './migrate-solutions.service';
 import { Thematic } from './entities/thematic.entity-v1';
 import { Challenge } from './entities/challenge.entity-v1';
 import { Image } from './entities/image.entity-v1';
+import { Status } from './entities/status.entity-v1';
 
 @Module({
   imports: [
     TypeOrmModule.forFeature([User, Solution, Call]),
-    TypeOrmModule.forFeature([v1User, v1Solution, v1Event, Thematic, Challenge, Image], 'v1'),
+    TypeOrmModule.forFeature([v1User, v1Solution, v1Event, Thematic, Challenge, Image, Status], 'v1'),
     RolesModule
   ],
   controllers: [MigrateController],

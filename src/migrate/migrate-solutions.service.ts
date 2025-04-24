@@ -23,10 +23,22 @@ export class MigrateSolutionsService {
     });
   }
 
+  async findWinningSolutions(): Promise<v1Solution[]> {
+    return await this.v1SolutionRepository
+      .createQueryBuilder('s')
+      .select(['s.id', 's.name', 's.description', 's.created_at'])
+      .leftJoinAndSelect('s.thematic', 'thematic')
+      .leftJoinAndSelect('s.images', 'solutionImages')
+      .leftJoinAndSelect('s.user', 'user')
+      .leftJoin('s.status', 'status')
+      .where('status.id IN (2,3,4)')
+      .getMany();
+  }
+
   async migrateSolutions(): Promise<void> {
     const solutions = await this.findAll();
     const imgs = await fs.readdir('./uploads/solutions');
-
+    const awards = await this.findWinningSolutions();
     const solutionsImgs = solutions
       .map(
         (s) =>
@@ -39,7 +51,6 @@ export class MigrateSolutionsService {
     for (const img of imgs) {
       if (!solutionsImgs.includes(img)) {
         await fs.unlink(`./uploads/solutions/${img}`);
-        console.log(`Deleted unused image: ${img}`);
       }
     }
 
@@ -50,9 +61,9 @@ export class MigrateSolutionsService {
       const newSolution = {
         user,
         call: {
-          id: 'f5287615-403a-4f27-b25c-fd4d88b835c8'
+          id: 'f575483a-49aa-4b55-aa8b-31323499885f'
         },
-        awardId: 'f5287615-403a-4f27-b25c-fd4d88b835c8',
+        awardId: awards.find((award) => award.id === s.id) ? 'f575483a-49aa-4b55-aa8b-31323499885f' : null,
         responses: {
           name: s.name,
           video_link: s.video_link,
