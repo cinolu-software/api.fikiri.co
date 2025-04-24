@@ -12,6 +12,9 @@ export class Solution extends AbstractEntity {
   @Column({ nullable: true })
   reviewer: string;
 
+  @Column({ type: 'enum', enum: ['pending', 'mapped', 'explored', 'experimented'], default: 'pending' })
+  status: 'pending' | 'mapped' | 'explored' | 'experimented';
+
   @Column({ nullable: true })
   image: string;
 
