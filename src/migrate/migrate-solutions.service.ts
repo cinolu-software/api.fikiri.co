@@ -39,9 +39,7 @@ export class MigrateSolutionsService {
   async migrateSolutions(): Promise<void> {
     const solutions = await this.findAll();
     const calls = await this.callRepository.find();
-    const winningSolutions = await this.findWinningSolutions();
-    const callId = calls[0]?.id;
-    console.log('Call ID:', callId);
+    // const winningSolutions = await this.findWinningSolutions();
     for (const s of solutions) {
       const user = await this.userRepositoryV2.findOne({
         where: { email: s.user.email }
@@ -63,11 +61,11 @@ export class MigrateSolutionsService {
         )?.image_link
       };
 
-      for (const w of winningSolutions) {
-        if (s.id === w.id) {
-          newSolution['award'] = calls[0];
-        }
-      }
+      // for (const w of winningSolutions) {
+      //   if (s.id === w.id) {
+      //     newSolution['award'] = calls[0];
+      //   }
+      // }
       await this.v2SolutionRepository.save(newSolution);
     }
   }
