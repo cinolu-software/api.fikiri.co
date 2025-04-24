@@ -64,6 +64,7 @@ export class MigrateSolutionsService {
 
       for (const w of winningSolutions) {
         if (s.id === w.id) {
+          console.log('Found winning solution:', s.name);
           newSolution['awardId'] = calls[0]?.id;
         }
       }
