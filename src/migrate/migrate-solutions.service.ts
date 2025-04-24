@@ -5,6 +5,7 @@ import { Solution as v1Solution } from './entities/solution.entity-v1';
 import { Solution } from 'src/calls/solutions/entities/solution.entity';
 import * as fs from 'fs-extra';
 import { User } from 'src/users/entities/user.entity';
+import { Call } from 'src/calls/entities/call.entity';
 
 @Injectable()
 export class MigrateSolutionsService {
@@ -14,7 +15,9 @@ export class MigrateSolutionsService {
     @InjectRepository(Solution)
     private readonly v2SolutionRepository: Repository<Solution>,
     @InjectRepository(User)
-    private readonly userRepositoryV2: Repository<User>
+    private readonly userRepositoryV2: Repository<User>,
+    @InjectRepository(Call)
+    private readonly callRepository: Repository<Call>
   ) {}
 
   async findAll(): Promise<v1Solution[]> {
@@ -26,7 +29,6 @@ export class MigrateSolutionsService {
   async findWinningSolutions(): Promise<v1Solution[]> {
     return await this.v1SolutionRepository
       .createQueryBuilder('s')
-      .select(['s.id', 's.name', 's.description', 's.created_at'])
       .leftJoinAndSelect('s.thematic', 'thematic')
       .leftJoinAndSelect('s.images', 'solutionImages')
       .leftJoinAndSelect('s.user', 'user')
@@ -37,8 +39,9 @@ export class MigrateSolutionsService {
 
   async migrateSolutions(): Promise<void> {
     const solutions = await this.findAll();
+    const calls = await this.callRepository.find();
     const imgs = await fs.readdir('./uploads/solutions');
-    const awards = await this.findWinningSolutions();
+    const winningSolutions = await this.findWinningSolutions();
     const solutionsImgs = solutions
       .map(
         (s) =>
@@ -60,10 +63,8 @@ export class MigrateSolutionsService {
       });
       const newSolution = {
         user,
-        call: {
-          id: 'f575483a-49aa-4b55-aa8b-31323499885f'
-        },
-        awardId: awards.find((award) => award.id === s.id) ? 'f575483a-49aa-4b55-aa8b-31323499885f' : null,
+        awardId: winningSolutions.findIndex((ws) => ws.id === s.id) > -1 ? calls[0]?.id : null,
+        call: calls[0],
         responses: {
           name: s.name,
           video_link: s.video_link,
