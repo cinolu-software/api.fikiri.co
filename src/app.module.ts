@@ -14,7 +14,6 @@ import { TransformInterceptor } from './shared/interceptors/transform.intercepto
 import { CallsModule } from './calls/calls.module';
 import { PartnersModule } from './partners/partners.module';
 import { StatsModule } from './stats/stats.module';
-import { MigrateModule } from './migrate/migrate.module';
 
 @Module({
   imports: [
@@ -40,8 +39,7 @@ import { MigrateModule } from './migrate/migrate.module';
     DatabaseModule,
     PartnersModule,
     CallsModule,
-    StatsModule,
-    MigrateModule
+    StatsModule
   ],
   providers: [
     { provide: APP_GUARD, useClass: AuthGuard },

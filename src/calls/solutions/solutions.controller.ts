@@ -21,6 +21,12 @@ export class SolutionsController {
     return this.solutionsService.create(user, dto);
   }
 
+  @Get('mapped')
+  @Auth(RoleEnum.Guest)
+  findMapped() {
+    return this.solutionsService.findMapped();
+  }
+
   @Post('image-profile/:id')
   @Auth(RoleEnum.User)
   @UseInterceptors(

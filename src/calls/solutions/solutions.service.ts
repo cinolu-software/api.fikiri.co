@@ -3,7 +3,7 @@ import { CreateSolutionDto } from './dto/create-solution.dto';
 import { UpdateSolutionDto } from './dto/update-solution.dto';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Solution } from './entities/solution.entity';
-import { IsNull, Repository } from 'typeorm';
+import { IsNull, Not, Repository } from 'typeorm';
 import { User } from '../../users/entities/user.entity';
 import { JwtService } from '@nestjs/jwt';
 import { IReviewer } from '../utils/types/reviewer.type';
@@ -34,6 +34,17 @@ export class SolutionsService {
       return await this.solutionRepository.find({
         where: { user: { id } },
         relations: ['user', 'call']
+      });
+    } catch {
+      throw new NotFoundException();
+    }
+  }
+
+  async findMapped(): Promise<[Solution[], number]> {
+    try {
+      return await this.solutionRepository.findAndCount({
+        where: { image: Not(IsNull()) },
+        relations: ['user']
       });
     } catch {
       throw new NotFoundException();

@@ -36,7 +36,6 @@ export class CallsController {
   }
 
   @Post('awards/:id')
-  @Auth(RoleEnum.User)
   awards(@Param('id') id: string, @Body('solutionsIds') solutionsIds: string[]): Promise<Call> {
     return this.callsService.awards(id, solutionsIds);
   }
