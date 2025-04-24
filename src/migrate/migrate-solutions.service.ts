@@ -3,7 +3,6 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Solution as v1Solution } from './entities/solution.entity-v1';
 import { Solution } from 'src/calls/solutions/entities/solution.entity';
-import * as fs from 'fs-extra';
 import { User } from 'src/users/entities/user.entity';
 import { Call } from 'src/calls/entities/call.entity';
 
@@ -40,22 +39,7 @@ export class MigrateSolutionsService {
   async migrateSolutions(): Promise<void> {
     const solutions = await this.findAll();
     const calls = await this.callRepository.find();
-    const imgs = await fs.readdir('./uploads/solutions');
     const winningSolutions = await this.findWinningSolutions();
-    const solutionsImgs = solutions
-      .map(
-        (s) =>
-          s.images.find(
-            (i) => i.image_link.endsWith('.png') || i.image_link.endsWith('.jpg') || i.image_link.endsWith('.jpeg')
-          )?.image_link
-      )
-      .filter(Boolean);
-
-    for (const img of imgs) {
-      if (!solutionsImgs.includes(img)) {
-        await fs.unlink(`./uploads/solutions/${img}`);
-      }
-    }
 
     for (const s of solutions) {
       const user = await this.userRepositoryV2.findOne({
@@ -63,7 +47,6 @@ export class MigrateSolutionsService {
       });
       const newSolution = {
         user,
-        awardId: winningSolutions.findIndex((ws) => ws.id === s.id) > -1 ? calls[0]?.id : null,
         call: calls[0],
         responses: {
           name: s.name,
@@ -78,6 +61,12 @@ export class MigrateSolutionsService {
           (i) => i.image_link.endsWith('.png') || i.image_link.endsWith('.jpg') || i.image_link.endsWith('.jpeg')
         )?.image_link
       };
+
+      for (const w of winningSolutions) {
+        if (s.id === w.id) {
+          newSolution['awardId'] = calls[0]?.id;
+        }
+      }
       await this.v2SolutionRepository.save(newSolution);
     }
   }
