@@ -4,6 +4,7 @@ import { Repository } from 'typeorm';
 import { Solution as v1Solution } from './entities/solution.entity-v1';
 import { Solution } from 'src/calls/solutions/entities/solution.entity';
 import * as fs from 'fs-extra';
+import { User } from 'src/users/entities/user.entity';
 
 @Injectable()
 export class MigrateSolutionsService {
@@ -11,7 +12,9 @@ export class MigrateSolutionsService {
     @InjectRepository(v1Solution, 'v1')
     private readonly v1SolutionRepository: Repository<v1Solution>,
     @InjectRepository(Solution)
-    private readonly v2SolutionRepository: Repository<Solution>
+    private readonly v2SolutionRepository: Repository<Solution>,
+    @InjectRepository(User)
+    private readonly userRepositoryV2: Repository<User>
   ) {}
 
   async findAll(): Promise<v1Solution[]> {
@@ -41,12 +44,13 @@ export class MigrateSolutionsService {
     }
 
     for (const s of solutions) {
+      const user = await this.userRepositoryV2.findOne({
+        where: { email: s.user.email }
+      });
       const newSolution = {
+        user,
         call: {
-          id: 'c6196916-f97e-4175-8721-d1079cc30baf'
-        },
-        user: {
-          email: s.user.email
+          id: 'f94b1e75-e9bf-47fd-a521-30394e3c2980'
         },
         responses: {
           name: s.name,
