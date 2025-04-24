@@ -2,6 +2,7 @@ import { Column, Entity, JoinColumn, ManyToOne, OneToMany } from 'typeorm';
 import { AbstractEntity } from '../../shared/utils/abstract.entity';
 import { User } from '../../users/entities/user.entity';
 import { Partner } from '../../partners/entities/partner.entity';
+import { Solution } from '../solutions/entities/solution.entity';
 
 @Entity('callForApplications')
 export class Call extends AbstractEntity {
@@ -51,4 +52,10 @@ export class Call extends AbstractEntity {
 
   @OneToMany(() => Partner, (partner) => partner.call)
   partners: Partner[];
+
+  @OneToMany(() => Solution, (solution) => solution.call)
+  awards: Solution[];
+
+  @OneToMany(() => Solution, (solution) => solution.call)
+  solutions: Solution[];
 }

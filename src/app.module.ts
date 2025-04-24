@@ -10,7 +10,6 @@ import { AuthGuard } from './auth/guards/auth.guard';
 import { DatabaseModule } from './database/database.module';
 import { EmailModule } from './email/email.module';
 import { UsersModule } from './users/users.module';
-import { BlogModule } from './blog/blog.module';
 import { TransformInterceptor } from './shared/interceptors/transform.interceptor';
 import { CallsModule } from './calls/calls.module';
 import { PartnersModule } from './partners/partners.module';
@@ -39,7 +38,6 @@ import { MigrateModule } from './migrate/migrate.module';
     UsersModule,
     EmailModule,
     DatabaseModule,
-    BlogModule,
     PartnersModule,
     CallsModule,
     StatsModule,

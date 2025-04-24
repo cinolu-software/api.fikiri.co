@@ -1,8 +1,6 @@
 import { Column, Entity, JoinColumn, JoinTable, ManyToMany, ManyToOne, OneToMany } from 'typeorm';
 import { AbstractEntity } from '../../shared/utils/abstract.entity';
 import { Role } from '../roles/entities/role.entity';
-import { Post } from '../../blog/posts/entities/post.entity';
-import { Comment } from '../../blog/comments/entities/comment.entity';
 import { Organization } from '../organizations/entities/organization.entity';
 import { Call } from '../../calls/entities/call.entity';
 import { Solution } from '../../calls/solutions/entities/solution.entity';
@@ -44,12 +42,6 @@ export class User extends AbstractEntity {
 
   @OneToMany(() => Call, (call) => call.publisher)
   published_calls: Call[];
-
-  @OneToMany(() => Post, (post) => post.author)
-  posts: Post[];
-
-  @OneToMany(() => Comment, (comment) => comment.by)
-  comments: Comment[];
 
   @ManyToMany(() => Role, (role) => role.users)
   @JoinTable()

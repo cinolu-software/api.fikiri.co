@@ -31,6 +31,18 @@ export class CallsService {
     }
   }
 
+  async awards(id: string, solutionsIds: string[]): Promise<Call> {
+    try {
+      const call = await this.findOne(id);
+      return await this.callRepository.save({
+        ...call,
+        awards: solutionsIds?.map((id) => ({ id }))
+      });
+    } catch {
+      throw new BadRequestException();
+    }
+  }
+
   async publish(publisher: User, id: string): Promise<Call> {
     try {
       const call = await this.findOne(id);
@@ -142,7 +154,7 @@ export class CallsService {
     try {
       return await this.callRepository.findOneOrFail({
         where: { id },
-        relations: ['author']
+        relations: ['author', 'awards']
       });
     } catch {
       throw new NotFoundException();

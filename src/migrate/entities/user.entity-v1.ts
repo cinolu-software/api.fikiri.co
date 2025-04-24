@@ -1,4 +1,5 @@
-import { Column, CreateDateColumn, Entity, PrimaryGeneratedColumn, UpdateDateColumn } from 'typeorm';
+import { Column, CreateDateColumn, Entity, OneToMany, PrimaryGeneratedColumn, UpdateDateColumn } from 'typeorm';
+import { Solution } from './solution.entity-v1';
 
 @Entity()
 export class User {
@@ -34,4 +35,7 @@ export class User {
 
   @UpdateDateColumn({ type: 'datetime' })
   updated_at: Date;
+
+  @OneToMany(() => Solution, (solution) => solution.user)
+  solutions: Solution[];
 }

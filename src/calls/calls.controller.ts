@@ -35,6 +35,12 @@ export class CallsController {
     return this.callsService.create(author, dto);
   }
 
+  @Post('awards/:id')
+  @Auth(RoleEnum.User)
+  awards(@Param('id') id: string, @Body('solutionsIds') solutionsIds: string[]): Promise<Call> {
+    return this.callsService.awards(id, solutionsIds);
+  }
+
   @Get('find-unpublished')
   @Auth(RoleEnum.Guest)
   findUnpublished(@Query() queryParams: QueryParams): Promise<[Call[], number]> {

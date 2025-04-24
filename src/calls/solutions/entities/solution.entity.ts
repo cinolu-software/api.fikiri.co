@@ -25,7 +25,11 @@ export class Solution extends AbstractEntity {
   @JoinColumn()
   user: User;
 
-  @ManyToOne(() => Call)
+  @ManyToOne(() => Call, (call) => call.solutions)
   @JoinColumn()
   call: Call;
+
+  @ManyToOne(() => Call, (call) => call.awards)
+  @JoinColumn()
+  award: Call;
 }
