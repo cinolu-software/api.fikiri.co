@@ -80,7 +80,7 @@ export class SolutionsService {
   async findAwards(): Promise<Solution[]> {
     return await this.solutionRepository.find({
       where: { award: { id: Not(IsNull()) } },
-      relations: ['user', 'call']
+      relations: ['user']
     });
   }
 
