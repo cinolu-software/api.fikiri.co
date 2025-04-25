@@ -10,8 +10,6 @@ export default class DbSeeder implements Seeder {
     dataSource.setOptions({
       database: 'fikiri'
     });
-    await dataSource.dropDatabase();
-    await dataSource.synchronize();
 
     const roleRepository = dataSource.getRepository(Role);
     const userRepository = dataSource.getRepository(User);

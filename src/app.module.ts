@@ -7,13 +7,13 @@ import { JwtModule } from '@nestjs/jwt';
 import { EventEmitterModule } from '@nestjs/event-emitter';
 import { AuthModule } from './auth/auth.module';
 import { AuthGuard } from './auth/guards/auth.guard';
-import { DatabaseModule } from './database/database.module';
 import { EmailModule } from './email/email.module';
 import { UsersModule } from './users/users.module';
 import { TransformInterceptor } from './shared/interceptors/transform.interceptor';
 import { CallsModule } from './calls/calls.module';
 import { PartnersModule } from './partners/partners.module';
 import { StatsModule } from './stats/stats.module';
+import { DatabaseModule } from './database/database.module';
 
 @Module({
   imports: [
