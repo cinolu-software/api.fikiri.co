@@ -21,6 +21,12 @@ export class SolutionsController {
     return this.solutionsService.create(user, dto);
   }
 
+  @Post('map-solutions')
+  @Auth(RoleEnum.Guest)
+  mapSolutions() {
+    return this.solutionsService.mapSolutions();
+  }
+
   @Get('mapped')
   @Auth(RoleEnum.Guest)
   findMapped() {

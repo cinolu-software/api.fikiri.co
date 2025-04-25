@@ -43,11 +43,28 @@ export class SolutionsService {
   async findMapped(): Promise<[Solution[], number]> {
     try {
       return await this.solutionRepository.findAndCount({
-        where: { image: Not(IsNull()) },
+        where: {
+          status: 'mapped'
+        },
         relations: ['user']
       });
     } catch {
       throw new NotFoundException();
+    }
+  }
+
+  async mapSolutions() {
+    try {
+      const solutions = await this.solutionRepository.find({
+        where: { image: Not(IsNull()) }
+      });
+      solutions.map(async (solution) => {
+        await this.solutionRepository.update(solution.id, {
+          status: 'mapped'
+        });
+      });
+    } catch {
+      throw new BadRequestException();
     }
   }
 
