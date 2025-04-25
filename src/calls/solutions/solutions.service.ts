@@ -8,6 +8,7 @@ import { User } from '../../users/entities/user.entity';
 import { JwtService } from '@nestjs/jwt';
 import { IReviewer } from '../utils/types/reviewer.type';
 import * as fs from 'fs-extra';
+import { QueryParams } from '../utils/types/query-params.type';
 
 @Injectable()
 export class SolutionsService {
@@ -40,31 +41,19 @@ export class SolutionsService {
     }
   }
 
-  async findMapped(): Promise<[Solution[], number]> {
+  async findMapped(queryParams: QueryParams): Promise<[Solution[], number]> {
     try {
+      const page = queryParams.page || 1;
+      const take = 12;
       return await this.solutionRepository.findAndCount({
-        where: {
-          status: 'mapped'
-        },
-        relations: ['user']
+        where: { status: 'mapped' },
+        relations: ['user'],
+        order: { updated_at: 'DESC' },
+        skip: (page - 1) * take,
+        take: take
       });
     } catch {
       throw new NotFoundException();
-    }
-  }
-
-  async mapSolutions() {
-    try {
-      const solutions = await this.solutionRepository.find({
-        where: { image: Not(IsNull()) }
-      });
-      solutions.map(async (solution) => {
-        await this.solutionRepository.update(solution.id, {
-          status: 'mapped'
-        });
-      });
-    } catch {
-      throw new BadRequestException();
     }
   }
 
@@ -85,6 +74,13 @@ export class SolutionsService {
     return await this.solutionRepository.find({
       order: { updated_at: 'DESC' },
       relations: ['user']
+    });
+  }
+
+  async findAwards(): Promise<Solution[]> {
+    return await this.solutionRepository.find({
+      where: { award: { id: Not(IsNull()) } },
+      relations: ['user', 'call']
     });
   }
 

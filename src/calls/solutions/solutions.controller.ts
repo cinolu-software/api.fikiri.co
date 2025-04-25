@@ -1,4 +1,15 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, UploadedFile, UseInterceptors } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Post,
+  Body,
+  Patch,
+  Param,
+  Delete,
+  UploadedFile,
+  UseInterceptors,
+  Query
+} from '@nestjs/common';
 import { SolutionsService } from './solutions.service';
 import { CreateSolutionDto } from './dto/create-solution.dto';
 import { UpdateSolutionDto } from './dto/update-solution.dto';
@@ -10,6 +21,7 @@ import { RoleEnum } from '../../shared/enums/roles.enum';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { diskStorage } from 'multer';
 import { v4 as uuidv4 } from 'uuid';
+import { QueryParams } from '../utils/types/query-params.type';
 
 @Controller('solutions')
 @Auth(RoleEnum.User)
@@ -21,16 +33,16 @@ export class SolutionsController {
     return this.solutionsService.create(user, dto);
   }
 
-  @Post('map-solutions')
+  @Get('find-awards')
   @Auth(RoleEnum.Guest)
-  mapSolutions() {
-    return this.solutionsService.mapSolutions();
+  findAwards(): Promise<Solution[]> {
+    return this.solutionsService.findAwards();
   }
 
   @Get('mapped')
   @Auth(RoleEnum.Guest)
-  findMapped() {
-    return this.solutionsService.findMapped();
+  findMapped(@Query() queryParams: QueryParams): Promise<[Solution[], number]> {
+    return this.solutionsService.findMapped(queryParams);
   }
 
   @Post('image-profile/:id')
