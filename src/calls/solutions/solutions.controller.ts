@@ -86,6 +86,7 @@ export class SolutionsController {
   }
 
   @Get(':id')
+  @Auth(RoleEnum.Guest)
   findOne(@Param('id') id: string): Promise<Solution> {
     return this.solutionsService.findOne(id);
   }
