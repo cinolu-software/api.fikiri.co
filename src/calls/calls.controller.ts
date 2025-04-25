@@ -132,6 +132,7 @@ export class CallsController {
   }
 
   @Get()
+  @Auth(RoleEnum.Guest)
   findAll(): Promise<Call[]> {
     return this.callsService.findAll();
   }

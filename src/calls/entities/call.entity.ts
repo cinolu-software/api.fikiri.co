@@ -53,7 +53,7 @@ export class Call extends AbstractEntity {
   @OneToMany(() => Partner, (partner) => partner.call)
   partners: Partner[];
 
-  @OneToMany(() => Solution, (solution) => solution.call)
+  @OneToMany(() => Solution, (solution) => solution.award)
   awards: Solution[];
 
   @OneToMany(() => Solution, (solution) => solution.call)
