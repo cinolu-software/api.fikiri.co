@@ -47,13 +47,13 @@ export class MigrateSolutionsService {
       const newSolution = {
         user,
         call: calls[0],
+        created_at: s.created_at,
+        updated_at: s.updated_at,
         responses: {
           name: s.name,
           video_link: s.video_link,
           description: s.description,
           targeted_problem: s.targeted_problem,
-          created_at: s.created_at,
-          updated_at: s.updated_at,
           thematic: s.thematic.name
         } as unknown as JSON,
         image: s.images.find(
