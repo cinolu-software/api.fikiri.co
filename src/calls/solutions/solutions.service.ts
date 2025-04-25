@@ -161,7 +161,10 @@ export class SolutionsService {
 
   async findOne(id: string): Promise<Solution> {
     try {
-      return await this.solutionRepository.findOneByOrFail({ id });
+      return await this.solutionRepository.findOneOrFail({
+        where: { id },
+        relations: ['user']
+      });
     } catch {
       throw new NotFoundException();
     }
