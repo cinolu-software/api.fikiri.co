@@ -1,4 +1,4 @@
-import { Controller, Get } from '@nestjs/common';
+import { Controller, Post } from '@nestjs/common';
 import { MigrateUsersService } from './migrate-users.service';
 import { MigrateEventsService } from './migrate-events.service';
 import { MigrateSolutionsService } from './migrate-solutions.service';
@@ -11,17 +11,17 @@ export class MigrateController {
     private migrateSolutionsService: MigrateSolutionsService
   ) {}
 
-  @Get('users')
+  @Post('users')
   migrateUsers(): Promise<void> {
     return this.migrateUsersService.migrateUsers();
   }
 
-  @Get('events')
+  @Post('events')
   migrateEvents(): Promise<void> {
     return this.migrateEventsService.migrateEvents();
   }
 
-  @Get('solutions')
+  @Post('solutions')
   migrateSolutions(): Promise<void> {
     return this.migrateSolutionsService.migrateSolutions();
   }
