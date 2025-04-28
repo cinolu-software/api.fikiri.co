@@ -3,6 +3,7 @@ import { AbstractEntity } from '../../../shared/utils/abstract.entity';
 import { User } from '../../../users/entities/user.entity';
 import { Review } from '../reviews/entities/review.entity';
 import { Call } from '../../entities/call.entity';
+import { ESatus } from 'src/calls/utils/enums/status.enum';
 
 @Entity()
 export class Solution extends AbstractEntity {
@@ -12,8 +13,8 @@ export class Solution extends AbstractEntity {
   @Column({ nullable: true })
   reviewer: string;
 
-  @Column({ type: 'enum', enum: ['pending', 'mapped', 'explored', 'experimented'], default: 'pending' })
-  status: 'pending' | 'mapped' | 'explored' | 'experimented';
+  @Column({ type: 'enum', enum: ESatus, default: ESatus.PENDING })
+  status: ESatus;
 
   @Column({ nullable: true })
   image: string;

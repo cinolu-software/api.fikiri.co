@@ -9,6 +9,7 @@ import { JwtService } from '@nestjs/jwt';
 import { IReviewer } from '../utils/types/reviewer.type';
 import * as fs from 'fs-extra';
 import { QueryParams } from '../utils/types/query-params.type';
+import { ESatus } from '../utils/enums/status.enum';
 
 @Injectable()
 export class SolutionsService {
@@ -46,7 +47,7 @@ export class SolutionsService {
       const page = queryParams.page || 1;
       const take = 12;
       return await this.solutionRepository.findAndCount({
-        where: { status: 'mapped' },
+        where: { status: ESatus.MAPPED },
         relations: ['user'],
         order: { updated_at: 'DESC' },
         skip: (page - 1) * take,
