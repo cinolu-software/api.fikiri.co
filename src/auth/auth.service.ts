@@ -48,8 +48,8 @@ export class AuthService {
       const link = process.env.FRONTEND_URI + 'verify-email?token=' + token;
       this.eventEmitter.emit('user.sign-up', { user, link });
       return user;
-    } catch (error) {
-      throw new BadRequestException(error.message);
+    } catch {
+      throw new BadRequestException();
     }
   }
 
