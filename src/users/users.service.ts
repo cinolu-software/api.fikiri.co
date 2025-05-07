@@ -53,11 +53,13 @@ export class UsersService {
   async signUp(dto: SignUpDto): Promise<User> {
     try {
       const userRole = await this.rolesService.findByName('user');
+      const password = Math.floor(100000 + Math.random() * 900000).toString();
       const user = await this.userRepository.save({
         ...dto,
+        password,
         roles: [userRole]
       });
-      this.eventEmitter.emit('user.created', { user, password: dto.password });
+      this.eventEmitter.emit('user.created', { user, password: password });
       return user;
     } catch {
       throw new BadRequestException();

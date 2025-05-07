@@ -1,15 +1,8 @@
-import { IsEmail, IsNotEmpty, MinLength } from 'class-validator';
-import { Match } from 'src/shared/decorators/match.decorator';
+import { IsEmail, IsNotEmpty } from 'class-validator';
 
 export class SignUpDto {
   @IsEmail()
   email: string;
-
-  @MinLength(6)
-  password: string;
-
-  @Match('password')
-  password_confirm: string;
 
   @IsNotEmpty()
   address: string;
