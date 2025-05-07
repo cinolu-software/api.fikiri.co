@@ -3,7 +3,7 @@ import * as fs from 'fs-extra';
 import { In, Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
 import { EventEmitter2 } from '@nestjs/event-emitter';
-import { CreateWithGoogleDto } from '../auth/dto';
+import { CreateWithGoogleDto, SignUpDto } from '../auth/dto';
 import CreateUserDto from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { Role } from './roles/entities/role.entity';
@@ -44,6 +44,20 @@ export class UsersService {
         roles: dto.roles?.map((id) => ({ id }))
       });
       this.eventEmitter.emit('user.created', { user, password });
+      return user;
+    } catch {
+      throw new BadRequestException();
+    }
+  }
+
+  async signUp(dto: SignUpDto): Promise<User> {
+    try {
+      const userRole = await this.rolesService.findByName('user');
+      const user = await this.userRepository.save({
+        ...dto,
+        roles: [userRole]
+      });
+      this.eventEmitter.emit('user.created', { user, password: dto.password });
       return user;
     } catch {
       throw new BadRequestException();

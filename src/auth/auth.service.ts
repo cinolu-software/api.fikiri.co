@@ -9,6 +9,7 @@ import { EventEmitter2 } from '@nestjs/event-emitter';
 import { User } from '../users/entities/user.entity';
 import { UsersService } from '../users/users.service';
 import { UpdateUserDto } from 'src/users/dto/update-user.dto';
+import { SignUpDto } from './dto';
 
 @Injectable()
 export class AuthService {
@@ -38,6 +39,18 @@ export class AuthService {
 
   async signOut(@Req() request: Request): Promise<void> {
     request.session.destroy(() => {});
+  }
+
+  async signUp(dto: SignUpDto): Promise<User> {
+    try {
+      const user = await this.usersService.signUp(dto);
+      const token = await this.generateToken(user, '15min');
+      const link = process.env.FRONTEND_URI + 'verify-email?token=' + token;
+      this.eventEmitter.emit('user.sign-up', { user, link });
+      return user;
+    } catch (error) {
+      throw new BadRequestException(error.message);
+    }
   }
 
   async verifyToken(token: string): Promise<User> {

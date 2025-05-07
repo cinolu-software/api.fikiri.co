@@ -11,6 +11,7 @@ import { CurrentUser } from '../shared/decorators/user.decorator';
 import { RoleEnum } from '../shared/enums/roles.enum';
 import { User } from '../users/entities/user.entity';
 import { UpdateUserDto } from 'src/users/dto/update-user.dto';
+import { SignUpDto } from './dto';
 
 @Controller('auth')
 @Auth(RoleEnum.User)
@@ -54,6 +55,12 @@ export class AuthController {
   @Patch('update-password')
   updatePassword(@CurrentUser() user: User, @Body() dto: UpdatePasswordDto): Promise<User> {
     return this.authService.updatePassword(user, dto);
+  }
+
+  @Post('sign-up')
+  @Auth(RoleEnum.Guest)
+  signUp(@Body() dto: SignUpDto): Promise<User> {
+    return this.authService.signUp(dto);
   }
 
   @Post('forgot-password')
