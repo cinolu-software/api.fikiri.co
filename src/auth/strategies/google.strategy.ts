@@ -26,6 +26,7 @@ export class GoogleStrategy extends PassportStrategy(Strategy, 'google') {
       name: `${name.givenName} ${name.familyName}`,
       google_image: photos[0].value
     };
+
     const user = await this.userService.findOrCreate(userDto);
     done(null, user);
   }
