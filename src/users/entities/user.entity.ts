@@ -29,6 +29,12 @@ export class User extends AbstractEntity {
   address: string;
 
   @Column({ nullable: true })
+  popularization_link: string;
+
+  @Column({ nullable: true })
+  popularizer: string;
+
+  @Column({ nullable: true })
   google_image: string;
 
   @Column({ nullable: true })
