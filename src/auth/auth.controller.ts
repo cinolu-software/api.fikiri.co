@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Patch, Post, Req, Res, UseGuards } from '@nestjs/common';
+import { Body, Controller, Get, Patch, Post, Query, Req, Res, UseGuards } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { UpdatePasswordDto } from './dto/update-password.dto';
 import { forgotPasswordDto } from './dto/forgot-password.dto';
@@ -17,6 +17,12 @@ import { SignUpDto } from './dto';
 @Auth(RoleEnum.User)
 export class AuthController {
   constructor(private authService: AuthService) {}
+
+  @Post('sign-up')
+  @Auth(RoleEnum.Guest)
+  signUp(@Body() dto: SignUpDto, @Query('link') link: string): Promise<User> {
+    return this.authService.signUp(dto, link);
+  }
 
   @Post('sign-in')
   @Auth(RoleEnum.Guest)
@@ -55,12 +61,6 @@ export class AuthController {
   @Patch('update-password')
   updatePassword(@CurrentUser() user: User, @Body() dto: UpdatePasswordDto): Promise<User> {
     return this.authService.updatePassword(user, dto);
-  }
-
-  @Post('sign-up')
-  @Auth(RoleEnum.Guest)
-  signUp(@Body() dto: SignUpDto): Promise<User> {
-    return this.authService.signUp(dto);
   }
 
   @Post('forgot-password')
