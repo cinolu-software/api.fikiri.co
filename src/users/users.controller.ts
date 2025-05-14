@@ -20,6 +20,18 @@ export class UsersController {
     return this.userService.create(dto);
   }
 
+  @Get('count-by-popularizer')
+  @Auth(RoleEnum.Volunteer)
+  countByPopularizer(): Promise<{ popularizer: string; count: number }[]> {
+    return this.userService.countByPopularizer();
+  }
+
+  @Get('find-by-popularizer/:popularizer')
+  @Auth(RoleEnum.Volunteer)
+  findByPopularizer(@Param('popularizer') popularizer: string): Promise<User[]> {
+    return this.userService.findByPopularizer(popularizer);
+  }
+
   @Get('')
   findAll(): Promise<User[]> {
     return this.userService.findAll();

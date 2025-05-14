@@ -9,6 +9,7 @@ import { UpdateUserDto } from './dto/update-user.dto';
 import { Role } from './roles/entities/role.entity';
 import { User } from './entities/user.entity';
 import { RolesService } from './roles/roles.service';
+import { generateRandomPassword } from 'src/shared/utils/generate-password.fn';
 
 @Injectable()
 export class UsersService {
@@ -36,7 +37,7 @@ export class UsersService {
 
   async create(dto: CreateUserDto): Promise<User> {
     try {
-      const password = Math.floor(100000 + Math.random() * 900000).toString();
+      const password = generateRandomPassword();
       const user = await this.userRepository.save({
         ...dto,
         password,
@@ -50,16 +51,41 @@ export class UsersService {
     }
   }
 
-  async signUp(dto: SignUpDto): Promise<User> {
+  async countByPopularizer(): Promise<{ popularizer: string; count: number }[]> {
+    try {
+      return await this.userRepository
+        .createQueryBuilder('user')
+        .select('user.popularizer')
+        .addSelect('COUNT(user.id)', 'count')
+        .groupBy('user.popularizer')
+        .getRawMany();
+    } catch {
+      throw new BadRequestException();
+    }
+  }
+
+  async findByPopularizer(popularizer: string): Promise<User[]> {
+    try {
+      return await this.userRepository.find({
+        where: { popularizer },
+        relations: ['roles']
+      });
+    } catch {
+      throw new BadRequestException();
+    }
+  }
+
+  async signUp(dto: SignUpDto, popularizer: string): Promise<User> {
     try {
       const userRole = await this.rolesService.findByName('user');
-      const password = Math.floor(100000 + Math.random() * 900000).toString();
+      const password = generateRandomPassword();
       const user = await this.userRepository.save({
         ...dto,
         password,
+        popularizer,
         roles: [userRole]
       });
-      this.eventEmitter.emit('user.created', { user, password: password });
+      this.eventEmitter.emit('user.created', { user, password });
       return user;
     } catch {
       throw new BadRequestException();
@@ -112,11 +138,10 @@ export class UsersService {
 
   async findByIds(ids: string[]): Promise<User[]> {
     try {
-      const data = await this.userRepository.find({
+      return await this.userRepository.find({
         where: { id: In(ids) },
         relations: ['roles']
       });
-      return data;
     } catch {
       throw new BadRequestException();
     }
@@ -172,7 +197,6 @@ export class UsersService {
         where: { id },
         relations: ['roles']
       });
-      delete oldUser?.password;
       const user = await this.userRepository.save({
         ...oldUser,
         ...dto,
@@ -191,7 +215,6 @@ export class UsersService {
         where: { id: currentUser.id },
         relations: ['roles']
       });
-      delete oldUser.password;
       await this.userRepository.save({
         ...oldUser,
         ...dto,
@@ -210,7 +233,6 @@ export class UsersService {
         relations: ['roles']
       });
       if (oldUser.profile) await fs.unlink(`./uploads/profiles/${oldUser.profile}`);
-      delete oldUser.password;
       await this.userRepository.save({ ...oldUser, profile: file.filename });
       return await this.findByEmail(oldUser.email);
     } catch {
