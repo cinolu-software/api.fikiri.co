@@ -43,9 +43,12 @@ export class AuthService {
 
   async signUp(dto: SignUpDto, link: string): Promise<User> {
     try {
-      const { id } = await this.jwtService.verifyAsync(link, { secret: process.env.JWT_SECRET });
-      const user = await this.usersService.findOne(id);
-      return await this.usersService.signUp(dto, user.email);
+      if (link) {
+        const { id } = await this.jwtService.verifyAsync(link, { secret: process.env.JWT_SECRET });
+        const user = await this.usersService.findOne(id);
+        return await this.usersService.signUp(dto, user.email);
+      }
+      return await this.usersService.signUp(dto);
     } catch {
       throw new BadRequestException();
     }

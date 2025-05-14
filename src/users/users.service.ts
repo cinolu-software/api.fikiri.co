@@ -75,7 +75,7 @@ export class UsersService {
     }
   }
 
-  async signUp(dto: SignUpDto, popularizer: string): Promise<User> {
+  async signUp(dto: SignUpDto, popularizer?: string): Promise<User> {
     try {
       const userRole = await this.rolesService.findByName('user');
       const password = generateRandomPassword();
