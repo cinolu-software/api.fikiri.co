@@ -7,9 +7,10 @@ import { UsersService } from './users.service';
 import { RolesModule } from './roles/roles.module';
 import { UserSubscriber } from './subscribers/user.subscriber';
 import { OrganisationsModule } from './organizations/organizations.module';
+import { PassportModule } from '@nestjs/passport';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([User]), EmailModule, RolesModule, OrganisationsModule],
+  imports: [PassportModule, TypeOrmModule.forFeature([User]), EmailModule, RolesModule, OrganisationsModule],
   controllers: [UsersController],
   providers: [UsersService, UserSubscriber],
   exports: [UsersService]
