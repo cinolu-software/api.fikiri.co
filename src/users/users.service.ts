@@ -10,6 +10,7 @@ import { Role } from './roles/entities/role.entity';
 import { User } from './entities/user.entity';
 import { RolesService } from './roles/roles.service';
 import { generateRandomPassword } from 'src/shared/utils/generate-password.fn';
+import { JwtService } from '@nestjs/jwt';
 
 @Injectable()
 export class UsersService {
@@ -17,7 +18,8 @@ export class UsersService {
     @InjectRepository(User)
     private userRepository: Repository<User>,
     private rolesService: RolesService,
-    private eventEmitter: EventEmitter2
+    private eventEmitter: EventEmitter2,
+    private jwtService: JwtService
   ) {}
 
   async findWithRole(name: string): Promise<User[]> {
@@ -37,10 +39,18 @@ export class UsersService {
 
   async create(dto: CreateUserDto): Promise<User> {
     try {
+      const popularization_link = await this.jwtService.signAsync(
+        { email: dto.email },
+        {
+          expiresIn: '30d',
+          secret: process.env.JWT_SECRET
+        }
+      );
       const password = generateRandomPassword();
       const user = await this.userRepository.save({
         ...dto,
         password,
+        popularization_link,
         organisation: { id: dto?.organisation },
         roles: dto.roles?.map((id) => ({ id }))
       });
