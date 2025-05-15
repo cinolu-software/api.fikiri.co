@@ -43,7 +43,7 @@ export class AuthService {
 
   async signUp(dto: SignUpDto, link: string): Promise<User> {
     try {
-      const popularization_link = await this.generateToken(dto as User, '30d');
+      const popularization_link = await this.generateToken(dto as User, '1y');
       if (link) {
         const { email } = await this.jwtService.verifyAsync(link, { secret: process.env.JWT_SECRET });
         return await this.usersService.signUp(dto, popularization_link, email);
