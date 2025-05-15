@@ -45,8 +45,8 @@ export class AuthService {
     try {
       const popularization_link = await this.generateToken(dto as User, '30d');
       if (link) {
-        const payload = await this.jwtService.verifyAsync(link, { secret: process.env.JWT_SECRET });
-        return await this.usersService.signUp(dto, popularization_link, payload.email);
+        const { email } = await this.jwtService.verifyAsync(link, { secret: process.env.JWT_SECRET });
+        return await this.usersService.signUp(dto, popularization_link, email);
       }
       return await this.usersService.signUp(dto, popularization_link);
     } catch {
