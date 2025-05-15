@@ -75,13 +75,14 @@ export class UsersService {
     }
   }
 
-  async signUp(dto: SignUpDto, popularizer?: string): Promise<User> {
+  async signUp(dto: SignUpDto, popularization_link: string, popularizer?: string): Promise<User> {
     try {
       const userRole = await this.rolesService.findByName('user');
       const password = generateRandomPassword();
       const user = await this.userRepository.save({
         ...dto,
         password,
+        popularization_link,
         popularizer,
         roles: [userRole]
       });
@@ -108,6 +109,7 @@ export class UsersService {
       const users = await this.findByIds(dto.ids);
       const updatedUsers = await Promise.all(
         users.map(async (user, index) => {
+          delete user.password;
           const updatedUser = await this.userRepository.save({
             ...user,
             ...dto.data[index],
@@ -174,12 +176,12 @@ export class UsersService {
   }
 
   async updateExistingUser(currentUser: User, dto: CreateWithGoogleDto): Promise<User> {
+    delete currentUser.password;
     if (!currentUser.profile) {
       currentUser.google_image = dto.google_image;
       await this.userRepository.save(currentUser);
     }
-    const user = await this.findByEmail(currentUser.email);
-    return user;
+    return await this.findByEmail(currentUser.email);
   }
 
   async createNewUser(dto: CreateWithGoogleDto, userRole: Role): Promise<User> {
@@ -197,6 +199,7 @@ export class UsersService {
         where: { id },
         relations: ['roles']
       });
+      delete oldUser.password;
       const user = await this.userRepository.save({
         ...oldUser,
         ...dto,
@@ -215,6 +218,7 @@ export class UsersService {
         where: { id: currentUser.id },
         relations: ['roles']
       });
+      delete oldUser.password;
       await this.userRepository.save({
         ...oldUser,
         ...dto,
