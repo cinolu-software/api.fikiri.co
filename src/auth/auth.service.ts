@@ -49,7 +49,7 @@ export class AuthService {
         return await this.usersService.signUp(dto, popularization_link, email);
       }
       return await this.usersService.signUp(dto, popularization_link);
-    } catch {
+    } catch { 
       throw new BadRequestException();
     }
   }
