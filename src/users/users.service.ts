@@ -61,7 +61,7 @@ export class UsersService {
     }
   }
 
-  async countByPopularizer(): Promise<{ popularizer: string; count: number }[]> {
+  async countByPopularizers(): Promise<{ popularizer: string; count: number }[]> {
     try {
       return await this.userRepository
         .createQueryBuilder('user')
@@ -69,6 +69,20 @@ export class UsersService {
         .addSelect('COUNT(user.id)', 'count')
         .groupBy('user.popularizer')
         .getRawMany();
+    } catch {
+      throw new BadRequestException();
+    }
+  }
+
+  async countByPopularizer(popularizer: string): Promise<number> {
+    try {
+      return await this.userRepository
+        .createQueryBuilder('user')
+        .select('user.popularizer')
+        .where('user.popularizer = :popularizer', { popularizer })
+        .addSelect('COUNT(user.id)', 'count')
+        .groupBy('user.popularizer')
+        .getCount();
     } catch {
       throw new BadRequestException();
     }
