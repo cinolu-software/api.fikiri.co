@@ -92,13 +92,14 @@ export class UsersService {
       const user = await this.userRepository.save({
         ...dto,
         password,
-        popularization_link,
-        popularizer,
+        popularization_link: popularization_link || null,
+        popularizer: popularizer || null,
         roles: [userRole]
       });
       this.eventEmitter.emit('user.created', { user, password });
       return user;
-    } catch {
+    } catch (e) {
+      console.log(e);
       throw new BadRequestException();
     }
   }
