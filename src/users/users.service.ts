@@ -98,8 +98,7 @@ export class UsersService {
       });
       this.eventEmitter.emit('user.created', { user, password });
       return user;
-    } catch (e) {
-      console.log(e);
+    } catch {
       throw new BadRequestException();
     }
   }
