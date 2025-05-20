@@ -43,13 +43,13 @@ export class AuthService {
 
   async signUp(dto: SignUpDto, link: string): Promise<User> {
     try {
-      const popularization_link = await this.generateToken(dto as User, '1y');
+      const popularization_link = await this.generateToken({ email: dto.email } as User, '1y');
       if (link) {
         const { email } = await this.jwtService.verifyAsync(link, { secret: process.env.JWT_SECRET });
         return await this.usersService.signUp(dto, popularization_link, email);
       }
       return await this.usersService.signUp(dto, popularization_link);
-    } catch { 
+    } catch {
       throw new BadRequestException();
     }
   }
