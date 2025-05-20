@@ -88,6 +88,19 @@ export class UsersService {
     }
   }
 
+  async generatePopularizationLink(user: User): Promise<User> {
+    try {
+      const popularization_link = await this.jwtService.signAsync(user, {
+        expiresIn: '1y',
+        secret: process.env.JWT_SECRET
+      });
+      await this.userRepository.update(user.id, { popularization_link });
+      return await this.findOne(user.id);
+    } catch {
+      throw new BadRequestException();
+    }
+  }
+
   async findByPopularizer(popularizer: string): Promise<User[]> {
     try {
       return await this.userRepository.find({

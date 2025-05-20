@@ -26,6 +26,12 @@ export class UsersController {
     return this.userService.countByPopularizers();
   }
 
+  @Post('generate-popularization-link')
+  @Auth(RoleEnum.User)
+  generatePopularizationLink(@CurrentUser() user: User): Promise<{ popularization_link: string }> {
+    return this.userService.generatePopularizationLink(user);
+  }
+
   @Get('find-by-popularizer/:popularizer')
   @Auth(RoleEnum.User)
   findByPopularizer(@Param('popularizer') popularizer: string): Promise<User[]> {
