@@ -77,7 +77,7 @@ export class AuthService {
   }
 
   async profile(user: User): Promise<User> {
-    return user;
+    return await this.usersService.findByEmail(user.email);
   }
 
   async updateProfile(user: User, dto: UpdateUserDto): Promise<User> {
