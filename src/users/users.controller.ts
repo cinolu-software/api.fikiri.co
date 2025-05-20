@@ -28,7 +28,7 @@ export class UsersController {
 
   @Post('generate-popularization-link')
   @Auth(RoleEnum.User)
-  generatePopularizationLink(@CurrentUser() user: User): Promise<{ popularization_link: string }> {
+  generatePopularizationLink(@CurrentUser() user: User): Promise<User> {
     return this.userService.generatePopularizationLink(user);
   }
 
