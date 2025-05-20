@@ -48,7 +48,7 @@ export class AuthService {
         const { email } = await this.jwtService.verifyAsync(link, { secret: process.env.JWT_SECRET });
         return await this.usersService.signUp(dto, popularization_link, email);
       }
-      return await this.usersService.signUp(dto, popularization_link);
+      return await this.usersService.signUp(dto, popularization_link, null);
     } catch {
       throw new BadRequestException();
     }
