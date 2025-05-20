@@ -20,7 +20,13 @@ export class UsersController {
     return this.userService.create(dto);
   }
 
-  @Get('count-by-popularizer')
+  @Get('count-by-popularizer/:popularizer')
+  @Auth(RoleEnum.User)
+  countByPopularizer(@Param('popularizer') popularizer: string): Promise<number> {
+    return this.userService.countByPopularizer(popularizer);
+  }
+
+  @Get('count-by-popularizers')
   @Auth(RoleEnum.Volunteer)
   countByPopularizers(): Promise<{ popularizer: string; count: number }[]> {
     return this.userService.countByPopularizers();

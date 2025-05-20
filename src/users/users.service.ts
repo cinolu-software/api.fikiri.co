@@ -115,15 +115,15 @@ export class UsersService {
     }
   }
 
-  async signUp(dto: SignUpDto, popularization_link: string, popularizer?: string): Promise<User> {
+  async signUp(dto: SignUpDto, popularization_link: string, popularizer: string): Promise<User> {
     try {
       const userRole = await this.rolesService.findByName('user');
       const password = generateRandomPassword();
       const user = await this.userRepository.save({
         ...dto,
         password,
-        popularization_link: popularization_link || null,
-        popularizer: popularizer || null,
+        popularizer,
+        popularization_link,
         roles: [userRole]
       });
       this.eventEmitter.emit('user.created', { user, password });
