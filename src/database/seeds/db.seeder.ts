@@ -7,16 +7,8 @@ import { Role } from '../../users/roles/entities/role.entity';
 
 export default class DbSeeder implements Seeder {
   async run(dataSource: DataSource) {
-    dataSource.setOptions({
-      database: 'fikiri'
-    });
-
     const roleRepository = dataSource.getRepository(Role);
     const userRepository = dataSource.getRepository(User);
-
-    ['admin', 'user', 'cartograph', 'explorator', 'experimentor', 'volunteer'].map(async (role) => {
-      await roleRepository.save({ name: role });
-    });
 
     await userRepository.save({
       name: faker.person.fullName(),
