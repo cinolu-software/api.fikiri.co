@@ -276,6 +276,7 @@ export class UsersService {
         where: { id: currenUser.id },
         relations: ['roles']
       });
+      delete oldUser.password;
       if (oldUser.profile) await fs.unlink(`./uploads/profiles/${oldUser.profile}`);
       await this.userRepository.save({ ...oldUser, profile: file.filename });
       return await this.findByEmail(oldUser.email);
