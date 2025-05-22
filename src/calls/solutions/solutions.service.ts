@@ -35,7 +35,7 @@ export class SolutionsService {
     try {
       return await this.solutionRepository.find({
         where: { user: { id } },
-        relations: ['user', 'call']
+        relations: ['user', 'call', 'galery']
       });
     } catch {
       throw new NotFoundException();

@@ -154,7 +154,7 @@ export class CallsService {
     try {
       return await this.callRepository.findOneOrFail({
         where: { id },
-        relations: ['author', 'awards']
+        relations: ['author', 'awards', 'galery']
       });
     } catch {
       throw new NotFoundException();
