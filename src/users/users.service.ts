@@ -61,34 +61,34 @@ export class UsersService {
     }
   }
 
-  async countByPopularizers(): Promise<{ popularizer: string; count: number }[]> {
+  async countByOutreachers(): Promise<{ outreacher: string; count: number }[]> {
     try {
       return await this.userRepository
         .createQueryBuilder('user')
-        .select('user.popularizer')
+        .select('user.outreacher')
         .addSelect('COUNT(user.id)', 'count')
-        .groupBy('user.popularizer')
+        .groupBy('user.outreacher')
         .getRawMany();
     } catch {
       throw new BadRequestException();
     }
   }
 
-  async countByPopularizer(popularizer: string): Promise<number> {
+  async countByOutreach(outreacher: string): Promise<number> {
     try {
       return await this.userRepository
         .createQueryBuilder('user')
-        .select('user.popularizer')
-        .where('user.popularizer = :popularizer', { popularizer })
+        .select('user.outreacher')
+        .where('user.outreacher = :outreacher', { outreacher })
         .addSelect('COUNT(user.id)', 'count')
-        .groupBy('user.popularizer')
+        .groupBy('user.outreacher')
         .getCount();
     } catch {
       throw new BadRequestException();
     }
   }
 
-  async generatePopularizationLink(user: User): Promise<User> {
+  async generateOutreachLink(user: User): Promise<User> {
     try {
       const outreach_link = await this.jwtService.signAsync(
         { email: user.email },

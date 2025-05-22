@@ -22,20 +22,20 @@ export class UsersController {
 
   @Get('count-by-popularizer/:popularizer')
   @Auth(RoleEnum.User)
-  countByPopularizer(@Param('popularizer') popularizer: string): Promise<number> {
-    return this.userService.countByPopularizer(popularizer);
+  countByOutreach(@Param('popularizer') popularizer: string): Promise<number> {
+    return this.userService.countByOutreach(popularizer);
   }
 
   @Get('count-by-popularizers')
   @Auth(RoleEnum.Volunteer)
-  countByPopularizers(): Promise<{ popularizer: string; count: number }[]> {
-    return this.userService.countByPopularizers();
+  countByOutreachers(): Promise<{ outreacher: string; count: number }[]> {
+    return this.userService.countByOutreachers();
   }
 
   @Post('generate-popularization-link')
   @Auth(RoleEnum.User)
-  generatePopularizationLink(@CurrentUser() user: User): Promise<User> {
-    return this.userService.generatePopularizationLink(user);
+  generateOutreachLink(@CurrentUser() user: User): Promise<User> {
+    return this.userService.generateOutreachLink(user);
   }
 
   @Get('find-by-popularizer/:popularizer')
