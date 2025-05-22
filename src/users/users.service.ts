@@ -104,7 +104,7 @@ export class UsersService {
     }
   }
 
-  async findByPopularizer(outreacher: string): Promise<User[]> {
+  async findByOutreacher(outreacher: string): Promise<User[]> {
     try {
       return await this.userRepository.find({
         where: { outreacher },
