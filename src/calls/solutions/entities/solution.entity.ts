@@ -1,12 +1,13 @@
 import { Column, Entity, JoinColumn, ManyToOne, OneToMany } from 'typeorm';
-import { AbstractEntity } from '../../../shared/utils/abstract.entity';
+import { BaseEntity } from '../../../shared/utils/base.entity';
 import { User } from '../../../users/entities/user.entity';
 import { Review } from '../reviews/entities/review.entity';
-import { Call } from '../../entities/call.entity';
+import { callSolution } from '../../entities/call.entity';
 import { ESatus } from 'src/calls/utils/enums/status.enum';
+import { SolutionGalery } from '../galeries/entities/galery.entity';
 
 @Entity()
-export class Solution extends AbstractEntity {
+export class Solution extends BaseEntity {
   @Column({ type: 'json' })
   responses: JSON;
 
@@ -26,11 +27,14 @@ export class Solution extends AbstractEntity {
   @JoinColumn()
   user: User;
 
-  @ManyToOne(() => Call, (call) => call.solutions)
+  @ManyToOne(() => callSolution, (call) => call.solutions)
   @JoinColumn()
-  call: Call;
+  call: callSolution;
 
-  @ManyToOne(() => Call, (call) => call.awards)
+  @ManyToOne(() => callSolution, (call) => call.awards)
   @JoinColumn()
-  award: Call;
+  award: callSolution;
+
+  @OneToMany(() => SolutionGalery, (galery) => galery.solution)
+  galery: SolutionGalery[];
 }

@@ -1,12 +1,12 @@
 import { Column, Entity, JoinColumn, JoinTable, ManyToMany, ManyToOne, OneToMany } from 'typeorm';
-import { AbstractEntity } from '../../shared/utils/abstract.entity';
+import { BaseEntity } from '../../shared/utils/base.entity';
 import { Role } from '../roles/entities/role.entity';
 import { Organization } from '../organizations/entities/organization.entity';
-import { Call } from '../../calls/entities/call.entity';
+import { callSolution } from '../../calls/entities/call.entity';
 import { Solution } from '../../calls/solutions/entities/solution.entity';
 
 @Entity()
-export class User extends AbstractEntity {
+export class User extends BaseEntity {
   @Column({ unique: true })
   email: string;
 
@@ -29,10 +29,10 @@ export class User extends AbstractEntity {
   address: string;
 
   @Column({ nullable: true })
-  popularization_link: string;
+  outreach_link: string;
 
   @Column({ nullable: true })
-  popularizer: string;
+  outreacher: string;
 
   @Column({ nullable: true })
   google_image: string;
@@ -43,11 +43,11 @@ export class User extends AbstractEntity {
   @OneToMany(() => Solution, (solution) => solution.user)
   solutions: Solution[];
 
-  @OneToMany(() => Call, (call) => call.author)
-  calls: Call[];
+  @OneToMany(() => callSolution, (call) => call.author)
+  calls: callSolution[];
 
-  @OneToMany(() => Call, (call) => call.publisher)
-  published_calls: Call[];
+  @OneToMany(() => callSolution, (call) => call.publisher)
+  published_calls: callSolution[];
 
   @ManyToMany(() => Role, (role) => role.users)
   @JoinTable()

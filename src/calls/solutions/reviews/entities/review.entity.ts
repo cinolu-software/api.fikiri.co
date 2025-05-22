@@ -1,9 +1,9 @@
 import { Column, Entity, JoinColumn, ManyToOne } from 'typeorm';
 import { Solution } from '../../entities/solution.entity';
-import { AbstractEntity } from '../../../../shared/utils/abstract.entity';
+import { BaseEntity } from '../../../../shared/utils/base.entity';
 
 @Entity()
-export class Review extends AbstractEntity {
+export class Review extends BaseEntity {
   @Column()
   reviewer: string;
 

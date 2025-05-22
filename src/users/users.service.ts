@@ -90,24 +90,24 @@ export class UsersService {
 
   async generatePopularizationLink(user: User): Promise<User> {
     try {
-      const popularization_link = await this.jwtService.signAsync(
+      const outreach_link = await this.jwtService.signAsync(
         { email: user.email },
         {
           expiresIn: '1y',
           secret: process.env.JWT_SECRET
         }
       );
-      await this.userRepository.update(user.id, { popularization_link });
+      await this.userRepository.update(user.id, { outreach_link });
       return await this.findOne(user.id);
     } catch {
       throw new BadRequestException();
     }
   }
 
-  async findByPopularizer(popularizer: string): Promise<User[]> {
+  async findByPopularizer(outreacher: string): Promise<User[]> {
     try {
       return await this.userRepository.find({
-        where: { popularizer },
+        where: { outreacher },
         relations: ['roles']
       });
     } catch {
@@ -115,15 +115,15 @@ export class UsersService {
     }
   }
 
-  async signUp(dto: SignUpDto, popularization_link: string, popularizer: string): Promise<User> {
+  async signUp(dto: SignUpDto, outreach_link: string, outreacher: string): Promise<User> {
     try {
       const userRole = await this.rolesService.findByName('user');
       const password = generateRandomPassword();
       const user = await this.userRepository.save({
         ...dto,
         password,
-        popularizer,
-        popularization_link,
+        outreacher,
+        outreach_link,
         roles: [userRole]
       });
       this.eventEmitter.emit('user.created', { user, password });

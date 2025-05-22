@@ -15,7 +15,7 @@ import { CreateCallDto } from './dto/create-call.dto';
 import { UpdateCallDto } from './dto/update-call.dto';
 import { CurrentUser } from '../shared/decorators/user.decorator';
 import { User } from '../users/entities/user.entity';
-import { Call } from './entities/call.entity';
+import { callSolution } from './entities/call.entity';
 import { v4 as uuidv4 } from 'uuid';
 import { Auth } from '../shared/decorators/auth.decorators';
 import { RoleEnum } from '../shared/enums/roles.enum';
@@ -31,30 +31,30 @@ export class CallsController {
   constructor(private readonly callsService: CallsService) {}
 
   @Post()
-  create(@CurrentUser() author: User, @Body() dto: CreateCallDto): Promise<Call> {
+  create(@CurrentUser() author: User, @Body() dto: CreateCallDto): Promise<callSolution> {
     return this.callsService.create(author, dto);
   }
 
   @Post('awards/:id')
-  awards(@Param('id') id: string, @Body('solutionsIds') solutionsIds: string[]): Promise<Call> {
+  awards(@Param('id') id: string, @Body('solutionsIds') solutionsIds: string[]): Promise<callSolution> {
     return this.callsService.awards(id, solutionsIds);
   }
 
   @Get('find-unpublished')
   @Auth(RoleEnum.Guest)
-  findUnpublished(@Query() queryParams: QueryParams): Promise<[Call[], number]> {
+  findUnpublished(@Query() queryParams: QueryParams): Promise<[callSolution[], number]> {
     return this.callsService.findUnpublished(queryParams);
   }
 
   @Get('find-published')
   @Auth(RoleEnum.Guest)
-  findPublished(@Query() queryParams: QueryParams): Promise<[Call[], number]> {
+  findPublished(@Query() queryParams: QueryParams): Promise<[callSolution[], number]> {
     return this.callsService.findPublished(queryParams);
   }
 
   @Get('find-latest')
   @Auth(RoleEnum.Guest)
-  findLatest(): Promise<Call[]> {
+  findLatest(): Promise<callSolution[]> {
     return this.callsService.findLatest();
   }
 
@@ -70,17 +70,17 @@ export class CallsController {
   }
 
   @Post('add-reviewer/:id')
-  addReviwer(@Param('id') id: string, @Body() dto: IReviewer): Promise<Call> {
+  addReviwer(@Param('id') id: string, @Body() dto: IReviewer): Promise<callSolution> {
     return this.callsService.addReviewer(id, dto);
   }
 
   @Patch('update-reviewer/:id/:email')
-  updateReviewer(@Param() params: unknown, @Body() dto: IReviewer): Promise<Call> {
+  updateReviewer(@Param() params: unknown, @Body() dto: IReviewer): Promise<callSolution> {
     return this.callsService.updateReviewer(params['id'], params['email'], dto);
   }
 
   @Delete('delete-reviewer/:id')
-  deleteReviewer(@Param('id') id: string, @Body('email') email: string): Promise<Call> {
+  deleteReviewer(@Param('id') id: string, @Body('email') email: string): Promise<callSolution> {
     return this.callsService.deleteReviewer(id, email);
   }
 
@@ -101,7 +101,7 @@ export class CallsController {
       })
     })
   )
-  addCover(@Param('id') id: string, @UploadedFile() file: Express.Multer.File): Promise<Call> {
+  addCover(@Param('id') id: string, @UploadedFile() file: Express.Multer.File): Promise<callSolution> {
     return this.callsService.addCover(id, file);
   }
 
@@ -117,34 +117,34 @@ export class CallsController {
       })
     })
   )
-  addDocument(@Param('id') id: string, @UploadedFile() file: Express.Multer.File): Promise<Call> {
+  addDocument(@Param('id') id: string, @UploadedFile() file: Express.Multer.File): Promise<callSolution> {
     return this.callsService.addDocument(id, file);
   }
 
   @Post('unpublish/:id')
-  unpublish(@Param('id') id: string): Promise<Call> {
+  unpublish(@Param('id') id: string): Promise<callSolution> {
     return this.callsService.unpublish(id);
   }
 
   @Post('publish/:id')
-  publish(@CurrentUser() publisher: User, @Param('id') id: string): Promise<Call> {
+  publish(@CurrentUser() publisher: User, @Param('id') id: string): Promise<callSolution> {
     return this.callsService.publish(publisher, id);
   }
 
   @Get()
   @Auth(RoleEnum.Guest)
-  findAll(): Promise<Call[]> {
+  findAll(): Promise<callSolution[]> {
     return this.callsService.findAll();
   }
 
   @Get(':id')
   @Auth(RoleEnum.Guest)
-  findOne(@Param('id') id: string): Promise<Call> {
+  findOne(@Param('id') id: string): Promise<callSolution> {
     return this.callsService.findOne(id);
   }
 
   @Patch(':id')
-  update(@Param('id') id: string, @Body() dto: UpdateCallDto): Promise<Call> {
+  update(@Param('id') id: string, @Body() dto: UpdateCallDto): Promise<callSolution> {
     return this.callsService.update(id, dto);
   }
 

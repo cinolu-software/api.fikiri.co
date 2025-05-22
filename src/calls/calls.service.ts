@@ -2,7 +2,7 @@ import { BadRequestException, Injectable, NotFoundException } from '@nestjs/comm
 import { CreateCallDto } from './dto/create-call.dto';
 import { UpdateCallDto } from './dto/update-call.dto';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Call } from './entities/call.entity';
+import { callSolution } from './entities/call.entity';
 import { IsNull, LessThanOrEqual, Not, Repository } from 'typeorm';
 import { User } from '../users/entities/user.entity';
 import * as fs from 'fs-extra';
@@ -16,14 +16,14 @@ import { IForm } from './utils/types/form.type';
 @Injectable()
 export class CallsService {
   constructor(
-    @InjectRepository(Call)
-    private callRepository: Repository<Call>,
+    @InjectRepository(callSolution)
+    private callRepository: Repository<callSolution>,
     private jwtService: JwtService,
     private eventEmitter: EventEmitter2,
     private solutionsService: SolutionsService
   ) {}
 
-  async create(author: User, dto: CreateCallDto): Promise<Call> {
+  async create(author: User, dto: CreateCallDto): Promise<callSolution> {
     try {
       return await this.callRepository.save({ ...dto, author });
     } catch {
@@ -31,7 +31,7 @@ export class CallsService {
     }
   }
 
-  async awards(id: string, solutionsIds: string[]): Promise<Call> {
+  async awards(id: string, solutionsIds: string[]): Promise<callSolution> {
     try {
       const call = await this.findOne(id);
       return await this.callRepository.save({
@@ -43,7 +43,7 @@ export class CallsService {
     }
   }
 
-  async publish(publisher: User, id: string): Promise<Call> {
+  async publish(publisher: User, id: string): Promise<callSolution> {
     try {
       const call = await this.findOne(id);
       return await this.callRepository.save({
@@ -56,7 +56,7 @@ export class CallsService {
     }
   }
 
-  async unpublish(id: string): Promise<Call> {
+  async unpublish(id: string): Promise<callSolution> {
     try {
       const call = await this.findOne(id);
       return await this.callRepository.save({
@@ -69,7 +69,7 @@ export class CallsService {
     }
   }
 
-  async findLatest(): Promise<Call[]> {
+  async findLatest(): Promise<callSolution[]> {
     return await this.callRepository.find({
       where: { published_at: LessThanOrEqual(new Date()) },
       relations: ['author'],
@@ -78,7 +78,7 @@ export class CallsService {
     });
   }
 
-  async findUnpublished(queryParams: QueryParams): Promise<[Call[], number]> {
+  async findUnpublished(queryParams: QueryParams): Promise<[callSolution[], number]> {
     const { page = 1 } = queryParams;
     const take = 9;
     const skip = (page - 1) * take;
@@ -108,7 +108,7 @@ export class CallsService {
     }
   }
 
-  async findPublished(queryParams: QueryParams): Promise<[Call[], number]> {
+  async findPublished(queryParams: QueryParams): Promise<[callSolution[], number]> {
     const { page = 1 } = queryParams;
     const take = 9;
     const skip = (page - 1) * take;
@@ -121,13 +121,13 @@ export class CallsService {
     });
   }
 
-  async findAll(): Promise<Call[]> {
+  async findAll(): Promise<callSolution[]> {
     return await this.callRepository.find({
       order: { created_at: 'DESC' }
     });
   }
 
-  async addDocument(id: string, file: Express.Multer.File): Promise<Call> {
+  async addDocument(id: string, file: Express.Multer.File): Promise<callSolution> {
     try {
       const call = await this.findOne(id);
       if (call.document) await fs.unlink(`./uploads/calls/documents/${call.document}`);
@@ -140,7 +140,7 @@ export class CallsService {
     }
   }
 
-  async addCover(id: string, file: Express.Multer.File): Promise<Call> {
+  async addCover(id: string, file: Express.Multer.File): Promise<callSolution> {
     try {
       const call = await this.findOne(id);
       if (call.cover) await fs.unlink(`./uploads/calls/covers/${call.cover}`);
@@ -150,7 +150,7 @@ export class CallsService {
     }
   }
 
-  async findOne(id: string): Promise<Call> {
+  async findOne(id: string): Promise<callSolution> {
     try {
       return await this.callRepository.findOneOrFail({
         where: { id },
@@ -161,7 +161,7 @@ export class CallsService {
     }
   }
 
-  async update(id: string, dto: UpdateCallDto): Promise<Call> {
+  async update(id: string, dto: UpdateCallDto): Promise<callSolution> {
     try {
       const call = await this.findOne(id);
       return await this.callRepository.save({
@@ -205,7 +205,7 @@ export class CallsService {
     }
   }
 
-  async addReviewer(id: string, reviewer: IReviewer): Promise<Call> {
+  async addReviewer(id: string, reviewer: IReviewer): Promise<callSolution> {
     try {
       const call = await this.findOne(id);
       const reviewers = (call.reviewers || []) as unknown as IReviewer[];
@@ -219,7 +219,7 @@ export class CallsService {
     }
   }
 
-  async updateReviewer(id: string, email: string, dto: IReviewer): Promise<Call> {
+  async updateReviewer(id: string, email: string, dto: IReviewer): Promise<callSolution> {
     try {
       const call = await this.findOne(id);
       const reviewers = (call.reviewers || []) as unknown as IReviewer[];
@@ -233,7 +233,7 @@ export class CallsService {
     }
   }
 
-  async deleteReviewer(id: string, email: string): Promise<Call> {
+  async deleteReviewer(id: string, email: string): Promise<callSolution> {
     try {
       const call = await this.findOne(id);
       const reviewers = (call.reviewers || []) as unknown as IReviewer[];

@@ -1,10 +1,10 @@
 import { Column, Entity, JoinColumn, ManyToOne } from 'typeorm';
-import { AbstractEntity } from '../../shared/utils/abstract.entity';
+import { BaseEntity } from '../../shared/utils/base.entity';
 import { PartnerType } from '../utils/enums/partner-type.enum';
-import { Call } from '../../calls/entities/call.entity';
+import { callSolution } from '../../calls/entities/call.entity';
 
 @Entity()
-export class Partner extends AbstractEntity {
+export class Partner extends BaseEntity {
   @Column()
   name: string;
 
@@ -17,7 +17,7 @@ export class Partner extends AbstractEntity {
   @Column({ type: 'enum', enum: PartnerType })
   type: PartnerType;
 
-  @ManyToOne(() => Call, { nullable: true })
+  @ManyToOne(() => callSolution, { nullable: true })
   @JoinColumn()
-  call?: Call;
+  call?: callSolution;
 }

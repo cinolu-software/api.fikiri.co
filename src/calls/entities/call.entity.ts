@@ -1,11 +1,12 @@
 import { Column, Entity, JoinColumn, ManyToOne, OneToMany } from 'typeorm';
-import { AbstractEntity } from '../../shared/utils/abstract.entity';
+import { BaseEntity } from '../../shared/utils/base.entity';
 import { User } from '../../users/entities/user.entity';
 import { Partner } from '../../partners/entities/partner.entity';
 import { Solution } from '../solutions/entities/solution.entity';
+import { CallGalery } from '../galeries/entities/galery.entity';
 
-@Entity('callForApplications')
-export class Call extends AbstractEntity {
+@Entity()
+export class callSolution extends BaseEntity {
   @Column()
   name: string;
 
@@ -58,4 +59,7 @@ export class Call extends AbstractEntity {
 
   @OneToMany(() => Solution, (solution) => solution.call)
   solutions: Solution[];
+
+  @OneToMany(() => CallGalery, (galery) => galery.call)
+  galery: CallGalery[];
 }

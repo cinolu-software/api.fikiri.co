@@ -1,9 +1,9 @@
 import { Column, Entity, ManyToMany } from 'typeorm';
-import { AbstractEntity } from '../../../shared/utils/abstract.entity';
+import { BaseEntity } from '../../../shared/utils/base.entity';
 import { User } from '../../entities/user.entity';
 
 @Entity()
-export class Role extends AbstractEntity {
+export class Role extends BaseEntity {
   @Column({ unique: true })
   name: string;
 
