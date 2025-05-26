@@ -8,11 +8,11 @@ export class StatsService {
 
   async getAdminStats(): Promise<IAdminStats> {
     const [calls, solutions, users, unpublishedCalls, publishedCalls] = await Promise.all([
-      this.dataSource.query('SELECT COUNT(*) as count FROM callForApplications'),
+      this.dataSource.query('SELECT COUNT(*) as count FROM call_solution'),
       this.dataSource.query('SELECT COUNT(*) as count FROM solution'),
       this.dataSource.query('SELECT COUNT(*) as count FROM user'),
-      this.dataSource.query('SELECT COUNT(*) as count FROM callForApplications WHERE published_at IS NULL'),
-      this.dataSource.query('SELECT COUNT(*) as count FROM callForApplications WHERE published_at IS NOT NULL')
+      this.dataSource.query('SELECT COUNT(*) as count FROM call_solution WHERE published_at IS NULL'),
+      this.dataSource.query('SELECT COUNT(*) as count FROM call_solution WHERE published_at IS NOT NULL')
     ]);
     return {
       calls: calls[0].count,
