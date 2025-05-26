@@ -30,8 +30,8 @@ export class GaleriesService {
   async deleteImage(id: string): Promise<void> {
     try {
       const img = await this.galeryRepository.findOneOrFail({ where: { id } });
-      await fs.unlink(`./uploads/calss/${img.image}`);
-      await this.galeryRepository.softDelete(id);
+      await fs.unlink(`./uploads/calls/${img.image}`);
+      await this.galeryRepository.delete(id);
     } catch {
       throw new BadRequestException();
     }

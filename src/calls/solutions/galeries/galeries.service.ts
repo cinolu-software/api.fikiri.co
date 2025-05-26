@@ -31,7 +31,7 @@ export class GaleriesService {
     try {
       const img = await this.galeryRepository.findOneOrFail({ where: { id } });
       await fs.unlink(`./uploads/solutions/${img.image}`);
-      await this.galeryRepository.softDelete(id);
+      await this.galeryRepository.delete(id);
     } catch {
       throw new BadRequestException();
     }
