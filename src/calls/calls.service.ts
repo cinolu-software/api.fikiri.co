@@ -114,8 +114,7 @@ export class CallsService {
     const skip = (page - 1) * take;
     return await this.callRepository.findAndCount({
       where: { published_at: Not(IsNull()) },
-      order: { published_at: 'DESC' },
-      relations: ['author'],
+      order: { published_at: 'ASC' },
       take,
       skip
     });
