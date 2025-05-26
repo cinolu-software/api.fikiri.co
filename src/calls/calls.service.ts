@@ -110,7 +110,7 @@ export class CallsService {
 
   async findPublished(queryParams: QueryParams): Promise<[callSolution[], number]> {
     const { page = 1 } = queryParams;
-    const take = 9;
+    const take = 5;
     const skip = (page - 1) * take;
     return await this.callRepository.findAndCount({
       where: { published_at: Not(IsNull()) },
