@@ -115,6 +115,7 @@ export class CallsService {
     return await this.callRepository.findAndCount({
       where: { published_at: Not(IsNull()) },
       order: { published_at: 'ASC' },
+      relations: ['galery'],
       take,
       skip
     });
