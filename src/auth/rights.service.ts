@@ -13,6 +13,7 @@ export class RightsService {
       RoleEnum.User,
       RoleEnum.Volunteer,
       RoleEnum.Cartograph,
+      RoleEnum.AssistantCartographer,
       RoleEnum.Explorator,
       RoleEnum.Experimentor,
       RoleEnum.Admin
