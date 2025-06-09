@@ -7,7 +7,7 @@ export class SolutionGallery extends BaseEntity {
   @Column()
   image: string;
 
-  @ManyToOne(() => Solution, (solution) => solution.galery)
+  @ManyToOne(() => Solution, (solution) => solution.gallery)
   @JoinColumn()
   solution: Solution;
 }

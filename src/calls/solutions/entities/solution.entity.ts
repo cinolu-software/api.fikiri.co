@@ -35,6 +35,6 @@ export class Solution extends BaseEntity {
   @JoinColumn()
   award: callSolution;
 
-  @OneToMany(() => SolutionGallery, (galery) => galery.solution)
-  galery: SolutionGallery[];
+  @OneToMany(() => SolutionGallery, (gallery) => gallery.solution)
+  gallery: SolutionGallery[];
 }

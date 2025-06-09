@@ -115,7 +115,7 @@ export class CallsService {
     return await this.callRepository.findAndCount({
       where: { published_at: Not(IsNull()) },
       order: { published_at: 'ASC' },
-      relations: ['galery'],
+      relations: ['gallery'],
       take,
       skip
     });
@@ -154,7 +154,7 @@ export class CallsService {
     try {
       return await this.callRepository.findOneOrFail({
         where: { id },
-        relations: ['author', 'awards', 'galery']
+        relations: ['author', 'awards', 'gallery']
       });
     } catch {
       throw new NotFoundException();
