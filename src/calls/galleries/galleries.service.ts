@@ -1,24 +1,24 @@
 import { BadRequestException, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
+import { CallGallery } from './entities/gallery.entity';
 import { Repository } from 'typeorm';
-import { SolutionGalery } from './entities/galery.entity';
 import * as fs from 'fs-extra';
 
 @Injectable()
-export class GaleriesService {
+export class GalleriesService {
   constructor(
-    @InjectRepository(SolutionGalery)
-    private readonly galeryRepository: Repository<SolutionGalery>
+    @InjectRepository(CallGallery)
+    private galleryRepository: Repository<CallGallery>
   ) {}
 
-  addImage(id: string, files: Express.Multer.File[]): Promise<SolutionGalery[]> {
+  addImage(id: string, files: Express.Multer.File[]): Promise<CallGallery[]> {
     try {
       return Promise.all(
         files.map(
           async (file) =>
-            await this.galeryRepository.save({
+            await this.galleryRepository.save({
               image: file.filename,
-              solution: { id }
+              call: { id }
             })
         )
       );
@@ -29,9 +29,9 @@ export class GaleriesService {
 
   async deleteImage(id: string): Promise<void> {
     try {
-      const img = await this.galeryRepository.findOneOrFail({ where: { id } });
-      await fs.unlink(`./uploads/solutions/${img.image}`);
-      await this.galeryRepository.delete(id);
+      const img = await this.galleryRepository.findOneOrFail({ where: { id } });
+      await fs.unlink(`./uploads/calls/${img.image}`);
+      await this.galleryRepository.delete(id);
     } catch {
       throw new BadRequestException();
     }

@@ -5,10 +5,10 @@ import { SolutionsModule } from './solutions/solutions.module';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { callSolution } from './entities/call.entity';
 import { EmailModule } from '../email/email.module';
-import { CallsGaleriesModule } from './galeries/galeries.module';
+import { CallsGalleriesModule } from './galleries/galleries.module';
 
 @Module({
-  imports: [SolutionsModule, EmailModule, TypeOrmModule.forFeature([callSolution]), CallsGaleriesModule],
+  imports: [SolutionsModule, EmailModule, TypeOrmModule.forFeature([callSolution]), CallsGalleriesModule],
   controllers: [CallsController],
   providers: [CallsService]
 })

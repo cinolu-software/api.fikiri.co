@@ -3,7 +3,7 @@ import { Column, Entity, JoinColumn, ManyToOne } from 'typeorm';
 import { Solution } from '../../entities/solution.entity';
 
 @Entity()
-export class SolutionGalery extends BaseEntity {
+export class SolutionGallery extends BaseEntity {
   @Column()
   image: string;
 

@@ -4,7 +4,7 @@ import { User } from '../../../users/entities/user.entity';
 import { Review } from '../reviews/entities/review.entity';
 import { callSolution } from '../../entities/call.entity';
 import { ESatus } from 'src/calls/utils/enums/status.enum';
-import { SolutionGalery } from '../galeries/entities/galery.entity';
+import { SolutionGallery } from '../galleries/entities/gallery.entity';
 
 @Entity()
 export class Solution extends BaseEntity {
@@ -35,6 +35,6 @@ export class Solution extends BaseEntity {
   @JoinColumn()
   award: callSolution;
 
-  @OneToMany(() => SolutionGalery, (galery) => galery.solution)
-  galery: SolutionGalery[];
+  @OneToMany(() => SolutionGallery, (galery) => galery.solution)
+  galery: SolutionGallery[];
 }

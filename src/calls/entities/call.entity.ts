@@ -3,7 +3,7 @@ import { BaseEntity } from '../../shared/utils/base.entity';
 import { User } from '../../users/entities/user.entity';
 import { Partner } from '../../partners/entities/partner.entity';
 import { Solution } from '../solutions/entities/solution.entity';
-import { CallGalery } from '../galeries/entities/galery.entity';
+import { CallGallery } from '../galleries/entities/gallery.entity';
 
 @Entity()
 export class callSolution extends BaseEntity {
@@ -60,6 +60,6 @@ export class callSolution extends BaseEntity {
   @OneToMany(() => Solution, (solution) => solution.call)
   solutions: Solution[];
 
-  @OneToMany(() => CallGalery, (galery) => galery.call)
-  galery: CallGalery[];
+  @OneToMany(() => CallGallery, (gallery) => gallery.call)
+  gallery: CallGallery[];
 }
