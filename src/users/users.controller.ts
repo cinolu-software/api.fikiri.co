@@ -56,7 +56,7 @@ export class UsersController {
   }
 
   @Get('')
-  findAll(@Query('page') page: string): Promise<User[]> {
+  findAll(@Query('page') page: string): Promise<[User[], number]> {
     return this.userService.findAll(+page);
   }
 

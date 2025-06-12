@@ -30,16 +30,14 @@ export class UsersService {
     return data;
   }
 
-  async findAll(page: number = 1): Promise<User[]> {
-    const take = 12;
-    const data = await this.userRepository.find({
+  async findAll(page: number = 1): Promise<[User[], number]> {
+    const take = 40;
+    return await this.userRepository.findAndCount({
       relations: ['roles'],
       order: { updated_at: 'DESC' },
       skip: (page - 1) * take,
       take: take
     });
-
-    return data;
   }
 
   async create(dto: CreateUserDto): Promise<User> {
