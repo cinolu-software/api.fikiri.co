@@ -30,10 +30,15 @@ export class UsersService {
     return data;
   }
 
-  async findAll(): Promise<User[]> {
+  async findAll(page: number = 1): Promise<User[]> {
+    const take = 12;
     const data = await this.userRepository.find({
-      relations: ['roles']
+      relations: ['roles'],
+      order: { updated_at: 'DESC' },
+      skip: (page - 1) * take,
+      take: take
     });
+
     return data;
   }
 
