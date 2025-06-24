@@ -77,12 +77,12 @@ export class UsersService {
     }
   }
 
-  async countByOutreach(outreacher: string): Promise<number> {
+  async countByOutreach(user: User): Promise<number> {
     try {
       return await this.userRepository
         .createQueryBuilder('user')
         .select('user.outreacher')
-        .where('user.outreacher = :outreacher', { outreacher })
+        .where('user.outreacher = :outreacher', { outreacher: user.email })
         .addSelect('COUNT(user.id)', 'count')
         .groupBy('user.outreacher')
         .getCount();

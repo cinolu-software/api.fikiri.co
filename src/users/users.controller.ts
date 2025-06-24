@@ -31,10 +31,10 @@ export class UsersController {
     return this.userService.create(dto);
   }
 
-  @Get('count-by-outreacher/:outreacher')
+  @Get('count-by-outreacher')
   @Auth(RoleEnum.User)
-  countByOutreach(@Param('outreacher') outreacher: string): Promise<number> {
-    return this.userService.countByOutreach(outreacher);
+  countByOutreach(@CurrentUser() user: User): Promise<number> {
+    return this.userService.countByOutreach(user);
   }
 
   @Get('count-by-outreachers')
