@@ -1,15 +1,4 @@
-import {
-  Body,
-  Controller,
-  Delete,
-  Get,
-  Param,
-  Patch,
-  Post,
-  Query,
-  UploadedFile,
-  UseInterceptors
-} from '@nestjs/common';
+import { Body, Controller, Delete, Get, Param, Patch, Post, UploadedFile, UseInterceptors } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { diskStorage } from 'multer';
 import { v4 as uuidv4 } from 'uuid';
@@ -56,8 +45,8 @@ export class UsersController {
   }
 
   @Get('')
-  findAll(@Query('page') page: string): Promise<[User[], number]> {
-    return this.userService.findAll(+page);
+  findAll(): Promise<[User[], number]> {
+    return this.userService.findAll();
   }
 
   @Get('with-role/:role')
