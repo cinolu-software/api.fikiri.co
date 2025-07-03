@@ -1,11 +1,10 @@
-import { IsNotEmpty, MinLength } from 'class-validator';
+import { MinLength } from 'class-validator';
 import { Match } from '../../shared/decorators/match.decorator';
 
 export class UpdatePasswordDto {
-  @MinLength(6, { message: 'Le mot de passe doit contenir au moins 6 caractères' })
+  @MinLength(6)
   password: string;
 
-  @IsNotEmpty({ message: 'La confirmation du mot de passe est recquise' })
-  @Match('password', { message: 'Les mots de passe ne correspondent pas' })
+  @Match('password')
   password_confirm: string;
 }
