@@ -30,9 +30,11 @@ export class UsersService {
     return data;
   }
 
-  async findAll(): Promise<User[]> {
+  async findAll(page: number): Promise<User[]> {
     return await this.userRepository.find({
       relations: ['roles'],
+      skip: (page - 1) * 30,
+      take: 30,
       order: { updated_at: 'DESC' }
     });
   }
@@ -61,15 +63,25 @@ export class UsersService {
     }
   }
 
-  async countByOutreachers(): Promise<{ outreacher: string; count: number }[]> {
+  async countByOutreachers(page: number): Promise<[{ outreacher: string; count: number }[], number]> {
     try {
-      return await this.userRepository
+      const data = await this.userRepository
         .createQueryBuilder('user')
         .select('user.outreacher')
         .addSelect('COUNT(user.id)', 'count')
+        .where('user.outreacher IS NOT NULL')
         .groupBy('user.outreacher')
         .orderBy('count', 'DESC')
+        .skip((page - 1) * 30)
+        .take(30)
         .getRawMany();
+      const totalQuery = this.userRepository
+        .createQueryBuilder('user')
+        .select('COUNT(DISTINCT user.outreacher)', 'total')
+        .where('user.outreacher IS NOT NULL');
+      const totalResult = await totalQuery.getRawOne();
+      const total = parseInt(totalResult.total, 10) || 0;
+      return [data, total];
     } catch {
       throw new BadRequestException();
     }

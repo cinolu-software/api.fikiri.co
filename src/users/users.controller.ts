@@ -1,4 +1,15 @@
-import { Body, Controller, Delete, Get, Param, Patch, Post, UploadedFile, UseInterceptors } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Delete,
+  Get,
+  Param,
+  Patch,
+  Post,
+  Query,
+  UploadedFile,
+  UseInterceptors
+} from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { diskStorage } from 'multer';
 import { v4 as uuidv4 } from 'uuid';
@@ -28,8 +39,8 @@ export class UsersController {
 
   @Get('count-by-outreachers')
   @Auth(RoleEnum.Volunteer)
-  countByOutreachers(): Promise<{ outreacher: string; count: number }[]> {
-    return this.userService.countByOutreachers();
+  countByOutreachers(@Query('page') page: string): Promise<[{ outreacher: string; count: number }[], number]> {
+    return this.userService.countByOutreachers(+page || 1);
   }
 
   @Post('generate-outreach-link')
@@ -45,8 +56,8 @@ export class UsersController {
   }
 
   @Get('')
-  findAll(): Promise<User[]> {
-    return this.userService.findAll();
+  findAll(@Query('page') page: string): Promise<User[]> {
+    return this.userService.findAll(+page || 1);
   }
 
   @Get('with-role/:role')
