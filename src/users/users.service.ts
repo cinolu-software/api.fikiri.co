@@ -68,13 +68,14 @@ export class UsersService {
         .select('user.outreacher')
         .addSelect('COUNT(user.id)', 'count')
         .groupBy('user.outreacher')
+        .orderBy('count', 'DESC')
         .getRawMany();
     } catch {
       throw new BadRequestException();
     }
   }
 
-  async countByOutreach(user: User): Promise<number> {
+  async countByOutreacher(user: User): Promise<number> {
     try {
       return await this.userRepository
         .createQueryBuilder('user')
