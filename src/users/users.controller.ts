@@ -22,8 +22,8 @@ export class UsersController {
 
   @Get('count-by-outreacher')
   @Auth(RoleEnum.User)
-  countByOutreach(@CurrentUser() user: User): Promise<number> {
-    return this.userService.countByOutreach(user);
+  countByOutreacher(@CurrentUser() user: User): Promise<number> {
+    return this.userService.countByOutreacher(user);
   }
 
   @Get('count-by-outreachers')
