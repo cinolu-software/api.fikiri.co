@@ -8,6 +8,18 @@ import { SolutionGallery } from '../galleries/entities/gallery.entity';
 
 @Entity()
 export class Solution extends BaseEntity {
+  @Column({ nullable: true })
+  name: string;
+
+  @Column({ nullable: true })
+  slug: string;
+
+  @Column({ nullable: true, type: 'text' })
+  description: string;
+
+  @Column({ nullable: true, type: 'text' })
+  problem_solved: string;
+
   @Column({ type: 'json' })
   responses: JSON;
 

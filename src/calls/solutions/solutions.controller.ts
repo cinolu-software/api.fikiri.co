@@ -33,6 +33,12 @@ export class SolutionsController {
     return this.solutionsService.create(user, dto);
   }
 
+  @Get('update-schema')
+  @Auth(RoleEnum.Guest)
+  updateSchema(): Promise<void> {
+    return this.solutionsService.updateSchema();
+  }
+
   @Get('find-awards')
   @Auth(RoleEnum.Guest)
   findAwards(): Promise<Solution[]> {
@@ -80,9 +86,15 @@ export class SolutionsController {
   }
 
   @Get()
-  @Auth(RoleEnum.Cartograph)
+  @Auth(RoleEnum.Guest)
   findAll() {
     return this.solutionsService.findAll();
+  }
+
+  @Get('find-by-slug/:slug')
+  @Auth(RoleEnum.Guest)
+  findBySlug(@Param('slug') slug: string): Promise<Solution> {
+    return this.solutionsService.findBySlug(slug);
   }
 
   @Get(':id')

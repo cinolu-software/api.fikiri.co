@@ -10,6 +10,7 @@ import { IReviewer } from '../utils/types/reviewer.type';
 import * as fs from 'fs-extra';
 import { QueryParams } from '../utils/types/query-params.type';
 import { ESatus } from '../utils/enums/status.enum';
+import slugify from 'slugify';
 
 @Injectable()
 export class SolutionsService {
@@ -76,6 +77,39 @@ export class SolutionsService {
       order: { updated_at: 'DESC' },
       relations: ['user']
     });
+  }
+
+  async updateSchema(): Promise<void> {
+    try {
+      const solutions = await this.findAll();
+      solutions.map(async (solution) => {
+        const responses = solution.responses as unknown as { [key: string]: string };
+        solution.problem_solved = responses['Problème ciblé '];
+        solution.name = responses['Nom de la solution'];
+        solution.description = responses['Nom de la solution'];
+        const name = responses['Nom de la solution'];
+        if (!name) await this.solutionRepository.remove(solution);
+        if (name) solution.slug = slugify(String(name), { lower: true });
+        delete responses['Problème ciblé '];
+        delete responses['Nom de la solution'];
+        delete responses['Nom de la solution'];
+        solution.responses = responses as unknown as JSON;
+        await this.solutionRepository.save(solution);
+      });
+    } catch {
+      throw new BadRequestException();
+    }
+  }
+
+  async findBySlug(slug: string): Promise<Solution> {
+    try {
+      return await this.solutionRepository.findOneOrFail({
+        where: { slug },
+        relations: ['user']
+      });
+    } catch {
+      throw new NotFoundException();
+    }
   }
 
   async findAwards(): Promise<Solution[]> {
