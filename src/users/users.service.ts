@@ -75,13 +75,12 @@ export class UsersService {
         .skip((page - 1) * 30)
         .take(30)
         .getRawMany();
-      const totalQuery = this.userRepository
+      const total = await this.userRepository
         .createQueryBuilder('user')
-        .select('COUNT(DISTINCT user.outreacher)', 'total')
-        .where('user.outreacher IS NOT NULL');
-      const totalResult = await totalQuery.getRawOne();
-      const total = parseInt(totalResult.total, 10) || 0;
-      return [data, total];
+        .select('COUNT(DISTINCT user.outreacher)', 'outreachersCount')
+        .where('user.outreacher IS NOT NULL')
+        .getRawOne();
+      return [data, +total['outreachersCount']];
     } catch {
       throw new BadRequestException();
     }
