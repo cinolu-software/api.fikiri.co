@@ -161,6 +161,17 @@ export class CallsService {
     }
   }
 
+  async findBySlug(slug: string): Promise<callSolution> {
+    try {
+      return await this.callRepository.findOneOrFail({
+        where: { slug },
+        relations: ['author', 'awards', 'gallery']
+      });
+    } catch {
+      throw new NotFoundException();
+    }
+  }
+
   async update(id: string, dto: UpdateCallDto): Promise<callSolution> {
     try {
       const call = await this.findOne(id);
