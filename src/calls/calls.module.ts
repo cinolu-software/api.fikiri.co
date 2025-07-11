@@ -6,10 +6,11 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { callSolution } from './entities/call.entity';
 import { EmailModule } from '../email/email.module';
 import { CallsGalleriesModule } from './galleries/galleries.module';
+import { CallSubscriber } from './subscribers/call.subscriber';
 
 @Module({
   imports: [SolutionsModule, EmailModule, TypeOrmModule.forFeature([callSolution]), CallsGalleriesModule],
   controllers: [CallsController],
-  providers: [CallsService]
+  providers: [CallsService, CallSubscriber]
 })
 export class CallsModule {}
