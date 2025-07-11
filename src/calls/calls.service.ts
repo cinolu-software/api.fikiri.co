@@ -161,12 +161,21 @@ export class CallsService {
     }
   }
 
-  async findBySlug(slug: string): Promise<callSolution> {
+  async findBySlug(slug: string): Promise<[callSolution, number]> {
     try {
-      return await this.callRepository.findOneOrFail({
-        where: { slug },
-        relations: ['author', 'awards', 'gallery']
-      });
+      const call = await this.callRepository
+        .createQueryBuilder('c')
+        .leftJoinAndSelect('c.gallery', 'gallery')
+        .where('c.slug = :slug', { slug })
+        .andWhere('c.published_at IS NOT NULL')
+        .getOneOrFail();
+      const total = await this.callRepository
+        .createQueryBuilder('c')
+        .leftJoin('c.solutions', 's')
+        .select('COUNT(DISTINCT s.id)', 'solutionsCount')
+        .where('c.slug = :slug', { slug })
+        .getRawOne();
+      return [call, +total['solutionsCount']];
     } catch {
       throw new NotFoundException();
     }
@@ -175,10 +184,7 @@ export class CallsService {
   async update(id: string, dto: UpdateCallDto): Promise<callSolution> {
     try {
       const call = await this.findOne(id);
-      return await this.callRepository.save({
-        ...call,
-        ...dto
-      });
+      return await this.callRepository.save({ ...call, ...dto });
     } catch {
       throw new BadRequestException();
     }
@@ -195,13 +201,7 @@ export class CallsService {
 
   async generateReviewLink(id: string, dto: IReviewer): Promise<string> {
     try {
-      return await this.jwtService.signAsync(
-        { ...dto, id },
-        {
-          secret: process.env.JWT_SECRET,
-          expiresIn: '7d'
-        }
-      );
+      return await this.jwtService.signAsync({ ...dto, id }, { secret: process.env.JWT_SECRET, expiresIn: '7d' });
     } catch {
       throw new BadRequestException();
     }

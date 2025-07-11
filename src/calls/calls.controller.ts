@@ -139,7 +139,7 @@ export class CallsController {
 
   @Get('find-by-slug/:slug')
   @Auth(RoleEnum.Guest)
-  findBySlug(@Param('slug') slug: string): Promise<callSolution> {
+  findBySlug(@Param('slug') slug: string): Promise<[callSolution, number]> {
     return this.callsService.findBySlug(slug);
   }
 
