@@ -3,7 +3,7 @@ import { CreateCallDto } from './dto/create-call.dto';
 import { UpdateCallDto } from './dto/update-call.dto';
 import { InjectRepository } from '@nestjs/typeorm';
 import { callSolution } from './entities/call.entity';
-import { IsNull, LessThanOrEqual, Not, Repository } from 'typeorm';
+import { IsNull, LessThanOrEqual, Repository } from 'typeorm';
 import { User } from '../users/entities/user.entity';
 import * as fs from 'fs-extra';
 import { JwtService } from '@nestjs/jwt';
@@ -112,13 +112,15 @@ export class CallsService {
     const { page = 1 } = queryParams;
     const take = 5;
     const skip = (page - 1) * take;
-    return await this.callRepository.findAndCount({
-      where: { published_at: Not(IsNull()) },
-      order: { published_at: 'ASC' },
-      relations: ['gallery'],
-      take,
-      skip
-    });
+    return await this.callRepository
+      .createQueryBuilder('c')
+      .leftJoinAndSelect('c.gallery', 'gallery')
+      .loadRelationCountAndMap('c.solutionsCount', 'c.solutions')
+      .where('c.published_at IS NOT NULL')
+      .orderBy('c.published_at', 'ASC')
+      .skip(skip)
+      .take(take)
+      .getManyAndCount();
   }
 
   async findAll(): Promise<callSolution[]> {
@@ -161,21 +163,15 @@ export class CallsService {
     }
   }
 
-  async findBySlug(slug: string): Promise<[callSolution, number]> {
+  async findBySlug(slug: string): Promise<callSolution> {
     try {
-      const call = await this.callRepository
+      return await this.callRepository
         .createQueryBuilder('c')
+        .loadRelationCountAndMap('c.solutionsCount', 'c.solutions')
         .leftJoinAndSelect('c.gallery', 'gallery')
         .where('c.slug = :slug', { slug })
         .andWhere('c.published_at IS NOT NULL')
         .getOneOrFail();
-      const total = await this.callRepository
-        .createQueryBuilder('c')
-        .leftJoin('c.solutions', 's')
-        .select('COUNT(DISTINCT s.id)', 'solutionsCount')
-        .where('c.slug = :slug', { slug })
-        .getRawOne();
-      return [call, +total['solutionsCount']];
     } catch {
       throw new NotFoundException();
     }
