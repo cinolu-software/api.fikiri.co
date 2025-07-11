@@ -10,6 +10,9 @@ export class callSolution extends BaseEntity {
   @Column()
   name: string;
 
+  @Column({ unique: true, nullable: true })
+  slug: string;
+
   @Column({ type: 'text' })
   description: string;
 
