@@ -11,7 +11,7 @@ export class StatsService {
     SELECT 
       (SELECT COUNT(*) FROM call_solution) AS calls,
       (SELECT COUNT(*) FROM solution) AS solutions,
-      (SELECT COUNT(*) FROM user) AS users,
+      (SELECT COUNT(*) FROM user WHERE deleted_at IS NOT NULL ) AS users,
       (SELECT COUNT(*) FROM call_solution WHERE published_at IS NULL) AS unpublishedCalls,
       (SELECT COUNT(*) FROM call_solution WHERE published_at IS NOT NULL) AS publishedCalls
   `);
