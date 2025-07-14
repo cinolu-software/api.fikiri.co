@@ -30,8 +30,8 @@ export class UsersService {
     return data;
   }
 
-  async findAll(page: number): Promise<User[]> {
-    return await this.userRepository.find({
+  async findAll(page: number): Promise<[User[], number]> {
+    return await this.userRepository.findAndCount({
       relations: ['roles'],
       skip: (page - 1) * 30,
       take: 30,
