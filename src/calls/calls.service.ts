@@ -123,8 +123,10 @@ export class CallsService {
       .getManyAndCount();
   }
 
-  async findAll(): Promise<[callSolution[], number]> {
+  async findAll(page: number): Promise<[callSolution[], number]> {
     return await this.callRepository.findAndCount({
+      skip: (page - 1) * 12,
+      take: 12,
       order: { created_at: 'DESC' }
     });
   }

@@ -133,8 +133,8 @@ export class CallsController {
 
   @Get()
   @Auth(RoleEnum.Guest)
-  findAll(): Promise<[callSolution[], number]> {
-    return this.callsService.findAll();
+  findAll(@Query('page') page: string): Promise<[callSolution[], number]> {
+    return this.callsService.findAll(+page || 1);
   }
 
   @Get('find-by-slug/:slug')
