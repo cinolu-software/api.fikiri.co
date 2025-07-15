@@ -67,13 +67,13 @@ export class UsersService {
     try {
       const data = await this.userRepository
         .createQueryBuilder('user')
-        .select('user.outreacher')
+        .select(['user.outreacher'])
         .addSelect('COUNT(user.id)', 'count')
         .where('user.outreacher IS NOT NULL')
         .groupBy('user.outreacher')
         .orderBy('count', 'DESC')
-        .skip((page - 1) * 30)
-        .take(30)
+        .skip((page - 1) * 40)
+        .take(40)
         .getRawMany();
       const total = await this.userRepository
         .createQueryBuilder('user')
