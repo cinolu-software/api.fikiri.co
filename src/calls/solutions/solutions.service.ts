@@ -73,12 +73,14 @@ export class SolutionsService {
   }
 
   async findAll(page: number): Promise<[Solution[], number]> {
-    return await this.solutionRepository.findAndCount({
-      order: { updated_at: 'DESC' },
-      skip: (page - 1) * 40,
-      take: 40,
-      relations: ['user']
-    });
+    return await this.solutionRepository
+      .createQueryBuilder('solution')
+      .leftJoinAndSelect('solution.user', 'user')
+      .orderBy('solution.image IS NULL', 'ASC')
+      .addOrderBy('solution.updated_at', 'DESC')
+      .skip((page - 1) * 40)
+      .take(40)
+      .getManyAndCount();
   }
 
   async updateSchema(): Promise<void> {
