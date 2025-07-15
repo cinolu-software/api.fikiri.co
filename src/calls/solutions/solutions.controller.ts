@@ -87,8 +87,8 @@ export class SolutionsController {
 
   @Get()
   @Auth(RoleEnum.Guest)
-  findAll(): Promise<[Solution[], number]> {
-    return this.solutionsService.findAll();
+  findAll(@Query('page') page: string): Promise<[Solution[], number]> {
+    return this.solutionsService.findAll(+page || 1);
   }
 
   @Get('find-by-slug/:slug')
