@@ -87,7 +87,7 @@ export class SolutionsController {
 
   @Get()
   @Auth(RoleEnum.Guest)
-  findAll() {
+  findAll(): Promise<[Solution[], number]> {
     return this.solutionsService.findAll();
   }
 

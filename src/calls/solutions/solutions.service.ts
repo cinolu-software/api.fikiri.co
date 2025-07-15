@@ -72,8 +72,8 @@ export class SolutionsService {
     }
   }
 
-  async findAll(): Promise<Solution[]> {
-    return await this.solutionRepository.find({
+  async findAll(): Promise<[Solution[], number]> {
+    return await this.solutionRepository.findAndCount({
       order: { updated_at: 'DESC' },
       relations: ['user']
     });
@@ -81,7 +81,7 @@ export class SolutionsService {
 
   async updateSchema(): Promise<void> {
     try {
-      const solutions = await this.findAll();
+      const [solutions] = await this.findAll();
       solutions.map(async (solution) => {
         const responses = solution.responses as unknown as { [key: string]: string };
         solution.problem_solved = responses['Problème ciblé '];

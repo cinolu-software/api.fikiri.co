@@ -133,7 +133,7 @@ export class CallsController {
 
   @Get()
   @Auth(RoleEnum.Guest)
-  findAll(): Promise<callSolution[]> {
+  findAll(): Promise<[callSolution[], number]> {
     return this.callsService.findAll();
   }
 
