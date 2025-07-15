@@ -76,7 +76,7 @@ export class SolutionsService {
     return await this.solutionRepository
       .createQueryBuilder('solution')
       .leftJoinAndSelect('solution.user', 'user')
-      .orderBy('solution.image IS NULL', 'ASC')
+      .orderBy('solution.image', 'DESC')
       .addOrderBy('solution.updated_at', 'DESC')
       .skip((page - 1) * 40)
       .take(40)
