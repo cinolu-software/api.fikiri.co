@@ -3,7 +3,6 @@ import {
   Controller,
   Delete,
   Get,
-  Header,
   Param,
   Patch,
   Post,
@@ -29,9 +28,7 @@ import { Response } from 'express';
 export class UsersController {
   constructor(private usersService: UsersService) {}
 
-  @Get('export-csv/users')
-  @Header('Content-Type', 'text/csv')
-  @Header('Content-Disposition', 'attachment; filename=users.csv')
+  @Get('export-csv/all')
   async exportUsersToCSV(@Res() res: Response) {
     await this.usersService.exportToCSV(res);
   }
