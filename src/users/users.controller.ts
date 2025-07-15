@@ -3,10 +3,12 @@ import {
   Controller,
   Delete,
   Get,
+  Header,
   Param,
   Patch,
   Post,
   Query,
+  Res,
   UploadedFile,
   UseInterceptors
 } from '@nestjs/common';
@@ -20,65 +22,78 @@ import { CurrentUser } from '../shared/decorators/user.decorator';
 import { RoleEnum } from '../shared/enums/roles.enum';
 import { UsersService } from './users.service';
 import CreateUserDto from './dto/create-user.dto';
+import { Response } from 'express';
 
 @Controller('users')
 @Auth(RoleEnum.Cartograph)
 export class UsersController {
-  constructor(private userService: UsersService) {}
+  constructor(private usersService: UsersService) {}
+
+  @Get('export-csv/users')
+  @Header('Content-Type', 'text/csv')
+  @Header('Content-Disposition', 'attachment; filename=users.csv')
+  async exportUsersToCSV(@Res() res: Response) {
+    await this.usersService.exportToCSV(res);
+  }
+
+  @Get('export-csv/outreachers')
+  async exportOutreachersToCSV(@Res() res: Response) {
+    await this.usersService.exportOutreachersToCSV(res);
+  }
 
   @Post('')
   create(@Body() dto: CreateUserDto): Promise<User> {
-    return this.userService.create(dto);
+    return this.usersService.create(dto);
   }
 
   @Get('count-by-outreacher')
   @Auth(RoleEnum.User)
   countByOutreacher(@CurrentUser() user: User): Promise<number> {
-    return this.userService.countByOutreacher(user);
+    return this.usersService.countByOutreacher(user);
   }
 
   @Get('count-by-outreachers')
   @Auth(RoleEnum.Volunteer)
   countByOutreachers(@Query('page') page: string): Promise<[{ outreacher: string; count: number }[], number]> {
-    return this.userService.countByOutreachers(+page || 1);
+    return this.usersService.countByOutreachers(+page || 1);
   }
 
   @Post('generate-outreach-link')
   @Auth(RoleEnum.User)
   generateOutreachLink(@CurrentUser() user: User): Promise<User> {
-    return this.userService.generateOutreachLink(user);
+    return this.usersService.generateOutreachLink(user);
   }
 
   @Get('find-by-outreacher/:outreacher')
   @Auth(RoleEnum.User)
   findByOutreacher(@Param('outreacher') outreacher: string): Promise<User[]> {
-    return this.userService.findByOutreacher(outreacher);
+    return this.usersService.findByOutreacher(outreacher);
   }
 
   @Get('')
   findAll(@Query('page') page: string): Promise<[User[], number]> {
-    return this.userService.findAll(+page || 1);
+    return this.usersService.findAll(+page || 1);
   }
 
   @Get('with-role/:role')
   findAdmins(@Param() role: string): Promise<User[]> {
-    return this.userService.findWithRole(role);
+    return this.usersService.findWithRole(role);
   }
 
   @Get(':id')
   findOne(@Param('id') id: string): Promise<User> {
-    return this.userService.findOne(id);
+    return this.usersService.findOne(id);
   }
 
   @Patch('update-many')
   @Auth(RoleEnum.Admin)
   updateMany(@Body() dto: { ids: string[]; data: UpdateUserDto[] }): Promise<User[]> {
-    return this.userService.updateMany(dto);
+    return this.usersService.updateMany(dto);
   }
 
   @Patch(':id')
   update(@Param('id') id: string, @Body() updateUserDto: UpdateUserDto): Promise<User> {
-    return this.userService.update(id, updateUserDto);
+    return this.usersService.update(id, updateUserDto);
   }
 
   @Post('image-profile')
@@ -94,12 +109,12 @@ export class UsersController {
     })
   )
   uploadImage(@CurrentUser() user: User, @UploadedFile() file: Express.Multer.File): Promise<User> {
-    return this.userService.uploadImage(user, file);
+    return this.usersService.uploadImage(user, file);
   }
 
   @Delete(':id')
   @Auth(RoleEnum.Admin)
   remove(@Param('id') id: string): Promise<void> {
-    return this.userService.remove(id);
+    return this.usersService.remove(id);
   }
 }

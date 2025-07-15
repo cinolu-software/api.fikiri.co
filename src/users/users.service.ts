@@ -11,6 +11,8 @@ import { User } from './entities/user.entity';
 import { RolesService } from './roles/roles.service';
 import { generateRandomPassword } from 'src/shared/utils/generate-password.fn';
 import { JwtService } from '@nestjs/jwt';
+import { format } from 'fast-csv';
+import { Response } from 'express';
 
 @Injectable()
 export class UsersService {
@@ -21,6 +23,43 @@ export class UsersService {
     private eventEmitter: EventEmitter2,
     private jwtService: JwtService
   ) {}
+
+  async exportToCSV(res: Response): Promise<void> {
+    try {
+      const users = await this.userRepository.find({
+        select: ['name', 'email', 'phone_number']
+      });
+      const csvStream = format({ headers: ['Name', 'Email', 'Phone Number'] });
+      csvStream.pipe(res);
+      users.forEach((user) => {
+        csvStream.write({ Name: user.name, Email: user.email, 'Phone Number': user.phone_number });
+      });
+      csvStream.end();
+    } catch {
+      throw new BadRequestException();
+    }
+  }
+
+  async exportOutreachersToCSV(res: Response): Promise<void> {
+    try {
+      const users = await this.userRepository
+        .createQueryBuilder('user')
+        .select(['user.outreacher'])
+        .addSelect('COUNT(user.id)', 'count')
+        .where('user.outreacher IS NOT NULL')
+        .groupBy('user.outreacher')
+        .orderBy('count', 'DESC')
+        .getRawMany();
+      const csvStream = format({ headers: ['Outreacher', 'Count'] });
+      csvStream.pipe(res);
+      users.forEach((user) => {
+        csvStream.write({ Outreacher: user['user_outreacher'], Count: user['count'] });
+      });
+      csvStream.end();
+    } catch {
+      throw new BadRequestException();
+    }
+  }
 
   async findWithRole(name: string): Promise<User[]> {
     const data = await this.userRepository.find({
