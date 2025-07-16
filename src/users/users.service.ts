@@ -1,6 +1,6 @@
 import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
 import * as fs from 'fs-extra';
-import { In, Repository } from 'typeorm';
+import { Repository, SelectQueryBuilder } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
 import { EventEmitter2 } from '@nestjs/event-emitter';
 import { CreateWithGoogleDto, SignUpDto } from '../auth/dto';
@@ -43,18 +43,12 @@ export class UsersService {
 
   async exportOutreachersToCSV(res: Response): Promise<void> {
     try {
-      const users = await this.userRepository
-        .createQueryBuilder('user')
-        .select(['user.outreacher'])
-        .addSelect('COUNT(user.id)', 'count')
-        .where('user.outreacher IS NOT NULL')
-        .groupBy('user.outreacher')
-        .orderBy('count', 'DESC')
-        .getRawMany();
-      const csvStream = format({ headers: ['Outreacher', 'Count'] });
+      const query = this.findOutreachersQuery();
+      const users = await query.getRawMany();
+      const csvStream = format({ headers: ['Nom', 'Email', 'Stat'] });
       csvStream.pipe(res);
       users.forEach((user) => {
-        csvStream.write({ Outreacher: user['user_outreacher'], Count: user['count'] });
+        csvStream.write({ Nom: user['name'], Email: user['email'], Stat: user['outreachCount'] });
       });
       csvStream.end();
     } catch {
@@ -83,10 +77,7 @@ export class UsersService {
     try {
       const popularization_link = await this.jwtService.signAsync(
         { email: dto.email },
-        {
-          expiresIn: '30d',
-          secret: process.env.JWT_SECRET
-        }
+        { expiresIn: '30d', secret: process.env.JWT_SECRET }
       );
       const password = generateRandomPassword();
       const user = await this.userRepository.save({
@@ -103,52 +94,17 @@ export class UsersService {
     }
   }
 
-  async countByOutreachers(page: number): Promise<[{ outreacher: string; count: number }[], number]> {
-    try {
-      const data = await this.userRepository
-        .createQueryBuilder('user')
-        .select(['user.outreacher'])
-        .addSelect('COUNT(user.id)', 'count')
-        .where('user.outreacher IS NOT NULL')
-        .groupBy('user.outreacher')
-        .orderBy('count', 'DESC')
-        .skip((page - 1) * 40)
-        .take(40)
-        .getRawMany();
-      const total = await this.userRepository
-        .createQueryBuilder('user')
-        .select('COUNT(DISTINCT user.outreacher)', 'outreachersCount')
-        .where('user.outreacher IS NOT NULL')
-        .getRawOne();
-      return [data, +total['outreachersCount']];
-    } catch {
-      throw new BadRequestException();
-    }
-  }
-
-  async findUsersWithOutreachCount(page = 1) {
-    const offset = (page - 1) * 40;
-    const data = await this.userRepository
-      .createQueryBuilder('user')
-      .leftJoin(User, 'referred', 'referred.outreacher = user.email')
-      .select(['user.id AS id', 'user.name AS name', 'user.email AS email', 'COUNT(referred.id) AS outreachCount'])
-      .groupBy('user.id')
-      .having('COUNT(referred.id) > 0')
-      .orderBy('outreachCount', 'DESC')
-      .offset(offset)
-      .limit(40)
+  async findUsersWithOutreachCount(page = 1): Promise<[User[], number]> {
+    const query = this.findOutreachersQuery();
+    const outreachers = query
+      .take(((page || 1) - 1) * 40)
+      .skip(40)
       .getRawMany();
-    const countResult = await this.userRepository
-      .createQueryBuilder('user')
-      .leftJoin(User, 'referred', 'referred.outreacher = user.email')
-      .select('user.id')
-      .groupBy('user.id')
-      .having('COUNT(referred.id) > 0')
-      .getCount();
-    return [data, countResult];
+    const countResult = query.getCount();
+    return await Promise.all([outreachers, countResult]);
   }
 
-  async countByOutreacher(user: User): Promise<number> {
+  async findOutreachCount(user: User): Promise<number> {
     try {
       return await this.userRepository
         .createQueryBuilder('user')
@@ -173,17 +129,6 @@ export class UsersService {
       );
       await this.userRepository.update(user.id, { outreach_link });
       return await this.findOne(user.id);
-    } catch {
-      throw new BadRequestException();
-    }
-  }
-
-  async findByOutreacher(outreacher: string): Promise<User[]> {
-    try {
-      return await this.userRepository.find({
-        where: { outreacher },
-        relations: ['roles']
-      });
     } catch {
       throw new BadRequestException();
     }
@@ -222,38 +167,6 @@ export class UsersService {
     }
   }
 
-  async findByRole(id: string): Promise<User[]> {
-    try {
-      const data = await this.userRepository.find({
-        where: { roles: { id } }
-      });
-      return data;
-    } catch {
-      throw new BadRequestException();
-    }
-  }
-
-  async updateMany(dto: { ids: string[]; data: UpdateUserDto[] }): Promise<User[]> {
-    try {
-      const users = await this.findByIds(dto.ids);
-      const updatedUsers = await Promise.all(
-        users.map(async (user, index) => {
-          delete user.password;
-          const updatedUser = await this.userRepository.save({
-            ...user,
-            ...dto.data[index],
-            organisation: { id: dto.data[index]?.organisation || user.organization?.id },
-            roles: dto.data[index].roles?.map((id) => ({ id })) || user.roles
-          });
-          return updatedUser;
-        })
-      );
-      return updatedUsers;
-    } catch {
-      throw new BadRequestException();
-    }
-  }
-
   async findOne(id: string): Promise<User> {
     try {
       const user = await this.userRepository.findOneOrFail({
@@ -262,17 +175,6 @@ export class UsersService {
       });
       const roles = user.roles.map((role) => role.name);
       return { ...user, roles } as unknown as User;
-    } catch {
-      throw new BadRequestException();
-    }
-  }
-
-  async findByIds(ids: string[]): Promise<User[]> {
-    try {
-      return await this.userRepository.find({
-        where: { id: In(ids) },
-        relations: ['roles']
-      });
     } catch {
       throw new BadRequestException();
     }
@@ -318,8 +220,7 @@ export class UsersService {
       ...dto,
       roles: [userRole]
     });
-    const user = await this.findByEmail(newUser.email);
-    return user;
+    return await this.findByEmail(newUser.email);
   }
 
   async update(id: string, dto: UpdateUserDto): Promise<User> {
@@ -395,5 +296,30 @@ export class UsersService {
     } catch {
       throw new BadRequestException();
     }
+  }
+
+  findOutreachersQuery(): SelectQueryBuilder<User> {
+    return this.userRepository
+      .createQueryBuilder('user')
+      .innerJoin(
+        (subQuery) => {
+          return subQuery
+            .select(['outreacher AS email', 'COUNT(id) AS outreachCount'])
+            .from(User, 'referred')
+            .where('outreacher IS NOT NULL')
+            .groupBy('outreacher');
+        },
+        'outreach_stats',
+        'outreach_stats.email = user.email'
+      )
+      .select([
+        'user.id AS id',
+        'user.profile AS profile',
+        'user.google_image AS google_image',
+        'user.name AS name',
+        'user.email AS email',
+        'outreach_stats.outreachCount AS outreachCount'
+      ])
+      .orderBy('outreach_stats.outreachCount', 'DESC');
   }
 }

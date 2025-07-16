@@ -46,13 +46,13 @@ export class UsersController {
 
   @Get('me/outreach-count')
   @Auth(RoleEnum.User)
-  countByOutreacher(@CurrentUser() user: User): Promise<number> {
-    return this.usersService.countByOutreacher(user);
+  findOutreachCount(@CurrentUser() user: User): Promise<number> {
+    return this.usersService.findOutreachCount(user);
   }
 
   @Get('outreachers/count')
   @Auth(RoleEnum.Volunteer)
-  countByOutreachers(@Query('page') page: string) {
+  findUsersWithOutreachCount(@Query('page') page: string): Promise<[User[], number]> {
     return this.usersService.findUsersWithOutreachCount(+page || 1);
   }
 
@@ -65,12 +65,6 @@ export class UsersController {
   @Auth(RoleEnum.User)
   generateOutreachLink(@CurrentUser() user: User): Promise<User> {
     return this.usersService.generateOutreachLink(user);
-  }
-
-  @Get('by-outreacher/:email')
-  @Auth(RoleEnum.User)
-  findByOutreacher(@Param('email') email: string): Promise<User[]> {
-    return this.usersService.findByOutreacher(email);
   }
 
   @Get()
@@ -86,12 +80,6 @@ export class UsersController {
   @Get(':id')
   findOne(@Param('id') id: string): Promise<User> {
     return this.usersService.findOne(id);
-  }
-
-  @Patch('batch')
-  @Auth(RoleEnum.Admin)
-  updateMany(@Body() dto: { ids: string[]; data: UpdateUserDto[] }): Promise<User[]> {
-    return this.usersService.updateMany(dto);
   }
 
   @Patch(':id')
