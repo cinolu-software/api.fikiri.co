@@ -79,8 +79,8 @@ export class SolutionsService {
       .leftJoinAndSelect('solution.user', 'user')
       .orderBy('solution.image', 'DESC')
       .addOrderBy('solution.updated_at', 'DESC')
-      .skip((page - 1) * 40)
-      .take(40)
+      .limit(40)
+      .offset(((page || 1) - 1) * 40)
       .getManyAndCount();
   }
 
@@ -90,8 +90,8 @@ export class SolutionsService {
       return await this.solutionRepository
         .createQueryBuilder('solution')
         .where('solution.name LIKE :query OR solution.description LIKE :query', { query: `%${query}%` })
-        .take(40)
-        .skip(((page || 1) - 1) * 40)
+        .limit(40)
+        .offset(((page || 1) - 1) * 40)
         .getManyAndCount();
     } catch {
       throw new BadRequestException();

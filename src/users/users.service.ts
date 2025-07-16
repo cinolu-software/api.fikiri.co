@@ -94,11 +94,11 @@ export class UsersService {
     }
   }
 
-  async findUsersWithOutreachCount(page = 1): Promise<[User[], number]> {
+  async findUsersWithOutreachCount(page: number = 1): Promise<[User[], number]> {
     const query = this.findOutreachersQuery();
     const outreachers = query
-      .take(((page || 1) - 1) * 40)
-      .skip(40)
+      .limit(40)
+      .offset((page - 1) * 40)
       .getRawMany();
     const countResult = query.getCount();
     return await Promise.all([outreachers, countResult]);
@@ -122,10 +122,7 @@ export class UsersService {
     try {
       const outreach_link = await this.jwtService.signAsync(
         { email: user.email },
-        {
-          expiresIn: '1y',
-          secret: process.env.JWT_SECRET
-        }
+        { expiresIn: '1y', secret: process.env.JWT_SECRET }
       );
       await this.userRepository.update(user.id, { outreach_link });
       return await this.findOne(user.id);
@@ -134,15 +131,15 @@ export class UsersService {
     }
   }
 
-  async searchBy(queryParams: SearchQueryParams): Promise<[User[], number]> {
+  async search(queryParams: SearchQueryParams): Promise<[User[], number]> {
     try {
       const { page, query } = queryParams;
       console.log('Searching for users with query:', query);
       return await this.userRepository
         .createQueryBuilder('user')
         .where('user.name LIKE :query OR user.email LIKE :query', { query: `%${query}%` })
-        .take(40)
-        .skip(((page || 1) - 1) * 40)
+        .limit(40)
+        .offset((page - 1) * 40)
         .getManyAndCount();
     } catch {
       throw new BadRequestException();

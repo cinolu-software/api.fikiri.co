@@ -58,7 +58,7 @@ export class UsersController {
 
   @Get('search')
   searchBy(@Query() params: SearchQueryParams) {
-    return this.usersService.searchBy(params);
+    return this.usersService.search(params);
   }
 
   @Post('me/outreach-link')

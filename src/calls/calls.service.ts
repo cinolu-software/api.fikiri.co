@@ -109,17 +109,14 @@ export class CallsService {
   }
 
   async findPublished(queryParams: QueryParams): Promise<[callSolution[], number]> {
-    const { page = 1 } = queryParams;
-    const take = 5;
-    const skip = (page - 1) * take;
     return await this.callRepository
       .createQueryBuilder('c')
       .leftJoinAndSelect('c.gallery', 'gallery')
       .loadRelationCountAndMap('c.solutionsCount', 'c.solutions')
       .where('c.published_at IS NOT NULL')
       .orderBy('c.published_at', 'ASC')
-      .skip(skip)
-      .take(take)
+      .limit(5)
+      .offset(((queryParams.page || 1) - 1) * 5)
       .getManyAndCount();
   }
 
