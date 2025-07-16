@@ -11,6 +11,7 @@ import * as fs from 'fs-extra';
 import { QueryParams } from '../utils/types/query-params.type';
 import { ESatus } from '../utils/enums/status.enum';
 import slugify from 'slugify';
+import { SearchQueryParams } from '../utils/types/search-query-params.type';
 
 @Injectable()
 export class SolutionsService {
@@ -81,6 +82,20 @@ export class SolutionsService {
       .skip((page - 1) * 40)
       .take(40)
       .getManyAndCount();
+  }
+
+  async searchBy(queryParams: SearchQueryParams): Promise<[Solution[], number]> {
+    try {
+      const { page, query } = queryParams;
+      return await this.solutionRepository
+        .createQueryBuilder('solution')
+        .where('solution.name LIKE :query OR solution.description LIKE :query', { query: `%${query}%` })
+        .take(40)
+        .skip(((page || 1) - 1) * 40)
+        .getManyAndCount();
+    } catch {
+      throw new BadRequestException();
+    }
   }
 
   async updateSchema(): Promise<void> {

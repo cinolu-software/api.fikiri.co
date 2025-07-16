@@ -22,24 +22,31 @@ import { FileInterceptor } from '@nestjs/platform-express';
 import { diskStorage } from 'multer';
 import { v4 as uuidv4 } from 'uuid';
 import { QueryParams } from '../utils/types/query-params.type';
+import { SearchQueryParams } from '../utils/types/search-query-params.type';
 
 @Controller('solutions')
 @Auth(RoleEnum.User)
 export class SolutionsController {
-  constructor(private readonly solutionsService: SolutionsService) {}
+  constructor(private solutionsService: SolutionsService) {}
 
   @Post()
   create(@CurrentUser() user: User, @Body() dto: CreateSolutionDto): Promise<Solution> {
     return this.solutionsService.create(user, dto);
   }
 
-  @Get('update-schema')
+  @Get('schema/update')
   @Auth(RoleEnum.Guest)
   updateSchema(): Promise<void> {
     return this.solutionsService.updateSchema();
   }
 
-  @Get('find-awards')
+  @Get('search')
+  @Auth(RoleEnum.Guest)
+  search(@Query() queryParams: SearchQueryParams): Promise<[Solution[], number]> {
+    return this.solutionsService.searchBy(queryParams);
+  }
+
+  @Get('awards')
   @Auth(RoleEnum.Guest)
   findAwards(): Promise<Solution[]> {
     return this.solutionsService.findAwards();
@@ -51,15 +58,13 @@ export class SolutionsController {
     return this.solutionsService.findMapped(queryParams);
   }
 
-  @Post('image-profile/:id')
+  @Post(':id/image')
   @Auth(RoleEnum.User)
   @UseInterceptors(
     FileInterceptor('thumb', {
       storage: diskStorage({
         destination: './uploads/solutions',
-        filename: function (_req, file, cb) {
-          cb(null, `${uuidv4()}.${file.mimetype.split('/')[1]}`);
-        }
+        filename: (_req, file, cb) => cb(null, `${uuidv4()}.${file.mimetype.split('/')[1]}`)
       })
     })
   )
@@ -67,7 +72,7 @@ export class SolutionsController {
     return this.solutionsService.uploadImage(id, file);
   }
 
-  @Get('reviewer/:token')
+  @Get('by-reviewer/:token')
   @Auth(RoleEnum.Guest)
   findByReviewer(@Param('token') token: string) {
     return this.solutionsService.findByReviewer(token);
@@ -80,7 +85,7 @@ export class SolutionsController {
   }
 
   @Get('call/:id')
-  @Auth(RoleEnum.Cartograph)
+  @Auth(RoleEnum.Cartographer)
   findByCall(@Param('id') id: string) {
     return this.solutionsService.findByCall(id);
   }
@@ -91,7 +96,7 @@ export class SolutionsController {
     return this.solutionsService.findAll(+page || 1);
   }
 
-  @Get('find-by-slug/:slug')
+  @Get('slug/:slug')
   @Auth(RoleEnum.Guest)
   findBySlug(@Param('slug') slug: string): Promise<Solution> {
     return this.solutionsService.findBySlug(slug);

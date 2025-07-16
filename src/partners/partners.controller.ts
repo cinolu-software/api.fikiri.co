@@ -10,7 +10,7 @@ import { Auth } from '../shared/decorators/auth.decorators';
 import { RoleEnum } from '../shared/enums/roles.enum';
 
 @Controller('partners')
-@Auth(RoleEnum.Cartograph)
+@Auth(RoleEnum.Cartographer)
 export class PartnersController {
   constructor(private readonly partnersService: PartnersService) {}
 

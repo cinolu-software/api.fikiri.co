@@ -26,7 +26,7 @@ import { IReviewer } from './utils/types/reviewer.type';
 import { IForm } from './utils/types/form.type';
 
 @Controller('calls')
-@Auth(RoleEnum.Cartograph)
+@Auth(RoleEnum.Cartographer)
 export class CallsController {
   constructor(private readonly callsService: CallsService) {}
 

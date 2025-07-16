@@ -12,7 +12,7 @@ export class GaleriesController {
   constructor(private readonly galeriesService: GalleriesService) {}
 
   @Post(':id')
-  @Auth(RoleEnum.Cartograph)
+  @Auth(RoleEnum.Cartographer)
   @UseInterceptors(
     FilesInterceptor('thumbs', 5, {
       storage: diskStorage({
@@ -28,7 +28,7 @@ export class GaleriesController {
   }
 
   @Delete(':id')
-  @Auth(RoleEnum.Cartograph)
+  @Auth(RoleEnum.Cartographer)
   deleteImage(@Param('id') id: string): Promise<void> {
     return this.galeriesService.deleteImage(id);
   }

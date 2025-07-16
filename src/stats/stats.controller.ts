@@ -5,7 +5,7 @@ import { RoleEnum } from 'src/shared/enums/roles.enum';
 import { IAdminStats } from './utils/types/admin.type';
 
 @Controller('stats')
-@Auth(RoleEnum.Cartograph)
+@Auth(RoleEnum.Cartographer)
 export class StatsController {
   constructor(private readonly statsService: StatsService) {}
 

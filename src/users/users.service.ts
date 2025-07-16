@@ -13,6 +13,7 @@ import { generateRandomPassword } from 'src/shared/utils/generate-password.fn';
 import { JwtService } from '@nestjs/jwt';
 import { format } from 'fast-csv';
 import { Response } from 'express';
+import { SearchQueryParams } from './utils/types/search-query-params.type';
 
 @Injectable()
 export class UsersService {
@@ -72,8 +73,8 @@ export class UsersService {
   async findAll(page: number): Promise<[User[], number]> {
     return await this.userRepository.findAndCount({
       relations: ['roles'],
-      skip: (page - 1) * 30,
-      take: 30,
+      skip: (page - 1) * 40,
+      take: 40,
       order: { updated_at: 'DESC' }
     });
   }
@@ -125,6 +126,28 @@ export class UsersService {
     }
   }
 
+  async findUsersWithOutreachCount(page = 1) {
+    const offset = (page - 1) * 40;
+    const data = await this.userRepository
+      .createQueryBuilder('user')
+      .leftJoin(User, 'referred', 'referred.outreacher = user.email')
+      .select(['user.id AS id', 'user.name AS name', 'user.email AS email', 'COUNT(referred.id) AS outreachCount'])
+      .groupBy('user.id')
+      .having('COUNT(referred.id) > 0')
+      .orderBy('outreachCount', 'DESC')
+      .offset(offset)
+      .limit(40)
+      .getRawMany();
+    const countResult = await this.userRepository
+      .createQueryBuilder('user')
+      .leftJoin(User, 'referred', 'referred.outreacher = user.email')
+      .select('user.id')
+      .groupBy('user.id')
+      .having('COUNT(referred.id) > 0')
+      .getCount();
+    return [data, countResult];
+  }
+
   async countByOutreacher(user: User): Promise<number> {
     try {
       return await this.userRepository
@@ -161,6 +184,21 @@ export class UsersService {
         where: { outreacher },
         relations: ['roles']
       });
+    } catch {
+      throw new BadRequestException();
+    }
+  }
+
+  async searchBy(queryParams: SearchQueryParams): Promise<[User[], number]> {
+    try {
+      const { page, query } = queryParams;
+      console.log('Searching for users with query:', query);
+      return await this.userRepository
+        .createQueryBuilder('user')
+        .where('user.name LIKE :query OR user.email LIKE :query', { query: `%${query}%` })
+        .take(40)
+        .skip(((page || 1) - 1) * 40)
+        .getManyAndCount();
     } catch {
       throw new BadRequestException();
     }

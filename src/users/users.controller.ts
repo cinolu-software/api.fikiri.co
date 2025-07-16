@@ -22,58 +22,64 @@ import { RoleEnum } from '../shared/enums/roles.enum';
 import { UsersService } from './users.service';
 import CreateUserDto from './dto/create-user.dto';
 import { Response } from 'express';
+import { SearchQueryParams } from './utils/types/search-query-params.type';
 
 @Controller('users')
-@Auth(RoleEnum.Cartograph)
+@Auth(RoleEnum.Cartographer)
 export class UsersController {
   constructor(private usersService: UsersService) {}
 
-  @Get('export-csv/all')
-  async exportUsersToCSV(@Res() res: Response) {
+  @Get('export/csv')
+  async exportAllToCSV(@Res() res: Response) {
     await this.usersService.exportToCSV(res);
   }
 
-  @Get('export-csv/outreachers')
+  @Get('export/csv/outreachers')
   async exportOutreachersToCSV(@Res() res: Response) {
     await this.usersService.exportOutreachersToCSV(res);
   }
 
-  @Post('')
+  @Post()
   create(@Body() dto: CreateUserDto): Promise<User> {
     return this.usersService.create(dto);
   }
 
-  @Get('count-by-outreacher')
+  @Get('me/outreach-count')
   @Auth(RoleEnum.User)
   countByOutreacher(@CurrentUser() user: User): Promise<number> {
     return this.usersService.countByOutreacher(user);
   }
 
-  @Get('count-by-outreachers')
+  @Get('outreachers/count')
   @Auth(RoleEnum.Volunteer)
-  countByOutreachers(@Query('page') page: string): Promise<[{ outreacher: string; count: number }[], number]> {
-    return this.usersService.countByOutreachers(+page || 1);
+  countByOutreachers(@Query('page') page: string) {
+    return this.usersService.findUsersWithOutreachCount(+page || 1);
   }
 
-  @Post('generate-outreach-link')
+  @Get('search')
+  searchBy(@Query() params: SearchQueryParams) {
+    return this.usersService.searchBy(params);
+  }
+
+  @Post('me/outreach-link')
   @Auth(RoleEnum.User)
   generateOutreachLink(@CurrentUser() user: User): Promise<User> {
     return this.usersService.generateOutreachLink(user);
   }
 
-  @Get('find-by-outreacher/:outreacher')
+  @Get('by-outreacher/:email')
   @Auth(RoleEnum.User)
-  findByOutreacher(@Param('outreacher') outreacher: string): Promise<User[]> {
-    return this.usersService.findByOutreacher(outreacher);
+  findByOutreacher(@Param('email') email: string): Promise<User[]> {
+    return this.usersService.findByOutreacher(email);
   }
 
-  @Get('')
+  @Get()
   findAll(@Query('page') page: string): Promise<[User[], number]> {
     return this.usersService.findAll(+page || 1);
   }
 
-  @Get('with-role/:role')
-  findAdmins(@Param() role: string): Promise<User[]> {
+  @Get('role/:role')
+  findByRole(@Param('role') role: string): Promise<User[]> {
     return this.usersService.findWithRole(role);
   }
 
@@ -82,7 +88,7 @@ export class UsersController {
     return this.usersService.findOne(id);
   }
 
-  @Patch('update-many')
+  @Patch('batch')
   @Auth(RoleEnum.Admin)
   updateMany(@Body() dto: { ids: string[]; data: UpdateUserDto[] }): Promise<User[]> {
     return this.usersService.updateMany(dto);
@@ -93,15 +99,13 @@ export class UsersController {
     return this.usersService.update(id, updateUserDto);
   }
 
-  @Post('image-profile')
+  @Post('me/profile-image')
   @Auth(RoleEnum.User)
   @UseInterceptors(
     FileInterceptor('thumb', {
       storage: diskStorage({
         destination: './uploads/profiles',
-        filename: function (_req, file, cb) {
-          cb(null, `${uuidv4()}.${file.mimetype.split('/')[1]}`);
-        }
+        filename: (_req, file, cb) => cb(null, `${uuidv4()}.${file.mimetype.split('/')[1]}`)
       })
     })
   )
