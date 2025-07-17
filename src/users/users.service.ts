@@ -133,8 +133,7 @@ export class UsersService {
 
   async search(queryParams: SearchQueryParams): Promise<[User[], number]> {
     try {
-      const { page, query } = queryParams;
-      console.log('Searching for users with query:', query);
+      const { page = 1, query } = queryParams;
       return await this.userRepository
         .createQueryBuilder('user')
         .where('user.name LIKE :query OR user.email LIKE :query', { query: `%${query}%` })
