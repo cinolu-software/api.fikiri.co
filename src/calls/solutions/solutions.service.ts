@@ -84,14 +84,14 @@ export class SolutionsService {
       .getManyAndCount();
   }
 
-  async searchBy(queryParams: SearchQueryParams): Promise<[Solution[], number]> {
+  async search(queryParams: SearchQueryParams): Promise<[Solution[], number]> {
     try {
-      const { page, query } = queryParams;
+      const { page = 1, query } = queryParams;
       return await this.solutionRepository
         .createQueryBuilder('solution')
         .where('solution.name LIKE :query OR solution.description LIKE :query', { query: `%${query}%` })
         .limit(40)
-        .offset(((page || 1) - 1) * 40)
+        .offset((page - 1) * 40)
         .getManyAndCount();
     } catch {
       throw new BadRequestException();
