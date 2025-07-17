@@ -22,7 +22,7 @@ import { RoleEnum } from '../shared/enums/roles.enum';
 import { UsersService } from './users.service';
 import CreateUserDto from './dto/create-user.dto';
 import { Response } from 'express';
-import { SearchQueryParams } from './utils/types/search-query-params.type';
+import { QueryParams } from './utils/types/query-params.type';
 
 @Controller('users')
 @Auth(RoleEnum.Cartographer)
@@ -52,13 +52,8 @@ export class UsersController {
 
   @Get('outreachers/count')
   @Auth(RoleEnum.Volunteer)
-  findUsersWithOutreachCount(@Query('page') page: string): Promise<[User[], number]> {
-    return this.usersService.findUsersWithOutreachCount(+page || 1);
-  }
-
-  @Get('search')
-  searchBy(@Query() params: SearchQueryParams) {
-    return this.usersService.search(params);
+  findUsersWithOutreachCount(@Query() queryParams: QueryParams): Promise<[User[], number]> {
+    return this.usersService.findUsersWithOutreachCount(queryParams);
   }
 
   @Post('me/outreach-link')
@@ -68,8 +63,8 @@ export class UsersController {
   }
 
   @Get()
-  findAll(@Query('page') page: string): Promise<[User[], number]> {
-    return this.usersService.findAll(+page || 1);
+  findAll(@Query() queryParams: QueryParams): Promise<[User[], number]> {
+    return this.usersService.findAll(queryParams);
   }
 
   @Get('role/:role')

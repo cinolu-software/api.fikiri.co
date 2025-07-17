@@ -22,7 +22,6 @@ import { FileInterceptor } from '@nestjs/platform-express';
 import { diskStorage } from 'multer';
 import { v4 as uuidv4 } from 'uuid';
 import { QueryParams } from '../utils/types/query-params.type';
-import { SearchQueryParams } from '../utils/types/search-query-params.type';
 
 @Controller('solutions')
 @Auth(RoleEnum.User)
@@ -38,12 +37,6 @@ export class SolutionsController {
   @Auth(RoleEnum.Guest)
   updateSchema(): Promise<void> {
     return this.solutionsService.updateSchema();
-  }
-
-  @Get('search')
-  @Auth(RoleEnum.Guest)
-  search(@Query() queryParams: SearchQueryParams): Promise<[Solution[], number]> {
-    return this.solutionsService.searchBy(queryParams);
   }
 
   @Get('awards')
@@ -92,8 +85,8 @@ export class SolutionsController {
 
   @Get()
   @Auth(RoleEnum.Guest)
-  findAll(@Query('page') page: string): Promise<[Solution[], number]> {
-    return this.solutionsService.findAll(+page || 1);
+  findAll(@Query() queryParams: QueryParams): Promise<[Solution[], number]> {
+    return this.solutionsService.findAll(queryParams);
   }
 
   @Get('slug/:slug')

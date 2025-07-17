@@ -11,7 +11,6 @@ import * as fs from 'fs-extra';
 import { QueryParams } from '../utils/types/query-params.type';
 import { ESatus } from '../utils/enums/status.enum';
 import slugify from 'slugify';
-import { SearchQueryParams } from '../utils/types/search-query-params.type';
 
 @Injectable()
 export class SolutionsService {
@@ -73,29 +72,18 @@ export class SolutionsService {
     }
   }
 
-  async findAll(page: number): Promise<[Solution[], number]> {
-    return await this.solutionRepository
+  async findAll(queryParams: QueryParams): Promise<[Solution[], number]> {
+    const { page = 1, q } = queryParams;
+    const query = this.solutionRepository
       .createQueryBuilder('solution')
       .leftJoinAndSelect('solution.user', 'user')
       .orderBy('solution.image', 'DESC')
-      .addOrderBy('solution.updated_at', 'DESC')
+      .addOrderBy('solution.updated_at', 'DESC');
+    if (q) query.where('solution.name LIKE :q OR solution.description LIKE :q', { q: `%${q}%` });
+    return await query
       .limit(40)
-      .offset(((page || 1) - 1) * 40)
+      .offset((page - 1) * 40)
       .getManyAndCount();
-  }
-
-  async search(queryParams: SearchQueryParams): Promise<[Solution[], number]> {
-    try {
-      const { page = 1, query } = queryParams;
-      return await this.solutionRepository
-        .createQueryBuilder('solution')
-        .where('solution.name LIKE :query OR solution.description LIKE :query', { query: `%${query}%` })
-        .limit(40)
-        .offset((page - 1) * 40)
-        .getManyAndCount();
-    } catch {
-      throw new BadRequestException();
-    }
   }
 
   async updateSchema(): Promise<void> {

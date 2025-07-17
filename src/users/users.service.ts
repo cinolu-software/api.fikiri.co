@@ -13,7 +13,7 @@ import { generateRandomPassword } from 'src/shared/utils/generate-password.fn';
 import { JwtService } from '@nestjs/jwt';
 import { format } from 'fast-csv';
 import { Response } from 'express';
-import { SearchQueryParams } from './utils/types/search-query-params.type';
+import { QueryParams } from './utils/types/query-params.type';
 
 @Injectable()
 export class UsersService {
@@ -43,7 +43,7 @@ export class UsersService {
 
   async exportOutreachersToCSV(res: Response): Promise<void> {
     try {
-      const query = this.findOutreachersQuery();
+      const query = this.findOutreachersQuery(null);
       const users = await query.getRawMany();
       const csvStream = format({ headers: ['Nom', 'Email', 'Stat'] });
       csvStream.pipe(res);
@@ -64,13 +64,17 @@ export class UsersService {
     return data;
   }
 
-  async findAll(page: number): Promise<[User[], number]> {
-    return await this.userRepository.findAndCount({
-      relations: ['roles'],
-      skip: (page - 1) * 40,
-      take: 40,
-      order: { updated_at: 'DESC' }
-    });
+  async findAll(queryParams: QueryParams): Promise<[User[], number]> {
+    const { page = 1, q } = queryParams;
+    const query = this.userRepository
+      .createQueryBuilder('user')
+      .leftJoinAndSelect('user.roles', 'roles')
+      .orderBy('user.updated_at', 'DESC');
+    if (q) query.where('user.name LIKE :q OR user.email LIKE :q', { q: `%${q}%` });
+    return await query
+      .skip((page - 1) * 40)
+      .take(40)
+      .getManyAndCount();
   }
 
   async create(dto: CreateUserDto): Promise<User> {
@@ -94,8 +98,9 @@ export class UsersService {
     }
   }
 
-  async findUsersWithOutreachCount(page: number = 1): Promise<[User[], number]> {
-    const query = this.findOutreachersQuery();
+  async findUsersWithOutreachCount(queryParams: QueryParams): Promise<[User[], number]> {
+    const { page = 1, q } = queryParams;
+    const query = this.findOutreachersQuery(q);
     const outreachers = query
       .limit(40)
       .offset((page - 1) * 40)
@@ -126,20 +131,6 @@ export class UsersService {
       );
       await this.userRepository.update(user.id, { outreach_link });
       return await this.findOne(user.id);
-    } catch {
-      throw new BadRequestException();
-    }
-  }
-
-  async search(queryParams: SearchQueryParams): Promise<[User[], number]> {
-    try {
-      const { page = 1, query } = queryParams;
-      return await this.userRepository
-        .createQueryBuilder('user')
-        .where('user.name LIKE :query OR user.email LIKE :query', { query: `%${query}%` })
-        .limit(40)
-        .offset((page - 1) * 40)
-        .getManyAndCount();
     } catch {
       throw new BadRequestException();
     }
@@ -294,16 +285,18 @@ export class UsersService {
     }
   }
 
-  findOutreachersQuery(): SelectQueryBuilder<User> {
+  findOutreachersQuery(q: string | null): SelectQueryBuilder<User> {
     return this.userRepository
       .createQueryBuilder('user')
       .innerJoin(
         (subQuery) => {
-          return subQuery
+          const sb = subQuery
             .select(['outreacher AS email', 'COUNT(id) AS outreachCount'])
             .from(User, 'referred')
             .where('outreacher IS NOT NULL')
             .groupBy('outreacher');
+          if (q) sb.andWhere('referred.name LIKE :q OR referred.email LIKE :q', { q: `%${q}%` });
+          return sb;
         },
         'outreach_stats',
         'outreach_stats.email = user.email'
