@@ -8,7 +8,8 @@ import {
   Delete,
   UploadedFile,
   UseInterceptors,
-  Query
+  Query,
+  Res
 } from '@nestjs/common';
 import { SolutionsService } from './solutions.service';
 import { CreateSolutionDto } from './dto/create-solution.dto';
@@ -22,6 +23,7 @@ import { FileInterceptor } from '@nestjs/platform-express';
 import { diskStorage } from 'multer';
 import { v4 as uuidv4 } from 'uuid';
 import { QueryParams } from '../utils/types/query-params.type';
+import { Response } from 'express';
 
 @Controller('solutions')
 @Auth(RoleEnum.User)
@@ -31,6 +33,12 @@ export class SolutionsController {
   @Post()
   create(@CurrentUser() user: User, @Body() dto: CreateSolutionDto): Promise<Solution> {
     return this.solutionsService.create(user, dto);
+  }
+
+  @Get('export/csv')
+  @Auth(RoleEnum.Guest)
+  exportAllToCSV(@Query() queryParams: QueryParams, @Res() res: Response): Promise<void> {
+    return this.solutionsService.exportAllToCSV(queryParams, res);
   }
 
   @Get('schema/update')

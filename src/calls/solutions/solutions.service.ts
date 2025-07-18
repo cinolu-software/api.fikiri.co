@@ -11,6 +11,8 @@ import * as fs from 'fs-extra';
 import { QueryParams } from '../utils/types/query-params.type';
 import { ESatus } from '../utils/enums/status.enum';
 import slugify from 'slugify';
+import { format } from 'fast-csv';
+import { Response } from 'express';
 
 @Injectable()
 export class SolutionsService {
@@ -45,15 +47,17 @@ export class SolutionsService {
 
   async findMapped(queryParams: QueryParams): Promise<[Solution[], number]> {
     try {
-      const page = queryParams.page || 1;
-      const take = 12;
-      return await this.solutionRepository.findAndCount({
-        where: { status: ESatus.MAPPED },
-        relations: ['user'],
-        order: { updated_at: 'DESC' },
-        skip: (page - 1) * take,
-        take: take
-      });
+      const { page = 1, q } = queryParams;
+      const query = this.solutionRepository
+        .createQueryBuilder('solution')
+        .leftJoinAndSelect('solution.user', 'user')
+        .where('solution.status = :status', { status: ESatus.MAPPED })
+        .orderBy('solution.updated_at', 'DESC');
+      if (q) query.andWhere('solution.name LIKE :q OR solution.description LIKE :q', { q: `%${q}%` });
+      return await query
+        .skip((+page - 1) * 12)
+        .take(12)
+        .getManyAndCount();
     } catch {
       throw new NotFoundException();
     }
@@ -72,6 +76,23 @@ export class SolutionsService {
     }
   }
 
+  async exportAllToCSV(queryParams: QueryParams, res: Response): Promise<void> {
+    try {
+      const { q } = queryParams;
+      const query = this.solutionRepository.createQueryBuilder('solution').orderBy('solution.created_at', 'DESC');
+      if (q) query.where('solution.name LIKE :q OR solution.description LIKE :q', { q: `%${q}%` });
+      const solutions = await query.getMany();
+      const csvStream = format({ headers: ['Nom', 'Description'] });
+      csvStream.pipe(res);
+      solutions.forEach((solution) => {
+        csvStream.write({ Nom: solution.name, Description: solution.description });
+      });
+      csvStream.end();
+    } catch {
+      throw new BadRequestException();
+    }
+  }
+
   async findAll(queryParams: QueryParams): Promise<[Solution[], number]> {
     const { page = 1, q } = queryParams;
     const query = this.solutionRepository
@@ -82,7 +103,7 @@ export class SolutionsService {
     if (q) query.where('solution.name LIKE :q OR solution.description LIKE :q', { q: `%${q}%` });
     return await query
       .limit(40)
-      .offset((page - 1) * 40)
+      .offset((+page - 1) * 40)
       .getManyAndCount();
   }
 

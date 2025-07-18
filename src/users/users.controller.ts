@@ -30,13 +30,13 @@ export class UsersController {
   constructor(private usersService: UsersService) {}
 
   @Get('export/csv')
-  async exportAllToCSV(@Res() res: Response) {
-    await this.usersService.exportToCSV(res);
+  async exportAllToCSV(@Query() queryParams: QueryParams, @Res() res: Response): Promise<void> {
+    await this.usersService.exportAllToCSV(queryParams, res);
   }
 
   @Get('export/csv/outreachers')
-  async exportOutreachersToCSV(@Res() res: Response) {
-    await this.usersService.exportOutreachersToCSV(res);
+  async exportOutreachersToCSV(@Query() queryParams: QueryParams, @Res() res: Response): Promise<void> {
+    await this.usersService.exportOutreachersToCSV(queryParams, res);
   }
 
   @Post()

@@ -8,7 +8,8 @@ import {
   Delete,
   UploadedFile,
   UseInterceptors,
-  Query
+  Query,
+  Res
 } from '@nestjs/common';
 import { CallsService } from './calls.service';
 import { CreateCallDto } from './dto/create-call.dto';
@@ -24,6 +25,7 @@ import { diskStorage } from 'multer';
 import { QueryParams } from './utils/types/query-params.type';
 import { IReviewer } from './utils/types/reviewer.type';
 import { IForm } from './utils/types/form.type';
+import { Response } from 'express';
 
 @Controller('calls')
 @Auth(RoleEnum.Cartographer)
@@ -35,15 +37,19 @@ export class CallsController {
     return this.callsService.create(author, dto);
   }
 
+  @Get('export/csv')
+  async exportAllToCSV(@Query() queryParams: QueryParams, @Res() res: Response): Promise<void> {
+    await this.callsService.exportAllToCSV(queryParams, res);
+  }
+
+  @Get()
+  findAll(@Query() queryParams: QueryParams): Promise<[callSolution[], number]> {
+    return this.callsService.findAll(queryParams);
+  }
+
   @Post('awards/:id')
   awards(@Param('id') id: string, @Body('solutionsIds') solutionsIds: string[]): Promise<callSolution> {
     return this.callsService.awards(id, solutionsIds);
-  }
-
-  @Get('find-unpublished')
-  @Auth(RoleEnum.Guest)
-  findUnpublished(@Query() queryParams: QueryParams): Promise<[callSolution[], number]> {
-    return this.callsService.findUnpublished(queryParams);
   }
 
   @Get('find-published')
@@ -129,12 +135,6 @@ export class CallsController {
   @Post('publish/:id')
   publish(@CurrentUser() publisher: User, @Param('id') id: string): Promise<callSolution> {
     return this.callsService.publish(publisher, id);
-  }
-
-  @Get()
-  @Auth(RoleEnum.Guest)
-  findAll(@Query('page') page: string): Promise<[callSolution[], number]> {
-    return this.callsService.findAll(+page || 1);
   }
 
   @Get('find-by-slug/:slug')

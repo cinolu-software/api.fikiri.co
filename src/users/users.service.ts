@@ -25,11 +25,15 @@ export class UsersService {
     private jwtService: JwtService
   ) {}
 
-  async exportToCSV(res: Response): Promise<void> {
+  async exportAllToCSV(queryParams: QueryParams, res: Response): Promise<void> {
     try {
-      const users = await this.userRepository.find({
-        select: ['name', 'email', 'phone_number']
-      });
+      const { q } = queryParams;
+      const query = this.userRepository
+        .createQueryBuilder('user')
+        .select(['user.name', 'user.email', 'user.phone_number'])
+        .orderBy('user.updated_at', 'DESC');
+      if (q) query.where('user.name LIKE :q OR user.email LIKE :q', { q: `%${q}%` });
+      const users = await query.getMany();
       const csvStream = format({ headers: ['Name', 'Email', 'Phone Number'] });
       csvStream.pipe(res);
       users.forEach((user) => {
@@ -41,9 +45,9 @@ export class UsersService {
     }
   }
 
-  async exportOutreachersToCSV(res: Response): Promise<void> {
+  async exportOutreachersToCSV(queryParams: QueryParams, res: Response): Promise<void> {
     try {
-      const query = this.findOutreachersQuery(null);
+      const query = this.findOutreachersQuery(queryParams.q);
       const users = await query.getRawMany();
       const csvStream = format({ headers: ['Nom', 'Email', 'Stat'] });
       csvStream.pipe(res);
@@ -72,7 +76,7 @@ export class UsersService {
       .orderBy('user.updated_at', 'DESC');
     if (q) query.where('user.name LIKE :q OR user.email LIKE :q', { q: `%${q}%` });
     return await query
-      .skip((page - 1) * 40)
+      .skip((+page - 1) * 40)
       .take(40)
       .getManyAndCount();
   }
@@ -103,7 +107,7 @@ export class UsersService {
     const query = this.findOutreachersQuery(q);
     const outreachers = query
       .limit(40)
-      .offset((page - 1) * 40)
+      .offset((+page - 1) * 40)
       .getRawMany();
     const countResult = query.getCount();
     return await Promise.all([outreachers, countResult]);
@@ -286,17 +290,15 @@ export class UsersService {
   }
 
   findOutreachersQuery(q: string | null): SelectQueryBuilder<User> {
-    return this.userRepository
+    const query = this.userRepository
       .createQueryBuilder('user')
       .innerJoin(
         (subQuery) => {
-          const sb = subQuery
+          return subQuery
             .select(['outreacher AS email', 'COUNT(id) AS outreachCount'])
             .from(User, 'referred')
             .where('outreacher IS NOT NULL')
             .groupBy('outreacher');
-          if (q) sb.andWhere('referred.name LIKE :q OR referred.email LIKE :q', { q: `%${q}%` });
-          return sb;
         },
         'outreach_stats',
         'outreach_stats.email = user.email'
@@ -308,7 +310,8 @@ export class UsersService {
         'user.name AS name',
         'user.email AS email',
         'outreach_stats.outreachCount AS outreachCount'
-      ])
-      .orderBy('outreach_stats.outreachCount', 'DESC');
+      ]);
+    if (q) query.andWhere('user.name LIKE :q OR user.email LIKE :q', { q: `%${q}%` });
+    return query.orderBy('outreach_stats.outreachCount', 'DESC');
   }
 }

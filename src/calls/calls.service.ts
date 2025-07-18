@@ -3,7 +3,7 @@ import { CreateCallDto } from './dto/create-call.dto';
 import { UpdateCallDto } from './dto/update-call.dto';
 import { InjectRepository } from '@nestjs/typeorm';
 import { callSolution } from './entities/call.entity';
-import { IsNull, LessThanOrEqual, Repository } from 'typeorm';
+import { LessThanOrEqual, Repository } from 'typeorm';
 import { User } from '../users/entities/user.entity';
 import * as fs from 'fs-extra';
 import { JwtService } from '@nestjs/jwt';
@@ -12,6 +12,8 @@ import { EventEmitter2 } from '@nestjs/event-emitter';
 import { SolutionsService } from './solutions/solutions.service';
 import { IReviewer } from './utils/types/reviewer.type';
 import { IForm } from './utils/types/form.type';
+import { format } from 'fast-csv';
+import { Response } from 'express';
 
 @Injectable()
 export class CallsService {
@@ -78,19 +80,6 @@ export class CallsService {
     });
   }
 
-  async findUnpublished(queryParams: QueryParams): Promise<[callSolution[], number]> {
-    const { page = 1 } = queryParams;
-    const take = 9;
-    const skip = (page - 1) * take;
-    return await this.callRepository.findAndCount({
-      where: { published_at: IsNull() },
-      order: { published_at: 'DESC' },
-      relations: ['author'],
-      take,
-      skip
-    });
-  }
-
   async findReviewForm(token: string): Promise<IForm> {
     try {
       const { id, phase } = await this.jwtService.verifyAsync(token, {
@@ -109,23 +98,48 @@ export class CallsService {
   }
 
   async findPublished(queryParams: QueryParams): Promise<[callSolution[], number]> {
-    return await this.callRepository
+    const { page = 1, q } = queryParams;
+    const query = this.callRepository
       .createQueryBuilder('c')
       .leftJoinAndSelect('c.gallery', 'gallery')
       .loadRelationCountAndMap('c.solutionsCount', 'c.solutions')
-      .where('c.published_at IS NOT NULL')
+      .where('c.published_at IS NOT NULL');
+    if (q) query.andWhere('c.title LIKE :q OR c.description LIKE :q', { q: `%${q}%` });
+    return query
       .orderBy('c.published_at', 'ASC')
       .limit(5)
-      .offset(((queryParams.page || 1) - 1) * 5)
+      .offset((+page - 1) * 5)
       .getManyAndCount();
   }
 
-  async findAll(page: number): Promise<[callSolution[], number]> {
-    return await this.callRepository.findAndCount({
-      skip: (page - 1) * 12,
-      take: 12,
-      order: { created_at: 'DESC' }
-    });
+  async findAll(queryParams: QueryParams): Promise<[callSolution[], number]> {
+    const { page = 1, q } = queryParams;
+    const query = this.callRepository
+      .createQueryBuilder('c')
+      .loadRelationCountAndMap('c.solutionsCount', 'c.solutions');
+    if (q) query.andWhere('c.title LIKE :q OR c.description LIKE :q', { q: `%${q}%` });
+    return query
+      .orderBy('c.published_at', 'ASC')
+      .limit(20)
+      .offset((+page - 1) * 20)
+      .getManyAndCount();
+  }
+
+  async exportAllToCSV(queryParams: QueryParams, res: Response): Promise<void> {
+    try {
+      const { q } = queryParams;
+      const query = this.callRepository.createQueryBuilder('call').orderBy('call.created_at', 'DESC');
+      if (q) query.where('call.name LIKE :q OR call.description LIKE :q', { q: `%${q}%` });
+      const calls = await query.getMany();
+      const csvStream = format({ headers: ['Nom', 'Description'] });
+      csvStream.pipe(res);
+      calls.forEach((call) => {
+        csvStream.write({ Nom: call.name, Description: call.description });
+      });
+      csvStream.end();
+    } catch {
+      throw new BadRequestException();
+    }
   }
 
   async addDocument(id: string, file: Express.Multer.File): Promise<callSolution> {
