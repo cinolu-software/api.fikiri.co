@@ -47,7 +47,6 @@ export class SolutionsService {
 
   async findMapped(queryParams: QueryParams): Promise<[Solution[], number]> {
     try {
-      console.log(queryParams);
       const { page = 1, q } = queryParams;
       const query = this.solutionRepository
         .createQueryBuilder('solution')
