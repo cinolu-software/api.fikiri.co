@@ -117,7 +117,7 @@ export class CallsService {
     const query = this.callRepository
       .createQueryBuilder('c')
       .loadRelationCountAndMap('c.solutionsCount', 'c.solutions');
-    if (q) query.andWhere('c.title LIKE :q OR c.description LIKE :q', { q: `%${q}%` });
+    if (q) query.andWhere('c.name LIKE :q OR c.description LIKE :q', { q: `%${q}%` });
     return query
       .orderBy('c.published_at', 'ASC')
       .limit(20)

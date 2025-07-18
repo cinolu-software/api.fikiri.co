@@ -47,14 +47,15 @@ export class SolutionsService {
 
   async findMapped(queryParams: QueryParams): Promise<[Solution[], number]> {
     try {
+      console.log(queryParams);
       const { page = 1, q } = queryParams;
       const query = this.solutionRepository
         .createQueryBuilder('solution')
         .leftJoinAndSelect('solution.user', 'user')
-        .where('solution.status = :status', { status: ESatus.MAPPED })
-        .orderBy('solution.updated_at', 'DESC');
-      if (q) query.andWhere('solution.name LIKE :q OR solution.description LIKE :q', { q: `%${q}%` });
+        .where('solution.status = :status', { status: ESatus.MAPPED });
+      if (q) query.andWhere('(solution.name LIKE :q OR solution.description LIKE :q)', { q: `%${q}%` });
       return await query
+        .orderBy('solution.updated_at', 'DESC')
         .skip((+page - 1) * 12)
         .take(12)
         .getManyAndCount();
