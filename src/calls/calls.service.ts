@@ -129,10 +129,10 @@ export class CallsService {
     try {
       const { q } = queryParams;
       const query = this.callRepository
-        .createQueryBuilder('call')
+        .createQueryBuilder('c')
         .loadRelationCountAndMap('c.solutionsCount', 'c.solutions')
-        .orderBy('call.created_at', 'DESC');
-      if (q) query.where('call.name LIKE :q OR call.description LIKE :q', { q: `%${q}%` });
+        .orderBy('c.created_at', 'DESC');
+      if (q) query.where('c.name LIKE :q OR c.description LIKE :q', { q: `%${q}%` });
       const calls = await query.getMany();
       const csvStream = format({ headers: ['Nom', 'Description', 'Solutions'] });
       csvStream.pipe(res);
