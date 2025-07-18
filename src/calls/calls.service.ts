@@ -128,13 +128,16 @@ export class CallsService {
   async exportAllToCSV(queryParams: QueryParams, res: Response): Promise<void> {
     try {
       const { q } = queryParams;
-      const query = this.callRepository.createQueryBuilder('call').orderBy('call.created_at', 'DESC');
+      const query = this.callRepository
+        .createQueryBuilder('call')
+        .loadRelationCountAndMap('c.solutionsCount', 'c.solutions')
+        .orderBy('call.created_at', 'DESC');
       if (q) query.where('call.name LIKE :q OR call.description LIKE :q', { q: `%${q}%` });
       const calls = await query.getMany();
-      const csvStream = format({ headers: ['Nom', 'Description'] });
+      const csvStream = format({ headers: ['Nom', 'Description', 'Solutions'] });
       csvStream.pipe(res);
       calls.forEach((call) => {
-        csvStream.write({ Nom: call.name, Description: call.description });
+        csvStream.write({ Nom: call.name, Description: call.description, Solutions: call['solutionsCount'] });
       });
       csvStream.end();
     } catch {
