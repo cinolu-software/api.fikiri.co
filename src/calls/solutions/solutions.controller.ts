@@ -92,7 +92,7 @@ export class SolutionsController {
   }
 
   @Get()
-  @Auth(RoleEnum.Guest)
+  @Auth(RoleEnum.Cartographer)
   findAll(@Query() queryParams: QueryParams): Promise<[Solution[], number]> {
     return this.solutionsService.findAll(queryParams);
   }
